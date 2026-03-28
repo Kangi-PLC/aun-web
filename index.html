@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阿吽 — Venture Phase Management</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a28;--surface3:#222236;
+--border:#2a2a40;--border-hover:#3a3a55;
+--text:#e8e8f0;--text-dim:#8888aa;--text-muted:#555570;
+--accent:#6c5ce7;--accent-light:#a29bfe;--accent-dim:#4a3fb0;
+--green:#00b894;--green-bg:rgba(0,184,148,0.1);
+--yellow:#fdcb6e;--yellow-bg:rgba(253,203,110,0.1);
+--red:#e17055;--red-bg:rgba(225,112,85,0.1);
+--blue:#74b9ff;--blue-bg:rgba(116,185,255,0.1);
+--orange:#e17055;--cyan:#00cec9;--cyan-bg:rgba(0,206,201,0.1);
+}
+body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.app{display:flex;height:100vh}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;position:fixed;left:-240px;z-index:100;height:100vh;transition:left .3s}
+.sidebar.open{left:0}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
+.sidebar.open~.sidebar-overlay{display:block}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:24px}
+.sidebar-logo{padding:16px 16px 12px;border-bottom:1px solid var(--border)}
+.sidebar-logo h1{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--accent-light),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar-logo span{font-size:10px;color:var(--text-muted);display:block;margin-top:2px}
+.sidebar-section{padding:14px 12px 6px;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;margin:1px 6px;border-radius:7px;cursor:pointer;transition:all .15s;font-size:12px;color:var(--text-dim);border:none;background:none;width:calc(100% - 12px);text-align:left}
+.nav-btn:hover{background:var(--surface2);color:var(--text)}
+.nav-btn.active{background:var(--accent-dim);color:#fff}
+.nav-btn .icon{width:18px;text-align:center;font-size:14px}
+.nav-btn .badge{margin-left:auto;background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;font-weight:700}
+.deal-item{display:flex;align-items:center;gap:6px;padding:6px 14px;margin:1px 6px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--text-dim);transition:all .15s}
+.deal-item:hover{background:var(--surface2);color:var(--text)}
+.deal-item.active{background:var(--surface3);color:var(--text)}
+.deal-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.deal-item .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.deal-item .ph{font-size:9px;color:var(--text-muted)}
+.add-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;margin:3px 6px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--accent-light);border:1px dashed var(--border);background:none;width:calc(100% - 12px);transition:all .15s}
+.add-btn:hover{border-color:var(--accent);background:rgba(108,92,231,0.05)}
+.topbar-title{font-size:15px;font-weight:700;flex:1}
+.btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-size:11px;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn.danger:hover{background:var(--red-bg)}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.stat .label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat .val{font-size:24px;font-weight:800}
+.stat .sub{font-size:10px;color:var(--text-dim);margin-top:3px}
+.pipeline{display:flex;gap:2px;overflow-x:auto;padding-bottom:12px}
+.pipe-col{flex:1;min-width:110px;background:var(--surface);border-radius:8px;border:1px solid var(--border)}
+.pipe-hdr{padding:10px;border-bottom:1px solid var(--border);text-align:center}
+.pipe-hdr .pn{font-size:9px;font-weight:700;letter-spacing:1px}
+.pipe-hdr .pname{font-size:10px;font-weight:600}
+.pipe-body{padding:6px;min-height:60px}
+.pipe-card{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px;margin-bottom:4px;cursor:pointer;font-size:10px;transition:all .15s}
+.pipe-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.pipe-card .cn{font-weight:600;margin-bottom:3px;font-size:11px}
+.pipe-card .co{color:var(--text-muted);font-size:9px}
+.pipe-card .bar{margin-top:4px;height:2px;background:var(--surface3);border-radius:1px;overflow:hidden}
+.pipe-card .bar-fill{height:100%;border-radius:1px}
+.timeline{display:flex;gap:0;margin-bottom:24px;overflow-x:auto;padding-bottom:6px}
+.tstep{flex:1;min-width:70px;text-align:center;position:relative;cursor:pointer}
+.tstep::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:var(--border)}
+.tstep:last-child::after{display:none}
+.tstep .tdot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;position:relative;z-index:1;font-size:11px;font-weight:700}
+.tstep.done .tdot{background:var(--green);border-color:var(--green);color:#fff}
+.tstep.cur .tdot{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 3px rgba(108,92,231,0.3)}
+.tstep .tlbl{font-size:9px;color:var(--text-muted);line-height:1.2}
+.tstep.cur .tlbl{color:var(--accent-light);font-weight:600}
+.tstep.done .tlbl{color:var(--green)}
+.section{margin-bottom:24px}
+.section-title{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;color:var(--text-dim)}
+.section-desc{font-size:10px;color:var(--text-muted);margin-bottom:10px;padding:6px 10px;background:var(--surface2);border-radius:5px;border-left:3px solid}
+.badge{font-size:8px;padding:2px 5px;border-radius:3px;font-weight:700;letter-spacing:0.5px}
+.bg{background:var(--red-bg);color:var(--red)}.br{background:var(--yellow-bg);color:var(--yellow)}.bo{background:var(--blue-bg);color:var(--blue)}
+.chk{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:6px}
+.chk-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.chk-hdr .lbl{font-size:12px;flex:1;line-height:1.4}
+.chk-hdr .lbl.done{text-decoration:line-through;color:var(--text-muted)}
+.pchk{display:flex;gap:3px;flex-shrink:0}
+.pc{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer;transition:all .15s;color:var(--text-muted);background:var(--surface)}
+.pc:hover{border-color:var(--accent)}
+.pc.on{background:var(--green);border-color:var(--green);color:#fff}
+.itxt{width:100%;background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:6px 10px;color:var(--text);font-size:11px;font-family:inherit;resize:vertical;min-height:30px}
+.itxt:focus{border-color:var(--accent);outline:none}
+.subs{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;margin-top:6px}
+.sub{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:6px 8px}
+.sub label{display:block;font-size:9px;color:var(--text-muted);margin-bottom:3px;font-weight:600}
+.sub input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:11px;padding:2px 0;font-family:inherit}
+.sub input:focus{border-color:var(--accent);outline:none}
+.sub select{width:100%;background:var(--surface2,var(--surface));border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:3px 4px;font-family:inherit}
+.sub select:focus{border-color:var(--accent);outline:none}
+.sub input[type="number"]{-moz-appearance:textfield}
+.sub input[type="number"]::-webkit-inner-spin-button{opacity:1}
+.sub input[type="url"]{font-size:10px}
+.sub input[type="date"]{font-size:11px}
+.sub .input-prefix,.sub .input-suffix{font-size:10px;color:var(--text-muted);font-weight:600}
+.sub .input-prefix{margin-right:2px}
+.sub .input-suffix{margin-left:2px}
+.ks{background:rgba(225,112,85,0.05);border:1px solid rgba(225,112,85,0.2);border-radius:8px;padding:14px 16px;margin-top:16px}
+.ks-title{font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px}
+.ks-item{font-size:11px;color:var(--text-dim);padding:4px 0;line-height:1.5}
+.issue-board{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;min-height:300px}
+.issue-col{background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.issue-col-hdr{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;display:flex;justify-content:space-between}
+.issue-col-body{padding:6px;min-height:100px}
+.ic{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:6px;cursor:default;transition:border-color .15s}
+.ic:hover{border-color:var(--border-hover)}
+.ic .ic-t{font-size:12px;font-weight:600;margin-bottom:4px}
+.ic .ic-m{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--text-muted);flex-wrap:wrap}
+.ic .ic-tag{padding:1px 6px;border-radius:8px;font-size:9px}
+.ic .ic-tag.case{background:rgba(108,92,231,0.15);color:var(--accent-light)}
+.ic .ic-tag.topic{background:var(--cyan-bg);color:var(--cyan)}
+.ic .ic-btns{display:flex;gap:3px;margin-top:6px}
+.sb{padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .15s}
+.sb:hover{border-color:var(--accent)}
+.sb.s-icebox{background:var(--surface3);color:var(--text-muted);border-color:var(--text-muted)}
+.sb.s-open{background:var(--blue-bg);color:var(--blue);border-color:var(--blue)}
+.sb.s-prog{background:var(--yellow-bg);color:var(--yellow);border-color:var(--yellow)}
+.sb.s-wait{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.sb.s-done{background:var(--green-bg);color:var(--green);border-color:var(--green)}
+.ice-score{display:inline-block;padding:1px 5px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(253,203,110,0.15);color:var(--yellow)}
+.topic-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+.topic-card:hover{border-color:var(--cyan)}
+.topic-card h4{font-size:14px;margin-bottom:4px}
+.topic-card .tc-meta{font-size:11px;color:var(--text-dim)}
+.topic-status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.ts-open{background:var(--blue-bg);color:var(--blue)}
+.ts-discuss{background:var(--yellow-bg);color:var(--yellow)}
+.ts-resolved{background:var(--green-bg);color:var(--green)}
+.log-entry{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:8px}
+.log-entry .log-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.log-entry .log-text{font-size:13px;line-height:1.5}
+.log-entry .log-meta{font-size:10px;color:var(--text-muted);margin-top:6px}
+.log-entry .log-tag{padding:1px 6px;border-radius:8px;font-size:9px;margin-left:4px}
+.rm-phase{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.rm-phase h4{font-size:14px;margin-bottom:8px}
+.rm-item{font-size:12px;color:var(--text-dim);padding:3px 0;display:flex;align-items:center;gap:6px}
+.rm-item .rm-check{color:var(--green)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-bg.show{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:460px;max-width:90vw;max-height:80vh;overflow-y:auto;padding:24px}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:16px}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);outline:none}
+.fa{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 16px;font-size:11px;font-weight:600;color:var(--text-muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent-light);border-bottom-color:var(--accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.delivs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:6px}
+.deliv{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.deliv:hover{border-color:var(--accent)}
+.deliv .ds{margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--text-muted)}
+.deliv .ds.on{background:var(--green)}
+.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.list-header h2{font-size:18px;font-weight:800}
+.list-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.list-controls select{padding:5px 8px;background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11px}
+.list-controls select:focus{border-color:var(--accent);outline:none}
+.list-controls .count{font-size:10px;color:var(--text-muted)}
+.list-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;font-size:12px}
+.list-row:hover{border-color:var(--accent);transform:translateX(2px)}
+.list-row .lr-main{flex:1;min-width:0}
+.list-row .lr-title{font-weight:600;font-size:13px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-row .lr-sub{font-size:10px;color:var(--text-muted);display:flex;gap:8px;flex-wrap:wrap}
+.list-row .lr-right{display:flex;align-items:center;gap:8px;flex-shrink:0;font-size:10px;color:var(--text-muted)}
+.kb-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+.kb-card:hover{border-color:var(--accent)}
+.kb-card h4{font-size:14px;margin-bottom:4px}
+.kb-card p{font-size:11px;color:var(--text-dim)}
+.kb-detail{display:none}
+.kb-detail.show{display:block}
+.ov-section{margin-bottom:20px}
+.ov-section h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ov-list{display:grid;gap:6px}
+.ov-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;font-size:12px;cursor:pointer;transition:border-color .15s}
+.ov-row:hover{border-color:var(--accent)}
+.ov-alert{background:var(--red-bg);border-color:rgba(225,112,85,0.3)}
+.filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;font-size:11px}
+.filters select{padding:4px 8px;background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11px}
+.filters select:focus{border-color:var(--accent);outline:none}
+/* Save indicator */
+#save-indicator{font-size:10px;padding:3px 10px;border-radius:12px;transition:all .3s;white-space:nowrap}
+#save-indicator.saving{color:var(--yellow);background:var(--yellow-bg)}
+#save-indicator.saved{color:var(--green);background:var(--green-bg)}
+#save-indicator.error{color:var(--red);background:var(--red-bg)}
+/* Loading overlay */
+#loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .3s}
+#loading-overlay.hidden{opacity:0;pointer-events:none}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.view{display:none;animation:fadeIn .2s}.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* Activity feed */
+.activity-feed{max-height:400px;overflow-y:auto}
+.activity-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:11px;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.activity-text{flex:1;color:var(--text-dim)}
+.activity-time{font-size:9px;color:var(--text-muted);white-space:nowrap}
+/* Comments */
+.comment-list{max-height:300px;overflow-y:auto;margin-bottom:12px}
+.comment-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px}
+.comment-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.comment-author{font-size:11px;font-weight:600;color:var(--accent-light)}
+.comment-time{font-size:9px;color:var(--text-muted)}
+.comment-text{font-size:12px;color:var(--text-dim);line-height:1.5}
+.comment-input-row{display:flex;gap:8px;align-items:flex-end}
+.comment-input-row textarea{flex:1}
+.comment-input-row select{width:80px;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px}
+@media(max-width:768px){
+.stats{grid-template-columns:1fr 1fr}
+.pipeline{flex-direction:column}
+.pipeline .pipe-col{min-width:auto}
+.pipeline .pipe-col .pipe-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
+.pipeline .pipe-col .pipe-body{display:flex;gap:6px;overflow-x:auto;padding:6px;flex-wrap:nowrap}
+.pipeline .pipe-col .pipe-body .pipe-card{min-width:140px;flex-shrink:0;margin-bottom:0}
+.issue-board{grid-template-columns:1fr}
+.subs{grid-template-columns:1fr}
+.timeline{flex-wrap:wrap}
+.tstep{min-width:60px}
+.tstep::after{display:none}
+}
+.page-help{display:none;position:absolute;top:52px;right:16px;z-index:50;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;max-width:360px;font-size:12px;line-height:1.6;color:var(--text-dim);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.page-help.show{display:block}
+.page-help h4{font-size:13px;color:var(--text);margin-bottom:6px}
+.page-help p{margin-bottom:6px}
+.page-help .ph-tip{background:var(--surface3);border-radius:6px;padding:6px 10px;margin-top:6px;font-size:11px;color:var(--accent-light)}
+.help-btn:hover{background:var(--accent-dim)!important;color:var(--text)!important}
+/* Chip multi-select */
+.chip-select{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);transition:all .15s;user-select:none}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Tag badges */
+.tag-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:8px;font-weight:700;letter-spacing:0.3px;margin:0 1px}
+.tag-legal{background:rgba(225,112,85,0.15);color:var(--red)}
+.tag-finance{background:rgba(253,203,110,0.15);color:var(--yellow)}
+.tag-sales{background:rgba(0,184,148,0.15);color:var(--green)}
+.tag-dev{background:rgba(108,92,231,0.15);color:var(--accent-light)}
+.tag-ops{background:rgba(0,206,201,0.15);color:var(--cyan)}
+.tag-marketing{background:rgba(116,185,255,0.15);color:var(--blue)}
+.tag-strategy{background:rgba(162,155,254,0.15);color:#a29bfe}
+.tag-negotiation{background:rgba(255,159,67,0.15);color:#ff9f43}
+/* Member badge */
+.member-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:600;background:var(--surface3);color:var(--text-dim);margin:0 1px}
+/* Block reason badge */
+.block-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:8px;font-weight:600;background:var(--red-bg);color:var(--red);margin-left:4px}
+/* Category badge */
+.cat-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:600;background:rgba(108,92,231,0.12);color:var(--accent-light);margin:0 1px}
+/* Deal summary card */
+.deal-summary-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:16px}
+.dsc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.dsc-title{font-size:13px;font-weight:700;color:var(--text)}
+.dsc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.dsc-field{background:var(--surface2);border-radius:6px;padding:8px 10px}
+.dsc-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:4px}
+.dsc-value{font-size:11px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.dsc-empty{color:var(--text-muted);font-style:italic;font-size:10px}
+/* Deal badges */
+.deal-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:9px;font-weight:600;margin:0 1px}
+.deal-badge-market{background:rgba(0,206,201,0.15);color:var(--cyan)}
+.deal-badge-target{background:rgba(116,185,255,0.15);color:var(--blue)}
+.deal-badge-revenue{background:rgba(0,184,148,0.15);color:var(--green)}
+.deal-badge-resource{background:rgba(253,203,110,0.15);color:var(--yellow)}
+.deal-badge-invest{background:rgba(225,112,85,0.15);color:var(--red)}
+</style>
+
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading-overlay">
+<div class="spinner"></div>
+<div style="color:var(--accent-light);font-size:14px;font-weight:700">阿吽</div>
+<div style="color:var(--text-muted);font-size:11px;margin-top:6px">データを読み込み中...</div>
+</div>
+
+<div class="app">
+<div class="sidebar" id="sidebar">
+<div class="sidebar-logo"><h1 id="logo-title">阿吽</h1><span id="logo-sub">事業構築プラットフォーム</span></div>
+<div class="sidebar-section" id="nav-sec-main">メイン</div>
+<button class="nav-btn active" data-view="overview" onclick="go('overview')"><span class="icon">📊</span> <span class="nav-label" data-ja="全体像" data-en="Overview">全体像</span></button>
+<button class="nav-btn" data-view="cases" onclick="go('cases')"><span class="icon">🌱</span> <span class="nav-label" data-ja="新規事業" data-en="New Biz. Dev.">新規事業</span></button>
+<button class="nav-btn" data-view="topics" onclick="go('topics')"><span class="icon">💬</span> <span class="nav-label" data-ja="論点" data-en="Topics">論点</span></button>
+<button class="nav-btn" data-view="issues" onclick="go('issues')"><span class="icon">📌</span> <span class="nav-label" data-ja="課題" data-en="Issues">課題</span></button>
+<button class="nav-btn" data-view="input" onclick="go('input')"><span class="icon">🤖</span> <span class="nav-label" data-ja="入力" data-en="Input">入力</span></button>
+<div class="sidebar-section" id="nav-sec-ref" data-ja="リファレンス" data-en="REFERENCE">リファレンス</div>
+<button class="nav-btn" data-view="log" onclick="go('log')"><span class="icon">📝</span> <span class="nav-label" data-ja="決定ログ" data-en="Decision Log">決定ログ</span></button>
+<button class="nav-btn" data-view="kb" onclick="go('kb')"><span class="icon">📖</span> <span class="nav-label" data-ja="ナレッジベース" data-en="Knowledge Base">ナレッジベース</span></button>
+<button class="nav-btn" data-view="roadmap" onclick="go('roadmap')"><span class="icon">🗺️</span> <span class="nav-label" data-ja="開発ロードマップ" data-en="Dev Roadmap">開発ロードマップ</span></button>
+<div style="flex:1"></div>
+<button class="nav-btn" onclick="openModal('m-help')" style="margin:4px 6px;font-size:10px;color:var(--text-muted);justify-content:center">📖 使い方ガイド</button>
+<div style="padding:10px;border-top:1px solid var(--border);font-size:9px;color:var(--text-muted);text-align:center">阿吽 v4.1</div>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('open');this.style.display='none'"></div>
+<div class="main">
+<div class="topbar">
+<button class="btn" onclick="var sb=document.getElementById('sidebar');sb.classList.toggle('open');document.getElementById('sidebar-overlay').style.display=sb.classList.contains('open')?'block':'none'" id="menu-btn">☰</button>
+<div class="topbar-title" id="tt">Overview</div>
+<button class="btn help-btn" onclick="togglePageHelp()" id="page-help-btn" title="このページのヘルプ" style="font-size:12px;width:24px;height:24px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer">?</button>
+<div id="save-indicator"></div>
+<div id="clock" style="font-size:11px;color:var(--text-muted);font-variant-numeric:tabular-nums"></div>
+<div style="display:flex;gap:2px"><button class="btn lang-btn" onclick="setLang('jp')" id="lb-jp" style="font-size:10px;opacity:1;font-weight:700">JP</button><button class="btn lang-btn" onclick="setLang('en')" id="lb-en" style="font-size:10px;opacity:0.4">EN</button></div>
+</div>
+<div class="page-help" id="page-help"></div>
+<div class="content" onclick="var ph=document.getElementById('page-help');if(ph)ph.classList.remove('show')">
+<div class="view active" id="v-overview"></div>
+<div class="view" id="v-cases"></div>
+<div class="view" id="v-deal"></div>
+<div class="view" id="v-topics"></div>
+<div class="view" id="v-topic-detail"></div>
+<div class="view" id="v-issues"></div>
+<div class="view" id="v-input"></div>
+<div class="view" id="v-log"></div>
+<div class="view" id="v-kb"></div>
+<div class="view" id="v-roadmap"></div>
+</div>
+</div>
+</div>
+
+<!-- Modals -->
+<div class="modal-bg" id="m-deal"><div class="modal">
+<h3>新規案件</h3>
+<div class="fg"><label>案件名</label><input id="f-dn" placeholder="例: 抹茶D2Cブランド"></div>
+<div class="fg"><label>責任者</label><select id="f-do"><option>白石</option><option>中野</option><option>松崎</option></select></div>
+<div class="fg"><label>優先度</label><select id="f-dp"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
+<div class="fg"><label>完了目標日</label><input type="date" id="f-dd"></div>
+<div class="fg"><label>事業カテゴリ</label><div class="chip-select" id="f-dcat-chips"><span class="chip" data-val="M&A" onclick="toggleChip(this)">M&A</span><span class="chip" data-val="D2C" onclick="toggleChip(this)">D2C</span><span class="chip" data-val="SaaS" onclick="toggleChip(this)">SaaS</span><span class="chip" data-val="貿易" onclick="toggleChip(this)">貿易</span><span class="chip" data-val="製造" onclick="toggleChip(this)">製造</span><span class="chip" data-val="サービス" onclick="toggleChip(this)">サービス</span></div></div>
+<div class="fg"><label>市場タイプ</label><select id="f-dmt"><option value="">未選択</option><option value="既存市場">既存市場</option><option value="再セグメント市場">再セグメント市場</option><option value="新規市場">新規市場</option><option value="クローン市場">クローン市場</option></select></div>
+<div class="fg"><label>ターゲット顧客</label><div style="display:flex;gap:8px;align-items:center"><select id="f-dtt" style="width:120px"><option value="">未選択</option><option value="B2B">B2B</option><option value="B2C">B2C</option><option value="B2B2C">B2B2C</option></select><input id="f-dtd" placeholder="例: カンボジアの飲食店" style="flex:1"></div></div>
+<div class="fg"><label>収益モデル</label><div class="chip-select" id="f-drm-chips"><span class="chip" data-val="サブスクリプション" onclick="toggleChip(this)">サブスクリプション</span><span class="chip" data-val="トランザクション" onclick="toggleChip(this)">トランザクション</span><span class="chip" data-val="物販" onclick="toggleChip(this)">物販</span><span class="chip" data-val="ライセンス" onclick="toggleChip(this)">ライセンス</span><span class="chip" data-val="コミッション" onclick="toggleChip(this)">コミッション</span><span class="chip" data-val="広告" onclick="toggleChip(this)">広告</span><span class="chip" data-val="コンサル" onclick="toggleChip(this)">コンサル</span></div></div>
+<div class="fg"><label>必要リソース</label><div class="chip-select" id="f-drs-chips"><span class="chip" data-val="資金" onclick="toggleChip(this)">資金</span><span class="chip" data-val="人材" onclick="toggleChip(this)">人材</span><span class="chip" data-val="技術" onclick="toggleChip(this)">技術</span><span class="chip" data-val="許認可" onclick="toggleChip(this)">許認可</span><span class="chip" data-val="パートナー" onclick="toggleChip(this)">パートナー</span><span class="chip" data-val="設備" onclick="toggleChip(this)">設備</span></div></div>
+<div class="fg"><label>初期投資規模</label><select id="f-dis"><option value="">未選択</option><option value="$0-1K">$0-1K (ほぼゼロ)</option><option value="$1K-10K">$1K-10K (少額)</option><option value="$10K-50K">$10K-50K (中額)</option><option value="$50K-100K">$50K-100K (大額)</option><option value="$100K+">$100K+ (要大型資金)</option></select></div>
+<div class="fg"><label>想定月商</label><select id="f-dtr"><option value="">未定</option><option value="~$1K">~$1K</option><option value="$1K-5K">$1K-5K</option><option value="$5K-20K">$5K-20K</option><option value="$20K-100K">$20K-100K</option><option value="$100K+">$100K+</option></select></div>
+<div class="fg"><label>メモ</label><textarea id="f-dm" rows="2"></textarea></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-deal')">取消</button><button class="btn primary" onclick="createDeal()">作成</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-issue"><div class="modal">
+<h3 id="m-issue-title">新規Issue</h3>
+<div class="fg"><label>タイトル <span style="color:var(--red);font-size:9px">必須</span></label><input id="f-it" placeholder="何をすべきか"></div>
+<div class="fg"><label>担当者 <span style="color:var(--red);font-size:9px">必須（複数可）</span></label><div class="chip-select" id="f-ia-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip" data-val="中野" onclick="toggleChip(this)">中野</span><span class="chip" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
+<div class="fg"><label>紐付け先 <span style="color:var(--red);font-size:9px">必須</span></label><select id="f-il"></select></div>
+<div class="fg"><label>ステータス</label><select id="f-is" onchange="toggleBlockReason()"><option value="icebox">アイスボックス</option><option value="backlog" selected>バックログ</option><option value="wip">進行中</option><option value="waiting">ブロック中</option><option value="done">完了</option></select></div>
+<div class="fg" id="fg-block-reason" style="display:none"><label>ブロック理由</label><select id="f-ibr"><option value="">選択...</option><option value="外部返答待ち">外部返答待ち</option><option value="資金確保待ち">資金確保待ち</option><option value="法的確認待ち">法的確認待ち</option><option value="他タスク依存">他タスク依存</option><option value="その他">その他</option></select></div>
+<div class="fg"><label>タグ</label><div class="chip-select" id="f-itags-chips"><span class="chip" data-val="法務" onclick="toggleChip(this)">法務</span><span class="chip" data-val="財務" onclick="toggleChip(this)">財務</span><span class="chip" data-val="営業" onclick="toggleChip(this)">営業</span><span class="chip" data-val="開発" onclick="toggleChip(this)">開発</span><span class="chip" data-val="オペレーション" onclick="toggleChip(this)">オペレーション</span><span class="chip" data-val="マーケティング" onclick="toggleChip(this)">マーケティング</span><span class="chip" data-val="戦略" onclick="toggleChip(this)">戦略</span><span class="chip" data-val="外部交渉" onclick="toggleChip(this)">外部交渉</span></div></div>
+<div class="fg"><label>優先度</label><select id="f-ip"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
+<div class="fg"><label>ICE スコア <span style="font-size:9px;color:var(--text-muted)">（高い順に実行）</span></label>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+<div><label style="font-size:9px;color:var(--text-muted)">Impact (1-10)</label><input type="number" id="f-ice-i" min="1" max="10" value="5" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px"></div>
+<div><label style="font-size:9px;color:var(--text-muted)">Confidence (1-10)</label><input type="number" id="f-ice-c" min="1" max="10" value="5" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px"></div>
+<div><label style="font-size:9px;color:var(--text-muted)">Ease (1-10)</label><input type="number" id="f-ice-e" min="1" max="10" value="5" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px"></div>
+</div>
+<div id="f-ice-preview" style="text-align:right;font-size:11px;color:var(--accent-light);margin-top:4px">ICE = 125</div>
+</div>
+<div class="fg"><label>期限</label><input type="date" id="f-idd"></div>
+<div class="fg"><label>詳細</label><textarea id="f-id" rows="2"></textarea></div>
+<!-- Comments section (loaded dynamically when editing) -->
+<div id="issue-comments" style="margin-top:8px;border-top:1px solid var(--border);padding-top:12px"></div>
+<div class="fa" id="m-issue-actions"><button class="btn" onclick="closeModal('m-issue')">取消</button><button class="btn primary" onclick="createIssue()">作成</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-topic"><div class="modal">
+<h3>新規Topic（論点）</h3>
+<div class="fg"><label>論点タイトル</label><input id="f-tt" placeholder="例: 法人設立の是非"></div>
+<div class="fg"><label>ステータス</label><select id="f-ts"><option value="open">未着手</option><option value="discuss">議論中</option><option value="resolved">結論済</option></select></div>
+<div class="fg"><label>関与者</label><div class="chip-select" id="f-tmembers-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip active" data-val="中野" onclick="toggleChip(this)">中野</span><span class="chip active" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
+<div class="fg"><label>概要</label><textarea id="f-td" rows="3" placeholder="何について決める必要があるか"></textarea></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-topic')">取消</button><button class="btn primary" onclick="createTopic()">作成</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-log"><div class="modal">
+<h3>Decision Log に追加</h3>
+<div class="fg"><label>種別</label><select id="f-lt"><option value="decision">決定事項</option><option value="fact">新事実</option><option value="change">アクション変更</option></select></div>
+<div class="fg"><label>内容</label><textarea id="f-lc" rows="3" placeholder="何が決まった / 何がわかった / 何が変わったか"></textarea></div>
+<div class="fg"><label>紐付け先</label><select id="f-ll"></select></div>
+<div class="fg"><label>記録者</label><select id="f-lw"><option>白石</option><option>中野</option><option>松崎</option></select></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-log')">取消</button><button class="btn primary" onclick="createLog()">記録</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-ks"><div class="modal">
+<h3 style="color:var(--red)">⚠ キルスイッチ判定</h3>
+<div class="fg"><label>該当条件</label><textarea id="f-kc" rows="2"></textarea></div>
+<div class="fg"><label>判定</label><select id="f-kv"><option value="続行">続行</option><option value="後退">後退</option><option value="撤退">撤退</option></select></div>
+<div class="fg"><label>判定者</label><select id="f-kw"><option>全員</option><option>白石</option><option>中野</option><option>松崎</option></select></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-ks')">取消</button><button class="btn danger" onclick="logKS()">記録</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-devlog"><div class="modal">
+<h3>開発ログを追加</h3>
+<div class="fg"><label>バージョン / タグ</label><input id="f-dlv" placeholder="例: v3.0 / MVP完成"></div>
+<div class="fg"><label>内容</label><textarea id="f-dlc" rows="4" placeholder="何を作った / 何を変更した"></textarea></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-devlog')">取消</button><button class="btn primary" onclick="addDevLog()">記録</button></div>
+</div></div>
+
+<!-- Help Modal -->
+<div class="modal-bg" id="m-help"><div class="modal" style="width:560px;max-height:85vh">
+<h3>阿吽（あうん）— 使い方ガイド</h3>
+<div style="font-size:13px;line-height:1.8;color:var(--text-dim)">
+<p style="margin-bottom:16px;color:var(--text)"><strong>阿吽は、3人（白石・中野・松崎）で新規事業を立ち上げるための情報同期プラットフォームです。</strong></p>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
+<h4 style="color:var(--accent-light);margin-bottom:6px">📊 Overview（全体像）</h4>
+全ての情報を1画面で把握するダッシュボード。案件の進捗、未完了の課題、最近の決定事項が一覧で見える。
+</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
+<h4 style="color:var(--accent-light);margin-bottom:6px">🌱 New Biz. Dev.（新規事業）</h4>
+事業の種（案件）を管理する場所。各案件は9つのフェーズを順番にクリアしていく。<br>
+各フェーズには<strong style="color:var(--red)">ゲート条件（必須）</strong>と<strong style="color:var(--yellow)">把握必須項目</strong>があり、全てクリアしないと次に進めない。<br>
+<strong>白・中・松</strong>のチェックマークで誰が確認したかを記録する。
+</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
+<h4 style="color:var(--accent-light);margin-bottom:6px">💬 Topics（論点）</h4>
+案件に紐づかない、3人で決めるべきテーマを管理する場所。<br>
+ステータス：<strong style="color:var(--blue)">未着手</strong> → <strong style="color:var(--yellow)">議論中</strong> → <strong style="color:var(--green)">結論済</strong>
+</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
+<h4 style="color:var(--accent-light);margin-bottom:6px">📌 Issues（課題・タスク）</h4>
+「誰が何をいつまでにやるか」を管理する。必ず案件またはTopicに紐づく。<br><br>
+<strong style="color:var(--text)">▼ 5つのステータス</strong><br>
+<table style="width:100%;font-size:11px;margin:6px 0;border-collapse:collapse">
+<tr><td style="padding:4px 8px;color:var(--text-muted)">❄ アイスボックス</td><td style="padding:4px">いつかやる。今は動かさない</td></tr>
+<tr><td style="padding:4px 8px;color:var(--blue)">📋 バックログ</td><td style="padding:4px">やると決めた。まだ着手しない</td></tr>
+<tr><td style="padding:4px 8px;color:var(--yellow)">🔄 進行中</td><td style="padding:4px">誰かが今やっている</td></tr>
+<tr><td style="padding:4px 8px;color:var(--red)">🚧 ブロック中</td><td style="padding:4px">外部依存（取引先の返答・行政手続き等）で止まっている</td></tr>
+<tr><td style="padding:4px 8px;color:var(--green)">✅ 完了</td><td style="padding:4px">終わった</td></tr>
+</table>
+<strong style="color:var(--text)">▼ ICEスコア（優先順位の決め方）</strong><br>
+<span style="color:var(--accent-light)">I</span>mpact（影響度）× <span style="color:var(--accent-light)">C</span>onfidence（確信度）× <span style="color:var(--accent-light)">E</span>ase（容易さ）<br>
+各1〜10で評価。スコアが高い課題から順にやるのが最も合理的。<br>
+<span style="font-size:10px;color:var(--text-muted)">例: Impact 8 × Confidence 7 × Ease 9 = 504（高い→優先的に実行）</span>
+</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
+<h4 style="color:var(--text-dim);margin-bottom:6px">📝 Decision Log（決定ログ）</h4>
+3人で共有すべき重要な記録のみ。<br>
+<strong style="color:var(--green)">決定事項</strong>・<strong style="color:var(--blue)">新事実</strong>・<strong style="color:var(--yellow)">アクション変更</strong>
+</div>
+<div style="background:var(--accent-dim);border-radius:8px;padding:14px;margin-bottom:12px;color:var(--text)">
+<h4 style="margin-bottom:6px">💾 データについて</h4>
+データはGoogle Sheetsに自動保存されます。変更は自動的にクラウドに同期されるため、バックアップ不要。<br>
+<strong>複数デバイスから同じデータにアクセスできます。</strong>
+</div>
+</div>
+<div class="fa"><button class="btn primary" onclick="closeModal('m-help')">閉じる</button></div>
+</div></div>
+
+<script>
+var GAS_API = 'https://script.google.com/macros/s/AKfycbzx1Q5owOLzY9shQI3-YXrHZdc5oF6_GLSJ54ypAC4tqJ5fYVB-pfUjHsMVCOxDij0/exec';
+// ============================================================
+// PHASES — hardcoded, never stored in sheet
+// ============================================================
+var M=['白石','中野','松崎'];
+var PHASES=[
+{id:0,name:'発掘',en:'Discovery',color:'#6c5ce7',def:'案件の種を見つけて持ち帰る',cond:'ペインステートメント1文＋「なぜ俺らがやるか」の理由',team:false,
+gate:[{t:'ペインステートメント',d:'「[誰]は[どんな状況で][何に困っている]」',ph:'',f:null},{t:'解決の方向性',d:'「だから[手段で][こう解決する]」',ph:'',f:null},{t:'自分たちがやる理由',d:'構造的理由1つ以上',ph:'',f:null},{t:'市場タイプ仮判定',d:'',ph:'',f:[{n:'市場タイプ',type:'select',opts:['既存市場','再セグメント','新規市場','クローン']}]}],
+req:[{t:'ターゲット顧客像',ph:'',f:['業種','規模','役職']},{t:'顧客の現在の支払額',ph:'',f:['支出額','支払先']},{t:'競合・代替手段',ph:'',f:['競合1','競合2','代替手段']},{t:'初期リソース概算',ph:'',f:[{n:'資金',type:'currency'},{n:'人月',type:'number'},{n:'特殊スキル',type:'text'}]}],
+opt:[{t:'類似事業の成功/失敗事例',ph:'',f:[{n:'類似事例URL',type:'url'}]},{t:'市場規模推定',ph:'TAM/SAM/SOM',f:[{n:'市場規模概算',type:'select',opts:['不明','~$1M','$1M-10M','$10M-100M','$100M+']}]},{t:'既存アセット',ph:''},{t:'規制・法律面',ph:''}],
+del:['ペインステートメント','コンセプトメモ'],ks:['課題体感なし＋共感ゼロ→撤退','構造的理由なし→撤退']},
+{id:1,name:'概念設計',en:'Concept',color:'#a29bfe',def:'ビジネス概要を定性的に掴む',cond:'コンセプトメモ完成＋方向性明確',team:false,
+gate:[{t:'顧客像の明確化',d:'エバンジェリストユーザー定義',ph:'',f:['役職','業種','規模','課題認識度']},{t:'ストーリー一気通貫',d:'',ph:'エレベーターピッチ形式',f:[{n:'コンセプトメモ',type:'text'}]},{t:'市場魅力度',d:'',ph:'',f:['成長性','参入障壁','差別化']},{t:'初期チャネル仮説',d:'',ph:'',f:[{n:'想定価格帯',type:'currency'},{n:'競合数',type:'number'}]}],
+req:[{t:'顧客の日常業務フロー',ph:''},{t:'購買意思決定プロセス',ph:'',f:['使う人','選ぶ人','金を出す人']},{t:'競合の特徴・弱点',ph:''},{t:'外部依存条件',ph:'',f:['法律','インフラ','行動変化','他製品依存']}],
+opt:[{t:'知的財産の独自性',ph:''},{t:'アドバイザー候補',ph:''},{t:'展示会リスト',ph:''}],
+del:['コンセプトメモ詳細版','顧客像定義書','チャネルマップ'],ks:['課題↔解決策の論理接続不可→撤退','外部依存3年以上先→保留']},
+{id:2,name:'事業モデル',en:'Model',color:'#74b9ff',def:'定量的な数字を組み立てる',cond:'BMC完成＋暫定P/L＋価格仮説',team:false,
+gate:[{t:'BMC完成',d:'9ブロック全記入',ph:'',f:['顧客セグメント','価値提案','チャネル','顧客関係','収益','キーリソース','キーアクティビティ','キーパートナー','コスト構造']},{t:'価格仮説',d:'',ph:'',f:[{n:'暫定価格',type:'currency'},'根拠']},{t:'暫定P/L',d:'3年分',ph:'',f:[{n:'月間売上目標',type:'currency'},{n:'月間コスト',type:'currency'},{n:'想定顧客数',type:'number'},{n:'顧客単価',type:'currency'},{n:'粗利率',type:'number',suffix:'%'}]},{t:'流通チャネル設計',d:'',ph:''}],
+req:[{t:'ユニットエコノミクス仮説',ph:'',f:[{n:'LTV',type:'currency'},{n:'CAC',type:'currency'},{n:'粗利率',type:'number',suffix:'%'}]},{t:'初期投資額と調達方法',ph:'',f:[{n:'額',type:'currency'},'方法']},{t:'BEP概算',ph:''},{t:'コスト構造',ph:'',f:[{n:'固定費',type:'currency'},{n:'変動費',type:'currency'},'主要項目']}],
+opt:[{t:'TCO試算',ph:''},{t:'センシティビティ分析',ph:''},{t:'規模別シナリオ',ph:''}],
+del:['BMC','暫定P/L','価格表','チャネル図'],ks:['価値提案↔顧客の論理接続不可→撤退','投資調達不能→撤退']},
+{id:3,name:'チーム合意',en:'Alignment',color:'#00cec9',def:'3人全員でGo/No-Go判断',cond:'3人全員がGoを出す',team:true,
+gate:[{t:'事業プレゼン完成',d:'オペ計画+投資家デック+営業資料',ph:'',f:[{n:'プレゼン資料URL',type:'url'}]},{t:'全員Go判定',d:'1人でもNoなら不可',ph:''},{t:'役割分担確定',d:'',ph:'',f:['白石','中野','松崎']},{t:'初期マイルストーン合意',d:'3ヶ月以内目標',ph:''}],
+req:[{t:'リスク分析',ph:'最悪シナリオと対処法'},{t:'撤退条件の事前合意',d:'キルスイッチ事前コミット',ph:''},{t:'投資・リソース配分合意',ph:'',f:[{n:'合計',type:'currency'},{n:'白石',type:'currency'},{n:'中野',type:'currency'},{n:'松崎',type:'currency'}]},{t:'意思決定プロセス合意',ph:''}],
+opt:[{t:'外部アドバイザー意見',ph:''},{t:'法務レビュー',ph:''}],
+del:['プレゼンデック','オペ計画書','営業資料','役割分担表'],ks:['2人以上No→撤退','致命的リスク解消不能→撤退']},
+{id:4,name:'課題検証',en:'Problem',color:'#00b894',def:'課題が実在するか確認',cond:'10人ヒアリング→3人が「金を払いたい」',team:false,
+gate:[{t:'顧客インタビュー10人',d:'',ph:'',f:[{n:'ヒアリング実施数',type:'number'}]},{t:'課題実在確認3人',d:'「金を払いたい」明言',ph:'',f:[{n:'「金を払う」回答数',type:'number'}]},{t:'課題プレゼン完成',d:'',ph:'',f:[{n:'ヒアリングメモURL',type:'url'}]},{t:'顧客業務フロー図',d:'',ph:''}],
+req:[{t:'最大の苦悩',d:'Magic Wand Question',ph:''},{t:'苦悩の影響範囲',ph:'',f:['担当者','部署','全社']},{t:'苦悩の金額換算',ph:'',f:[{n:'損失額',type:'currency'},{n:'コスト',type:'currency'},'時間']},{t:'現状対処法と費用',ph:''},{t:'行動変容トリガー',ph:''},{t:'意思決定者と予算',ph:'',f:['決定者','予算所在',{n:'規模',type:'currency'}]}],
+opt:[{t:'イノベーターリスト',ph:''},{t:'アナリスト見解',ph:''}],
+del:['課題検証レポート','更新版BMC','フロー図','エバンジェリスト候補'],ks:['10人中0人→撤退','担当者レベルのみ→市場小','潜在ニーズのみ→判断']},
+{id:5,name:'製品検証',en:'Solution',color:'#55efc4',def:'MVPを作って触らせる',cond:'ユーザー5人が実際に使った',team:false,
+gate:[{t:'MVP存在',d:'紙芝居でもOK',ph:'',f:[{n:'MVP形態',type:'select',opts:['LP','プロトタイプ','手動オペ','実製品']}]},{t:'ユーザーテスト5人',d:'',ph:'',f:[{n:'テストユーザー数',type:'number'}]},{t:'製品プレゼン完成',d:'',ph:'',f:[{n:'MVP公開URL',type:'url'}]},{t:'暫定営業ロードマップ',d:'',ph:''}],
+req:[{t:'ユーザー反応分布',ph:'',f:[{n:'熱狂',type:'number'},{n:'好意的',type:'number'},{n:'無関心',type:'number'},{n:'否定的',type:'number'}]},{t:'便利vs不可欠の判定',ph:''},{t:'機能優先順位',ph:''},{t:'導入障壁',ph:'',f:['教育コスト','インフラ','組織変更']}],
+opt:[{t:'製品ロードマップ',ph:''},{t:'ホールプロダクト構想',ph:''}],
+del:['MVP','テストレポート','営業ロードマップ','製品プレゼン'],ks:['熱狂0人→再検討','障壁超過→撤退','リソース不能→撤退']},
+{id:6,name:'顧客実証',en:'Revenue',color:'#fdcb6e',def:'金が入ることを証明',cond:'初売上＋再現可能な販売プロセス',team:false,
+gate:[{t:'初売上',d:'実際の入金',ph:'',f:[{n:'初売上日',type:'date'},{n:'累計売上額',type:'currency'}]},{t:'営業ロードマップ実証',d:'',ph:''},{t:'再現可能な販売プロセス',d:'',ph:''},{t:'有料顧客3社以上',d:'',ph:'',f:['顧客1','顧客2','顧客3']}],
+req:[{t:'受注率',ph:'',f:[{n:'提案数',type:'number'},{n:'成約数',type:'number'},{n:'率',type:'number',suffix:'%'}]},{t:'販売サイクル',ph:''},{t:'CAC実測',ph:'',f:[{n:'CAC実測',type:'currency'}]},{t:'ARPU/ACV',ph:'',f:[{n:'ARPU/ACV',type:'currency'}]},{t:'解約兆候',ph:''},{t:'最効果的手法',ph:'',f:['メッセージ','チャネル','タイミング']},{t:'リピート率',ph:'',f:[{n:'リピート率',type:'number',suffix:'%'}]}],
+opt:[{t:'NPS',ph:''},{t:'紹介発生',ph:''}],
+del:['販売実績レポート','確定版営業RM','顧客事例','確定価格表'],ks:['3ヶ月売上ゼロ→撤退','受注率5%未満→P4戻り','全顧客離脱→P5戻り']},
+{id:7,name:'モデル確定',en:'Economics',color:'#e17055',def:'黒字構造を証明',cond:'LTV/CAC≧3＋粗利率OK',team:true,
+gate:[{t:'LTV/CAC≧3',d:'',ph:'',f:[{n:'LTV',type:'currency'},{n:'CAC',type:'currency'},{n:'LTV/CAC比率',type:'number'}]},{t:'粗利率OK',d:'業種平均以上',ph:'',f:[{n:'粗利率',type:'number',suffix:'%'},{n:'業種平均',type:'number',suffix:'%'}]},{t:'コホート分析',d:'継続率安定',ph:''},{t:'UEシート完成',d:'全実測値',ph:''}],
+req:[{t:'LTV計算',ph:'',f:[{n:'単価',type:'currency'},{n:'粗利率',type:'number',suffix:'%'},'継続期間',{n:'LTV',type:'currency'}]},{t:'CAC計算',ph:'',f:[{n:'マーケ費',type:'currency'},{n:'営業費',type:'currency'},{n:'顧客数',type:'number'},{n:'CAC',type:'currency'}]},{t:'回収期間',ph:''},{t:'MRR/ARR推移',ph:''},{t:'チャーンレート',ph:'',f:[{n:'チャーンレート',type:'number',suffix:'%'}]},{t:'費用構造',ph:'',f:[{n:'固定費',type:'currency'},{n:'変動費',type:'currency'},'BEP']}],
+opt:[{t:'セグメント別LTV/CAC',ph:''},{t:'チャネル別CAC',ph:''},{t:'価格弾力性',ph:''}],
+del:['UEシート','月次PL','CF計画12M','成長シナリオ'],ks:['LTV/CAC<1が3ヶ月→根本見直し','チャーン月10%→P5戻り','粗利マイナス→撤退']},
+{id:8,name:'組織構築',en:'Scale',color:'#d63031',def:'属人化排除・再現可能',cond:'創業者1ヶ月不在でも売上維持',team:true,
+gate:[{t:'オペマニュアル完成',d:'',ph:'',f:[{n:'マニュアル整備率',type:'select',opts:['0%','25%','50%','75%','100%']}]},{t:'創業者不在テスト',d:'1ヶ月',ph:'',f:[{n:'創業者不在テスト日数',type:'number'},{n:'不在時売上維持率',type:'number',suffix:'%'}]},{t:'採用/外注の仕組み',d:'',ph:''},{t:'KPIダッシュボード',d:'',ph:''}],
+req:[{t:'組織図',ph:'',f:['現状','12ヶ月後']},{t:'各ポジションJD',ph:''},{t:'マーケ部門定義',ph:''},{t:'営業スケーリング',ph:'',f:[{n:'人数',type:'number'},{n:'1人売上',type:'currency'},'目標']},{t:'テックスタック',ph:''},{t:'法務体制',ph:''}],
+opt:[{t:'Exitシナリオ',ph:''},{t:'資金調達計画',ph:''},{t:'海外展開',ph:''}],
+del:['オペマニュアル','組織計画書','スケーリングRM','ピッチデック'],ks:['品質急落→オペ再設計','人材不在→モデル再設計']}
+];
+var SD={gate:{b:'var(--red)',t:'通過に必ず完了が必要。全項目クリアで次へ。'},req:{b:'var(--yellow)',t:'必ず把握すべき情報。「不明」不可。'},opt:{b:'var(--blue)',t:'あると精度が上がる。なくても進行可。'}};
+
+// ============================================================
+// Data & State
+// ============================================================
+var D={deals:[],issues:[],topics:[],logs:[],_devLog:[],_inputDraft:'',activities:[]};
+var cv='overview',cd=null,ct=null;
+var _saveTimer=null;
+var _loaded=false;
+var _pollTimer=null;
+
+// ============================================================
+// Google Sheets <-> In-memory data bridge
+// ============================================================
+
+// Build full in-memory deal objects (with phases array) from flat sheet data
+function buildDealsFromSheetData(rawDeals, rawChecks) {
+  return rawDeals.map(function(rd) {
+    var deal = {
+      id: rd.id, name: rd.name, entity: 'Matsuyuki', owner: rd.owner,
+      priority: rd.priority, deadline: rd.deadline || null,
+      currentPhase: Number(rd.currentPhase) || 0,
+      createdAt: rd.createdAt, memo: rd.memo || '', category: rd.category || '',
+      marketType: rd.marketType || '', targetType: rd.targetType || '', targetDetail: rd.targetDetail || '',
+      revenueModel: rd.revenueModel || '', resources: rd.resources || '',
+      investmentScale: rd.investmentScale || '', targetRevenue: rd.targetRevenue || '',
+      killLogs: (function(){ try { return JSON.parse(rd.killLogs || '[]'); } catch(e) { return []; } })(),
+      phases: PHASES.map(function(p) {
+        return {
+          id: p.id,
+          status: p.id === 0 ? 'active' : 'locked',
+          startedAt: p.id === 0 ? rd.createdAt : null,
+          completedAt: null,
+          gc: p.gate.map(function() { return {p:{白石:false,中野:false,松崎:false},v:'',sv:{}}; }),
+          rc: p.req.map(function() { return {p:{白石:false,中野:false,松崎:false},v:'',sv:{}}; }),
+          oc: p.opt.map(function() { return {done:false,v:'',sv:{}}; }),
+          dc: p.del.map(function() { return false; })
+        };
+      })
+    };
+    // Mark completed phases
+    for (var ph = 0; ph < deal.currentPhase; ph++) {
+      deal.phases[ph].status = 'done';
+      deal.phases[ph].completedAt = rd.createdAt;
+    }
+    if (deal.currentPhase <= 8) {
+      deal.phases[deal.currentPhase].status = 'active';
+      deal.phases[deal.currentPhase].startedAt = rd.createdAt;
+    }
+    return deal;
+  });
+}
+
+function applyChecksToDeals(deals, rawChecks) {
+  rawChecks.forEach(function(c) {
+    var deal = deals.find(function(d) { return d.id === c.deal_id; });
+    if (!deal) return;
+    var phase = Number(c.phase);
+    if (phase < 0 || phase > 8) return;
+    var dp = deal.phases[phase];
+    var idx = Number(c.index);
+    var sv = {};
+    try { sv = JSON.parse(c.subValues || '{}'); } catch(e) { sv = {}; }
+
+    if (c.type === 'gate' && dp.gc[idx]) {
+      dp.gc[idx].p['白石'] = c.shiraishi;
+      dp.gc[idx].p['中野'] = c.nakano;
+      dp.gc[idx].p['松崎'] = c.matsuzaki;
+      dp.gc[idx].v = c.value;
+      dp.gc[idx].sv = sv;
+    } else if (c.type === 'req' && dp.rc[idx]) {
+      dp.rc[idx].p['白石'] = c.shiraishi;
+      dp.rc[idx].p['中野'] = c.nakano;
+      dp.rc[idx].p['松崎'] = c.matsuzaki;
+      dp.rc[idx].v = c.value;
+      dp.rc[idx].sv = sv;
+    } else if (c.type === 'opt' && dp.oc[idx]) {
+      dp.oc[idx].v = c.value;
+      dp.oc[idx].sv = sv;
+      dp.oc[idx].done = (c.value && c.value.trim().length > 0) || Object.keys(sv).some(function(k){return sv[k]&&sv[k].toString().trim().length>0;});
+    } else if (c.type === 'del' && idx < dp.dc.length) {
+      dp.dc[idx] = c.shiraishi || c.nakano || c.matsuzaki;
+    }
+  });
+}
+
+// Flatten in-memory deal phases back to sheet rows
+function flattenPhaseChecks(deals) {
+  var rows = [];
+  deals.forEach(function(deal) {
+    deal.phases.forEach(function(dp, phase) {
+      var pdef = PHASES[phase];
+      // gate
+      dp.gc.forEach(function(c, idx) {
+        rows.push({
+          deal_id: deal.id, phase: phase, type: 'gate', index: idx,
+          shiraishi: c.p['白石'], nakano: c.p['中野'], matsuzaki: c.p['松崎'],
+          value: c.v || '', subValues: JSON.stringify(c.sv || {})
+        });
+      });
+      // req
+      dp.rc.forEach(function(c, idx) {
+        rows.push({
+          deal_id: deal.id, phase: phase, type: 'req', index: idx,
+          shiraishi: c.p['白石'], nakano: c.p['中野'], matsuzaki: c.p['松崎'],
+          value: c.v || '', subValues: JSON.stringify(c.sv || {})
+        });
+      });
+      // opt
+      dp.oc.forEach(function(c, idx) {
+        rows.push({
+          deal_id: deal.id, phase: phase, type: 'opt', index: idx,
+          shiraishi: false, nakano: false, matsuzaki: false,
+          value: c.v || '', subValues: JSON.stringify(c.sv || {})
+        });
+      });
+      // del
+      dp.dc.forEach(function(done, idx) {
+        rows.push({
+          deal_id: deal.id, phase: phase, type: 'del', index: idx,
+          shiraishi: done, nakano: false, matsuzaki: false,
+          value: '', subValues: '{}'
+        });
+      });
+    });
+  });
+  return rows;
+}
+
+function flattenDeals(deals) {
+  return deals.map(function(d) {
+    return {
+      id: d.id, name: d.name, owner: d.owner, priority: d.priority,
+      deadline: d.deadline || '', currentPhase: d.currentPhase,
+      createdAt: d.createdAt, memo: d.memo || '', category: d.category || '',
+      marketType: d.marketType || '', targetType: d.targetType || '', targetDetail: d.targetDetail || '',
+      revenueModel: d.revenueModel || '', resources: d.resources || '',
+      investmentScale: d.investmentScale || '', targetRevenue: d.targetRevenue || '',
+      killLogs: JSON.stringify(d.killLogs || [])
+    };
+  });
+}
+
+// ============================================================
+// Save indicator & debounced auto-save
+// ============================================================
+function showSaveStatus(status) {
+  var el = document.getElementById('save-indicator');
+  if (!el) return;
+  if (status === 'saving') { el.textContent = '保存中...'; el.className = 'saving'; }
+  else if (status === 'saved') { el.textContent = '保存完了'; el.className = 'saved'; setTimeout(function(){ el.textContent=''; el.className=''; }, 2000); }
+  else if (status === 'error') { el.textContent = '保存エラー'; el.className = 'error'; }
+}
+
+function scheduleSave() {
+  if (!_loaded) return;
+  if (_saveTimer) clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(doSave, 2000);
+}
+
+function doSave() {
+  showSaveStatus('saving');
+  var payload = {
+    deals: flattenDeals(D.deals),
+    phase_checks: flattenPhaseChecks(D.deals),
+    issues: D.issues.map(function(i) {
+      return {id:i.id,title:i.title,assignee:i.assignee,linkType:i.linkType||'none',linkId:i.linkId||'',priority:i.priority,deadline:i.deadline||'',status:i.status,desc:i.desc||'',iceImpact:i.iceImpact||5,iceConfidence:i.iceConfidence||5,iceEase:i.iceEase||5,tags:i.tags||'',blockReason:i.blockReason||'',createdAt:i.createdAt};
+    }),
+    topics: D.topics.map(function(t) {
+      return {id:t.id,title:t.title,status:t.status,desc:t.desc||'',conclusion:t.conclusion||'',members:t.members||'',createdAt:t.createdAt};
+    }),
+    logs: D.logs.map(function(l) {
+      return {id:l.id,type:l.type,content:l.content,linkType:l.linkType||'none',linkId:l.linkId||'',by:l.by,createdAt:l.createdAt};
+    }),
+    dev_log: (D._devLog||[]).map(function(d) {
+      return {version:d.version,content:d.content,date:d.date};
+    })
+  };
+  fetch(GAS_API, {
+    method: 'POST',
+    redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'saveAllData', data: payload })
+  })
+  .then(function() { showSaveStatus('saved'); })
+  .catch(function(e) { showSaveStatus('error'); console.error(e); });
+}
+
+// ============================================================
+// Init from server
+// ============================================================
+function initApp(jsonStr) {
+  var raw = JSON.parse(jsonStr);
+  // Build deals with phases
+  D.deals = buildDealsFromSheetData(raw.deals || [], raw.phase_checks || []);
+  applyChecksToDeals(D.deals, raw.phase_checks || []);
+  D.issues = (raw.issues || []).map(function(i){
+    // Migrate old statuses
+    if(i.status==='open'||i.status==='todo')i.status='backlog';
+    if(i.status==='progress')i.status='wip';
+    if(!i.iceImpact)i.iceImpact=5;
+    if(!i.iceConfidence)i.iceConfidence=5;
+    if(!i.iceEase)i.iceEase=5;
+    if(!i.tags)i.tags='';
+    if(!i.blockReason)i.blockReason='';
+    return i;
+  });
+  D.topics = (raw.topics || []).map(function(tp){if(!tp.members)tp.members='';return tp;});
+  D.logs = raw.logs || [];
+  D._devLog = raw.dev_log || [];
+  D.activities = raw.activities || [];
+  D._inputDraft = '';
+  _loaded = true;
+  // Hide loading overlay
+  document.getElementById('loading-overlay').classList.add('hidden');
+  render();
+  // Start auto-reload polling (every 60 seconds)
+  startAutoReload();
+}
+
+// ============================================================
+// Auto-reload polling (Task 1)
+// ============================================================
+function startAutoReload() {
+  if (_pollTimer) clearInterval(_pollTimer);
+  _pollTimer = setInterval(function() {
+    // Don't poll if there's a pending save
+    if (_saveTimer) return;
+    fetch(GAS_API + '?action=getData', { redirect: 'follow' })
+      .then(function(r) { return r.text(); })
+      .then(function(jsonStr) {
+        var raw = JSON.parse(jsonStr);
+        // Rebuild data silently
+        D.deals = buildDealsFromSheetData(raw.deals || [], raw.phase_checks || []);
+        applyChecksToDeals(D.deals, raw.phase_checks || []);
+        D.issues = (raw.issues || []).map(function(i){
+          if(i.status==='open'||i.status==='todo')i.status='backlog';
+          if(i.status==='progress')i.status='wip';
+          if(!i.iceImpact)i.iceImpact=5;
+          if(!i.iceConfidence)i.iceConfidence=5;
+          if(!i.iceEase)i.iceEase=5;
+          if(!i.tags)i.tags='';
+          if(!i.blockReason)i.blockReason='';
+          return i;
+        });
+        D.topics = (raw.topics || []).map(function(tp){if(!tp.members)tp.members='';return tp;});
+        D.logs = raw.logs || [];
+        D._devLog = raw.dev_log || [];
+        D.activities = raw.activities || [];
+        // Re-render current view without disruption
+        render();
+      })
+      .catch(function(e) {
+        console.log('Auto-reload failed:', e.message);
+      });
+  }, 60000);
+}
+
+// Load data on page open
+fetch(GAS_API + '?action=getData', { redirect: 'follow' })
+  .then(function(r) { return r.text(); })
+  .then(function(t) { initApp(t); })
+  .catch(function(e) {
+    document.getElementById('loading-overlay').innerHTML =
+      '<div style="color:var(--red);font-size:14px">データ読み込みエラー</div>' +
+      '<div style="color:var(--text-muted);font-size:11px;margin-top:8px">' + e.message + '</div>' +
+      '<button class="btn primary" style="margin-top:16px" onclick="location.reload()">再読み込み</button>';
+  });
+
+// ============================================================
+// CRUD (same logic, sv() replaced with scheduleSave())
+// ============================================================
+function sv() { scheduleSave(); }
+
+// Chip multi-select helpers
+function toggleChip(el){el.classList.toggle('active');}
+function getChipValues(containerId){var chips=document.querySelectorAll('#'+containerId+' .chip.active');return Array.prototype.map.call(chips,function(c){return c.dataset.val;}).join(',');}
+function setChipValues(containerId,csv){var vals=(csv||'').split(',').filter(function(v){return v.trim();});document.querySelectorAll('#'+containerId+' .chip').forEach(function(c){c.classList.toggle('active',vals.indexOf(c.dataset.val)>=0);});}
+function toggleBlockReason(){var s=document.getElementById('f-is');var fg=document.getElementById('fg-block-reason');if(fg)fg.style.display=s&&s.value==='waiting'?'block':'none';}
+
+// Tag CSS class mapping
+var TAG_CSS={'法務':'tag-legal','財務':'tag-finance','営業':'tag-sales','開発':'tag-dev','オペレーション':'tag-ops','マーケティング':'tag-marketing','戦略':'tag-strategy','外部交渉':'tag-negotiation'};
+function renderTags(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(t){return '<span class="tag-badge '+(TAG_CSS[t]||'tag-dev')+'">'+t+'</span>';}).join('');}
+function renderMembers(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(m){return '<span class="member-badge">'+m+'</span>';}).join('');}
+
+function createDeal(){
+  var n=document.getElementById('f-dn').value.trim();if(!n)return;
+  var cat=getChipValues('f-dcat-chips');
+  var rm=getChipValues('f-drm-chips');
+  var rs=getChipValues('f-drs-chips');
+  D.deals.push({id:'d'+Date.now().toString(36),name:n,entity:'Matsuyuki',owner:document.getElementById('f-do').value,priority:document.getElementById('f-dp').value,deadline:document.getElementById('f-dd').value||null,memo:document.getElementById('f-dm').value,category:cat,currentPhase:0,createdAt:new Date().toISOString(),
+    marketType:document.getElementById('f-dmt').value||'',targetType:document.getElementById('f-dtt').value||'',targetDetail:document.getElementById('f-dtd').value||'',revenueModel:rm,resources:rs,investmentScale:document.getElementById('f-dis').value||'',targetRevenue:document.getElementById('f-dtr').value||'',
+    phases:PHASES.map(function(p){return{id:p.id,status:p.id===0?'active':'locked',startedAt:p.id===0?new Date().toISOString():null,completedAt:null,gc:p.gate.map(function(){return{p:{白石:false,中野:false,松崎:false},v:'',sv:{}};}),rc:p.req.map(function(){return{p:{白石:false,中野:false,松崎:false},v:'',sv:{}};}),oc:p.opt.map(function(){return{done:false,v:'',sv:{}};}),dc:p.del.map(function(){return false;})};}),killLogs:[]});
+  sv();closeModal('m-deal');document.getElementById('f-dn').value='';document.getElementById('f-dm').value='';setChipValues('f-dcat-chips','');document.getElementById('f-dmt').value='';document.getElementById('f-dtt').value='';document.getElementById('f-dtd').value='';setChipValues('f-drm-chips','');setChipValues('f-drs-chips','');document.getElementById('f-dis').value='';document.getElementById('f-dtr').value='';render();openDeal(D.deals[D.deals.length-1].id);
+}
+function createIssue(){
+  var t=document.getElementById('f-it').value.trim();if(!t)return;
+  var link=document.getElementById('f-il').value;
+  var iceI=Math.min(10,Math.max(1,parseInt(document.getElementById('f-ice-i').value)||5));
+  var iceC=Math.min(10,Math.max(1,parseInt(document.getElementById('f-ice-c').value)||5));
+  var iceE=Math.min(10,Math.max(1,parseInt(document.getElementById('f-ice-e').value)||5));
+  var assignee=getChipValues('f-ia-chips')||'白石';
+  var tags=getChipValues('f-itags-chips');
+  var st=document.getElementById('f-is').value||'backlog';
+  var br=st==='waiting'?(document.getElementById('f-ibr').value||''):'';
+  D.issues.push({id:'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),title:t,assignee:assignee,linkType:link.startsWith('d')?'case':link.startsWith('t')?'topic':'none',linkId:link||null,priority:document.getElementById('f-ip').value,deadline:document.getElementById('f-idd').value||null,desc:document.getElementById('f-id').value,status:st,iceImpact:iceI,iceConfidence:iceC,iceEase:iceE,tags:tags,blockReason:br,createdAt:new Date().toISOString()});
+  sv();closeModal('m-issue');resetIssueForm();render();
+}
+window._editIssueId=null;
+function resetIssueForm(){document.getElementById('f-it').value='';document.getElementById('f-id').value='';document.getElementById('f-idd').value='';document.getElementById('f-ice-i').value='5';document.getElementById('f-ice-c').value='5';document.getElementById('f-ice-e').value='5';document.getElementById('f-is').value='backlog';document.getElementById('f-ip').value='中';setChipValues('f-ia-chips','白石');setChipValues('f-itags-chips','');document.getElementById('f-ibr').value='';document.getElementById('fg-block-reason').style.display='none';window._editIssueId=null;document.getElementById('m-issue-title').textContent='新規Issue';document.getElementById('m-issue-actions').innerHTML='<button class="btn" onclick="closeModal(\'m-issue\')">取消</button><button class="btn primary" onclick="createIssue()">作成</button>';updIcePrev();}
+function openEditIssue(id){
+  var i=D.issues.find(function(x){return x.id===id;});if(!i)return;
+  window._editIssueId=id;
+  populateLink('f-il');
+  document.getElementById('m-issue-title').textContent='Issue 編集';
+  document.getElementById('f-it').value=i.title||'';
+  setChipValues('f-ia-chips',i.assignee||'白石');
+  document.getElementById('f-il').value=i.linkId||'';
+  document.getElementById('f-is').value=i.status||'backlog';
+  document.getElementById('f-ip').value=i.priority||'中';
+  document.getElementById('f-ice-i').value=i.iceImpact||5;
+  document.getElementById('f-ice-c').value=i.iceConfidence||5;
+  document.getElementById('f-ice-e').value=i.iceEase||5;
+  document.getElementById('f-idd').value=i.deadline||'';
+  document.getElementById('f-id').value=i.desc||'';
+  setChipValues('f-itags-chips',i.tags||'');
+  document.getElementById('f-ibr').value=i.blockReason||'';
+  toggleBlockReason();
+  updIcePrev();
+  // Build actions with comments section
+  document.getElementById('m-issue-actions').innerHTML='<button class="btn" onclick="closeModal(\'m-issue\');resetIssueForm()">取消</button><button class="btn danger" onclick="delIssue(\''+id+'\');closeModal(\'m-issue\');resetIssueForm()" style="margin-right:auto">削除</button><button class="btn primary" onclick="saveEditIssue()">保存</button>';
+  openModal('m-issue');
+  // Load comments for this issue
+  loadComments(id);
+}
+function saveEditIssue(){
+  var i=D.issues.find(function(x){return x.id===window._editIssueId;});if(!i)return;
+  var t=document.getElementById('f-it').value.trim();if(!t)return;
+  var link=document.getElementById('f-il').value;
+  i.title=t;i.assignee=getChipValues('f-ia-chips')||'白石';
+  i.linkType=link.startsWith('d')?'case':link.startsWith('t')?'topic':'none';i.linkId=link||null;
+  i.status=document.getElementById('f-is').value||'backlog';
+  i.priority=document.getElementById('f-ip').value;
+  i.iceImpact=Math.min(10,Math.max(1,parseInt(document.getElementById('f-ice-i').value)||5));
+  i.iceConfidence=Math.min(10,Math.max(1,parseInt(document.getElementById('f-ice-c').value)||5));
+  i.iceEase=Math.min(10,Math.max(1,parseInt(document.getElementById('f-ice-e').value)||5));
+  i.deadline=document.getElementById('f-idd').value||null;i.desc=document.getElementById('f-id').value;
+  i.tags=getChipValues('f-itags-chips');
+  i.blockReason=i.status==='waiting'?(document.getElementById('f-ibr').value||''):'';
+  sv();closeModal('m-issue');resetIssueForm();render();
+}
+function updIcePrev(){var a=parseInt(document.getElementById('f-ice-i').value)||5;var b=parseInt(document.getElementById('f-ice-c').value)||5;var c=parseInt(document.getElementById('f-ice-e').value)||5;var el=document.getElementById('f-ice-preview');if(el)el.textContent='ICE = '+(a*b*c);}
+function createTopic(){
+  var t=document.getElementById('f-tt').value.trim();if(!t)return;
+  var members=getChipValues('f-tmembers-chips');
+  D.topics.push({id:'t'+Date.now().toString(36),title:t,status:document.getElementById('f-ts').value,desc:document.getElementById('f-td').value,conclusion:'',members:members,createdAt:new Date().toISOString()});
+  sv();closeModal('m-topic');document.getElementById('f-tt').value='';document.getElementById('f-td').value='';setChipValues('f-tmembers-chips','白石,中野,松崎');render();
+}
+function createLog(){
+  var c=document.getElementById('f-lc').value.trim();if(!c)return;
+  var link=document.getElementById('f-ll').value;
+  D.logs.push({id:'l'+Date.now().toString(36),type:document.getElementById('f-lt').value,content:c,linkType:link.startsWith('d')?'case':link.startsWith('t')?'topic':'none',linkId:link||null,by:document.getElementById('f-lw').value,createdAt:new Date().toISOString()});
+  sv();closeModal('m-log');document.getElementById('f-lc').value='';render();
+}
+function gd(id){return D.deals.find(function(x){return x.id===id;});}
+function gt(id){return D.topics.find(function(x){return x.id===id;});}
+function linkName(type,id){if(type==='case'){var d=gd(id);return d?d.name:'';}if(type==='topic'){var t=gt(id);return t?t.title:'';}return '';}
+function populateLink(selId){
+  var s=document.getElementById(selId);
+  s.innerHTML='<option value="">なし</option>'+D.deals.map(function(d){return '<option value="'+d.id+'">📁 '+d.name+'</option>';}).join('')+D.topics.map(function(t){return '<option value="'+t.id+'">💬 '+t.title+'</option>';}).join('');
+}
+function chgIssue(id,st){var i=D.issues.find(function(x){return x.id===id;});if(i){i.status=st;sv();render();}}
+function delIssue(id){D.issues=D.issues.filter(function(x){return x.id!==id;});sv();render();}
+function delTopic(id){if(!confirm('削除？'))return;D.topics=D.topics.filter(function(x){return x.id!==id;});sv();go('topics');}
+function delDeal(id){if(!confirm('削除？'))return;D.deals=D.deals.filter(function(x){return x.id!==id;});sv();cd=null;go('overview');}
+function toggleP(did,type,idx,person){var d=gd(did);var dp=d.phases[d.currentPhase];var a=type==='gate'?dp.gc:dp.rc;a[idx].p[person]=!a[idx].p[person];sv();renderDeal(did);}
+function updVal(did,type,idx,v){var d=gd(did);var dp=d.phases[d.currentPhase];if(type==='gate')dp.gc[idx].v=v;else if(type==='req')dp.rc[idx].v=v;else{dp.oc[idx].v=v;dp.oc[idx].done=v.trim().length>0;}sv();}
+function updSub(did,type,idx,f,v){var d=gd(did);var dp=d.phases[d.currentPhase];var a=type==='gate'?dp.gc:type==='req'?dp.rc:dp.oc;if(!a[idx].sv)a[idx].sv={};a[idx].sv[f]=v;if(type==='opt')a[idx].done=v&&v.trim().length>0;sv();}
+function togDel(did,idx){var d=gd(did);d.phases[d.currentPhase].dc[idx]=!d.phases[d.currentPhase].dc[idx];sv();renderDeal(did);}
+function isOk(c,team){return team?M.every(function(m){return c.p[m];}):M.some(function(m){return c.p[m];});}
+function advPhase(did){var d=gd(did);if(d.currentPhase>=8)return;var p=PHASES[d.currentPhase];var dp=d.phases[d.currentPhase];if(!dp.gc.every(function(c){return isOk(c,p.team);})||!dp.rc.every(function(c){return isOk(c,p.team);})){alert(t('all_gate_clear'));return;}dp.status='done';dp.completedAt=new Date().toISOString();d.currentPhase++;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].startedAt=new Date().toISOString();sv();render();}
+function retPhase(did){if(!confirm(t('confirm_retreat')))return;var d=gd(did);if(d.currentPhase<=0)return;d.phases[d.currentPhase].status='locked';d.currentPhase--;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].completedAt=null;sv();render();}
+function logKS(){var d=gd(cd);d.killLogs.push({date:new Date().toISOString(),phase:d.currentPhase,cond:document.getElementById('f-kc').value,verdict:document.getElementById('f-kv').value,judge:document.getElementById('f-kw').value});if(document.getElementById('f-kv').value==='後退'&&d.currentPhase>0){d.phases[d.currentPhase].status='locked';d.currentPhase--;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].completedAt=null;}sv();closeModal('m-ks');render();}
+function updTopicStatus(id,st){var t=gt(id);t.status=st;sv();render();}
+function updTopicConclusion(id,v){var t=gt(id);t.conclusion=v;sv();}
+
+// ============================================================
+// Comments system (Task 3)
+// ============================================================
+function loadComments(issueId) {
+  var container = document.getElementById('issue-comments');
+  if (!container) return;
+  container.innerHTML = '<div style="color:var(--text-muted);font-size:11px">コメント読み込み中...</div>';
+  fetch(GAS_API + '?action=getComments&issueId=' + encodeURIComponent(issueId), { redirect: 'follow' })
+    .then(function(r) { return r.text(); })
+    .then(function(jsonStr) {
+      var comments = JSON.parse(jsonStr);
+      renderComments(comments, issueId);
+    })
+    .catch(function(e) {
+      container.innerHTML = '<div style="color:var(--red);font-size:11px">コメント読み込みエラー</div>';
+    });
+}
+
+function renderComments(comments, issueId) {
+  var container = document.getElementById('issue-comments');
+  if (!container) return;
+  var html = '<div class="section-title" style="margin-top:8px">💬 コメント (' + comments.length + ')</div>';
+  html += '<div class="comment-list">';
+  if (!comments.length) {
+    html += '<div style="color:var(--text-muted);font-size:11px;padding:8px 0">コメントなし</div>';
+  } else {
+    comments.forEach(function(c) {
+      var ts = new Date(c.timestamp);
+      var timeStr = ts.toLocaleDateString('ja-JP', {month:'short',day:'numeric'}) + ' ' + ts.toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'});
+      html += '<div class="comment-item"><div class="comment-header"><span class="comment-author">' + c.by + '</span><span class="comment-time">' + timeStr + '</span></div><div class="comment-text">' + c.text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') + '</div></div>';
+    });
+  }
+  html += '</div>';
+  html += '<div class="comment-input-row"><textarea class="itxt" id="comment-text" rows="2" placeholder="コメントを入力..."></textarea><select id="comment-by"><option>白石</option><option>中野</option><option>松崎</option></select><button class="btn primary" onclick="submitComment(\'' + issueId + '\')">送信</button></div>';
+  container.innerHTML = html;
+}
+
+function submitComment(issueId) {
+  var textEl = document.getElementById('comment-text');
+  var byEl = document.getElementById('comment-by');
+  if (!textEl || !byEl) return;
+  var text = textEl.value.trim();
+  if (!text) return;
+  var by = byEl.value;
+  textEl.value = '';
+  fetch(GAS_API, {
+    method: 'POST',
+    redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'addComment', issueId: issueId, text: text, by: by })
+  })
+  .then(function() { loadComments(issueId); })
+  .catch(function(e) {
+    alert('コメント送信エラー: ' + e.message);
+  });
+}
+
+// ============================================================
+// Activity Feed rendering (Task 2)
+// ============================================================
+function renderActivityFeed() {
+  var activities = D.activities || [];
+  if (!activities.length) return '<div style="color:var(--text-muted);font-size:12px">アクティビティなし</div>';
+  var icons = {
+    'created': '✨', 'updated': '📝', 'deleted': '🗑️', 'status-changed': '🔄',
+    'saved': '💾', 'commented': '💬'
+  };
+  return '<div class="activity-feed">' + activities.map(function(a) {
+    var icon = icons[a.action] || '📌';
+    var ts = new Date(a.timestamp);
+    var timeStr = ts.toLocaleDateString('ja-JP', {month:'short',day:'numeric'}) + ' ' + ts.toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'});
+    var targetName = a.target;
+    if (a.target === 'issue' && a.targetId) {
+      var iss = D.issues.find(function(i){return i.id===a.targetId;});
+      if (iss) targetName = 'Issue: ' + iss.title;
+    } else if (a.target === 'deals') {
+      targetName = '案件データ';
+    } else if (a.target === 'issues') {
+      targetName = 'Issueデータ';
+    } else if (a.target === 'topics') {
+      targetName = 'Topicデータ';
+    } else if (a.target === 'logs') {
+      targetName = 'ログデータ';
+    } else if (a.target === 'all') {
+      targetName = '全データ';
+    }
+    var actionLabel = a.action === 'created' ? '作成' : a.action === 'updated' ? '更新' : a.action === 'deleted' ? '削除' : a.action === 'status-changed' ? 'ステータス変更' : a.action === 'saved' ? '保存' : a.action === 'commented' ? 'コメント' : a.action;
+    return '<div class="activity-item"><div class="activity-icon">' + icon + '</div><div class="activity-text"><strong>' + actionLabel + '</strong> ' + targetName + (a.by ? ' <span style="color:var(--accent-light)">' + a.by + '</span>' : '') + '</div><div class="activity-time">' + timeStr + '</div></div>';
+  }).join('') + '</div>';
+}
+
+// ============================================================
+// RENDER (identical to original + activity feed in overview)
+// ============================================================
+function render(){
+  if(cv==='overview')renderOverview();
+  if(cv==='cases')renderCases();
+  if(cv==='deal'&&cd)renderDeal(cd);
+  if(cv==='topics')renderTopics();
+  if(cv==='topic-detail'&&ct)renderTopicDetail(ct);
+  if(cv==='issues')renderIssues();
+  if(cv==='input')renderInput();
+  if(cv==='log')renderLog();
+  if(cv==='kb')renderKB();
+  if(cv==='roadmap')renderRoadmap();
+}
+
+function renderOverview(){
+  var active=D.deals.filter(function(d){return d.currentPhase<9;});
+  var openI=D.issues.filter(function(i){return i.status!=='done';});
+  var waitingI=D.issues.filter(function(i){return i.status==='waiting';});
+  var recentLogs=D.logs.slice(-5).reverse();
+  var alerts=[];
+  if(waitingI.length)waitingI.forEach(function(i){alerts.push({text:'🚧 ブロック中: '+i.title+'（'+i.assignee+'）'+(i.blockReason?' ['+i.blockReason+']':''),type:'waiting'});});
+  D.deals.forEach(function(d){var dp=d.phases[d.currentPhase];if(dp&&dp.startedAt){var days=Math.floor((Date.now()-new Date(dp.startedAt).getTime())/86400000);if(days>90)alerts.push({text:d.name+' — Phase '+d.currentPhase+'で'+days+'日滞留',type:'stall'});}if(d.deadline&&new Date(d.deadline)<new Date())alerts.push({text:d.name+' — 期限超過',type:'overdue'});});
+  D.issues.forEach(function(i){if(i.deadline&&new Date(i.deadline)<new Date()&&i.status!=='done')alerts.push({text:'Issue: '+i.title+' — 期限超過（'+i.assignee+'）',type:'overdue'});});
+
+  document.getElementById('v-overview').innerHTML=
+    '<div class="stats">'+
+      '<div class="stat"><div class="label">'+t('cases_num')+'</div><div class="val">'+D.deals.length+'</div><div class="sub">Matsuyuki</div></div>'+
+      '<div class="stat"><div class="label">'+t('open_issues')+'</div><div class="val">'+openI.length+'</div><div class="sub">'+D.issues.length+t('cases_count')+'</div></div>'+
+      '<div class="stat"><div class="label">'+t('topics_label')+'</div><div class="val">'+D.topics.filter(function(tp){return tp.status!=='resolved';}).length+'</div><div class="sub">'+t('unresolved')+'</div></div>'+
+      '<div class="stat"><div class="label">Decision Log</div><div class="val">'+D.logs.length+'</div><div class="sub">'+t('recorded')+'</div></div>'+
+    '</div>'+
+    (alerts.length?'<div class="ov-section"><h3>'+t('alerts')+'</h3><div class="ov-list">'+alerts.map(function(a){return '<div class="ov-row ov-alert">'+a.text+'</div>';}).join('')+'</div></div>':'')+
+    '<div class="ov-section"><h3>'+t('pipeline')+'</h3><div class="pipeline" id="ov-pipe"></div></div>'+
+    '<div class="ov-section"><h3>'+t('issues_by_person')+'</h3>'+
+      (function(){var topI=openI.slice().sort(function(a,b){return iceScore(b)-iceScore(a);}).slice(0,10);var lang=window._lang||'ja';var stClr=function(s){return s==='icebox'?'var(--text-muted)':s==='backlog'?'var(--blue)':s==='wip'?'var(--yellow)':s==='waiting'?'var(--red)':'var(--green)';};var stLbl=function(s){return s==='icebox'?(lang==='ja'?'❄ 氷':'❄ Ice'):s==='backlog'?(lang==='ja'?'📋 BL':'📋 BL'):s==='wip'?(lang==='ja'?'🔄 進行':'🔄 WIP'):s==='waiting'?(lang==='ja'?'🚧 止':'🚧 Wait'):(lang==='ja'?'✅ 完':'✅ Done');};return !topI.length?'<div style="color:var(--text-muted);font-size:12px">'+(lang==='ja'?'未完了Issueなし':'No open issues')+'</div>':topI.map(function(i){var pi=i.priority==='高'?'🔴':i.priority==='低'?'🔵':'🟡';var ice=iceScore(i);return '<div class="ov-row" onclick="go(\'issues\')" style="gap:8px"><span style="min-width:36px;text-align:center;font-weight:700;color:var(--accent-light);font-size:11px">'+ice+'</span><span style="color:'+stClr(i.status)+';font-size:9px;font-weight:600;min-width:30px">'+stLbl(i.status)+'</span><span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pi+' '+i.title+'</span><span style="font-size:10px;color:var(--text-dim)">'+renderMembers(i.assignee)+'</span></div>';}).join('')+'<div class="ov-row" onclick="go(\'issues\')" style="justify-content:center;color:var(--accent-light);font-size:11px;cursor:pointer">'+(openI.length>10?(lang==='ja'?'他 '+(openI.length-10)+'件 →':'+'+(openI.length-10)+' more →'):(lang==='ja'?'全て見る →':'View all →'))+'</div>';})()+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+      '<div class="ov-section"><h3>💬 '+(window._lang==='en'?'Topics':'論点')+'</h3>'+
+        (function(){var openT=D.topics.filter(function(tp){return tp.status!=='resolved';});var lang=window._lang||'ja';var stC=function(s){return s==='open'?'var(--text-muted)':s==='discuss'?'var(--yellow)':'var(--green)';};var stL=function(s){return s==='open'?(lang==='ja'?'未着手':'Open'):s==='discuss'?(lang==='ja'?'議論中':'Discussing'):(lang==='ja'?'結論済':'Resolved');};return !openT.length?'<div style="color:var(--text-muted);font-size:12px">'+(lang==='ja'?'未解決の論点なし':'No open topics')+'</div>':openT.map(function(tp){var ic=D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===tp.id&&i.status!=='done';}).length;return '<div class="ov-row" onclick="openTopic(\''+tp.id+'\')" style="gap:8px"><span style="color:'+stC(tp.status)+';font-size:9px;font-weight:600;min-width:40px">'+stL(tp.status)+'</span><span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+tp.title+'</span>'+(ic?'<span style="font-size:10px;color:var(--red)">'+ic+(lang==='ja'?'件':'')+'</span>':'')+'</div>';}).join('');})()+
+      '</div>'+
+      '<div class="ov-section"><h3>'+t('recent_log')+'</h3>'+(!recentLogs.length?'<div style="color:var(--text-muted);font-size:12px">'+t('no_log')+'</div>':recentLogs.map(function(l){var tp=l.type==='decision'?t('decision'):l.type==='fact'?t('fact'):t('change');var tc=l.type==='decision'?'var(--green)':l.type==='fact'?'var(--blue)':'var(--yellow)';return '<div class="ov-row" onclick="go(\'log\')"><span style="color:'+tc+';font-size:10px;font-weight:700;min-width:40px">'+tp+'</span><span style="flex:1;font-size:11px">'+l.content.substring(0,50)+'</span><span style="font-size:9px;color:var(--text-muted)">'+l.by+'</span></div>';}).join(''))+'</div>'+
+    '</div>'+
+    '<div class="ov-section"><h3>📡 '+(window._lang==='en'?'Activity Feed':'アクティビティ')+'</h3>'+renderActivityFeed()+'</div>';
+  var op=document.getElementById('ov-pipe');
+  if(op)op.innerHTML=pipeHTML();
+}
+
+function pipeHTML(){
+  return PHASES.map(function(p){
+    var deals=D.deals.filter(function(d){return d.currentPhase===p.id;});
+    return '<div class="pipe-col"><div class="pipe-hdr"><div class="pn" style="color:'+p.color+'">P'+p.id+'</div><div class="pname">'+p.name+'</div></div><div class="pipe-body">'+deals.map(function(d){var dp=d.phases[p.id];var done=dp?dp.gc.filter(function(c){return M.some(function(m){return c.p[m];});}).length:0;var tot=dp?dp.gc.length:1;var pi=d.priority==='高'?'🔴':d.priority==='低'?'🔵':'🟡';var dl=d.deadline?new Date(d.deadline).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}):'';return '<div class="pipe-card" onclick="openDeal(\''+d.id+'\')"><div class="cn">'+pi+' '+d.name+'</div><div class="co">'+d.owner+(dl?' · '+dl:'')+'</div><div class="bar"><div class="bar-fill" style="width:'+Math.round(done/tot*100)+'%;background:'+p.color+'"></div></div></div>';}).join('')+'</div></div>';
+  }).join('');
+}
+
+function renderCases(){
+  var sortBy=document.getElementById('cs-sort')?.value||'priority';
+  var deals=D.deals.slice();
+  var po={高:0,中:1,低:2};
+  if(sortBy==='priority')deals.sort(function(a,b){return (po[a.priority]||1)-(po[b.priority]||1);});
+  else if(sortBy==='phase')deals.sort(function(a,b){return b.currentPhase-a.currentPhase;});
+  else if(sortBy==='owner')deals.sort(function(a,b){return a.owner.localeCompare(b.owner);});
+  else if(sortBy==='deadline')deals.sort(function(a,b){return (a.deadline||'9').localeCompare(b.deadline||'9');});
+  else if(sortBy==='name')deals.sort(function(a,b){return a.name.localeCompare(b.name);});
+
+  document.getElementById('v-cases').innerHTML=
+    '<div class="list-header"><h2>'+t('new_biz')+'</h2><div class="list-controls"><span class="count">'+deals.length+t('cases_count')+'</span><select id="cs-sort" onchange="renderCases()"><option value="priority"'+(sortBy==='priority'?' selected':'')+'>'+t('sort_priority')+'</option><option value="phase"'+(sortBy==='phase'?' selected':'')+'>'+t('sort_phase')+'</option><option value="owner"'+(sortBy==='owner'?' selected':'')+'>'+t('sort_owner')+'</option><option value="deadline"'+(sortBy==='deadline'?' selected':'')+'>'+t('sort_deadline')+'</option><option value="name"'+(sortBy==='name'?' selected':'')+'>'+t('sort_name')+'</option></select><button class="btn primary" onclick="openModal(\'m-deal\')">'+t('new_deal')+'</button></div></div>'+
+    '<div class="pipeline" style="margin-bottom:20px">'+pipeHTML()+'</div>'+
+    deals.map(function(d){
+      var p=PHASES[Math.min(d.currentPhase,8)];
+      var pi=d.priority==='高'?'🔴':d.priority==='低'?'🔵':'🟡';
+      var dl=d.deadline?new Date(d.deadline).toLocaleDateString('ja-JP'):'';
+      var dp=d.phases[d.currentPhase];
+      var gc=dp?dp.gc.filter(function(c){return M.some(function(m){return c.p[m];});}).length:0;
+      var gt2=dp?dp.gc.length:1;
+      return '<div class="list-row" onclick="openDeal(\''+d.id+'\')"><div class="dot" style="background:'+p.color+';width:8px;height:8px;border-radius:50%;flex-shrink:0"></div><div class="lr-main"><div class="lr-title">'+pi+' '+d.name+'</div><div class="lr-sub"><span>'+d.owner+'</span><span>P'+d.currentPhase+'｜'+p.name+'</span><span>ゲート '+gc+'/'+gt2+'</span>'+(d.category?d.category.split(',').map(function(c){return '<span class="cat-badge">'+c+'</span>';}).join(''):'')+(d.marketType?'<span class="deal-badge deal-badge-market">'+d.marketType+'</span>':'')+(d.targetType?'<span class="deal-badge deal-badge-target">'+d.targetType+'</span>':'')+(d.investmentScale?'<span class="deal-badge deal-badge-invest">'+d.investmentScale+'</span>':'')+'</div></div><div class="lr-right">'+(dl?'<span>🎯 '+dl+'</span>':'')+'</div></div>';
+    }).join('');
+}
+
+function openDeal(id){cd=id;go('deal');renderDeal(id);}
+
+function renderDealSummaryCard(d){
+  var hasAny=d.marketType||d.targetType||d.targetDetail||d.revenueModel||d.resources||d.investmentScale||d.targetRevenue;
+  var html='<div class="deal-summary-card">';
+  html+='<div class="dsc-header"><span class="dsc-title">📊 事業概要</span><button class="btn" onclick="openEditDealFields(\''+d.id+'\')" style="font-size:10px;padding:3px 8px">✏ 編集</button></div>';
+  html+='<div class="dsc-grid">';
+  // Market Type
+  html+='<div class="dsc-field"><div class="dsc-label">市場タイプ</div><div class="dsc-value">'+(d.marketType?'<span class="deal-badge deal-badge-market">'+d.marketType+'</span>':'<span class="dsc-empty">未設定</span>')+'</div></div>';
+  // Target Customer
+  html+='<div class="dsc-field"><div class="dsc-label">ターゲット顧客</div><div class="dsc-value">'+(d.targetType?'<span class="deal-badge deal-badge-target">'+d.targetType+'</span>':'')+(d.targetDetail?' <span style="font-size:11px;color:var(--text-dim)">'+d.targetDetail+'</span>':'')+(!d.targetType&&!d.targetDetail?'<span class="dsc-empty">未設定</span>':'')+'</div></div>';
+  // Revenue Model
+  html+='<div class="dsc-field"><div class="dsc-label">収益モデル</div><div class="dsc-value">'+(d.revenueModel?d.revenueModel.split(',').map(function(v){return '<span class="deal-badge deal-badge-revenue">'+v+'</span>';}).join(''):'<span class="dsc-empty">未設定</span>')+'</div></div>';
+  // Resources
+  html+='<div class="dsc-field"><div class="dsc-label">必要リソース</div><div class="dsc-value">'+(d.resources?d.resources.split(',').map(function(v){return '<span class="deal-badge deal-badge-resource">'+v+'</span>';}).join(''):'<span class="dsc-empty">未設定</span>')+'</div></div>';
+  // Investment Scale
+  html+='<div class="dsc-field"><div class="dsc-label">初期投資規模</div><div class="dsc-value">'+(d.investmentScale?'<span class="deal-badge deal-badge-invest">'+d.investmentScale+'</span>':'<span class="dsc-empty">未設定</span>')+'</div></div>';
+  // Target Revenue
+  html+='<div class="dsc-field"><div class="dsc-label">想定月商</div><div class="dsc-value">'+(d.targetRevenue?'<span class="deal-badge deal-badge-revenue">'+d.targetRevenue+'</span>':'<span class="dsc-empty">未設定</span>')+'</div></div>';
+  html+='</div></div>';
+  return html;
+}
+
+function openEditDealFields(id){
+  var d=gd(id);if(!d)return;
+  var html='<div class="modal-bg show" id="m-deal-edit" onclick="if(event.target===this)closeModal(\'m-deal-edit\')"><div class="modal">';
+  html+='<h3>事業概要を編集</h3>';
+  html+='<div class="fg"><label>市場タイプ</label><select id="fe-mt"><option value="">未選択</option><option value="既存市場"'+(d.marketType==='既存市場'?' selected':'')+'>既存市場</option><option value="再セグメント市場"'+(d.marketType==='再セグメント市場'?' selected':'')+'>再セグメント市場</option><option value="新規市場"'+(d.marketType==='新規市場'?' selected':'')+'>新規市場</option><option value="クローン市場"'+(d.marketType==='クローン市場'?' selected':'')+'>クローン市場</option></select></div>';
+  html+='<div class="fg"><label>ターゲット顧客</label><div style="display:flex;gap:8px;align-items:center"><select id="fe-tt" style="width:120px"><option value="">未選択</option><option value="B2B"'+(d.targetType==='B2B'?' selected':'')+'>B2B</option><option value="B2C"'+(d.targetType==='B2C'?' selected':'')+'>B2C</option><option value="B2B2C"'+(d.targetType==='B2B2C'?' selected':'')+'>B2B2C</option></select><input id="fe-td" placeholder="例: カンボジアの飲食店" value="'+(d.targetDetail||'')+'" style="flex:1"></div></div>';
+  html+='<div class="fg"><label>収益モデル</label><div class="chip-select" id="fe-rm-chips"><span class="chip" data-val="サブスクリプション" onclick="toggleChip(this)">サブスクリプション</span><span class="chip" data-val="トランザクション" onclick="toggleChip(this)">トランザクション</span><span class="chip" data-val="物販" onclick="toggleChip(this)">物販</span><span class="chip" data-val="ライセンス" onclick="toggleChip(this)">ライセンス</span><span class="chip" data-val="コミッション" onclick="toggleChip(this)">コミッション</span><span class="chip" data-val="広告" onclick="toggleChip(this)">広告</span><span class="chip" data-val="コンサル" onclick="toggleChip(this)">コンサル</span></div></div>';
+  html+='<div class="fg"><label>必要リソース</label><div class="chip-select" id="fe-rs-chips"><span class="chip" data-val="資金" onclick="toggleChip(this)">資金</span><span class="chip" data-val="人材" onclick="toggleChip(this)">人材</span><span class="chip" data-val="技術" onclick="toggleChip(this)">技術</span><span class="chip" data-val="許認可" onclick="toggleChip(this)">許認可</span><span class="chip" data-val="パートナー" onclick="toggleChip(this)">パートナー</span><span class="chip" data-val="設備" onclick="toggleChip(this)">設備</span></div></div>';
+  html+='<div class="fg"><label>初期投資規模</label><select id="fe-is"><option value="">未選択</option><option value="$0-1K"'+(d.investmentScale==='$0-1K'?' selected':'')+'>$0-1K (ほぼゼロ)</option><option value="$1K-10K"'+(d.investmentScale==='$1K-10K'?' selected':'')+'>$1K-10K (少額)</option><option value="$10K-50K"'+(d.investmentScale==='$10K-50K'?' selected':'')+'>$10K-50K (中額)</option><option value="$50K-100K"'+(d.investmentScale==='$50K-100K'?' selected':'')+'>$50K-100K (大額)</option><option value="$100K+"'+(d.investmentScale==='$100K+'?' selected':'')+'>$100K+ (要大型資金)</option></select></div>';
+  html+='<div class="fg"><label>想定月商</label><select id="fe-tr"><option value="">未定</option><option value="~$1K"'+(d.targetRevenue==='~$1K'?' selected':'')+'>~$1K</option><option value="$1K-5K"'+(d.targetRevenue==='$1K-5K'?' selected':'')+'>$1K-5K</option><option value="$5K-20K"'+(d.targetRevenue==='$5K-20K'?' selected':'')+'>$5K-20K</option><option value="$20K-100K"'+(d.targetRevenue==='$20K-100K'?' selected':'')+'>$20K-100K</option><option value="$100K+"'+(d.targetRevenue==='$100K+'?' selected':'')+'>$100K+</option></select></div>';
+  html+='<div class="fa"><button class="btn" onclick="closeModal(\'m-deal-edit\')">取消</button><button class="btn primary" onclick="saveDealFields(\''+d.id+'\')">保存</button></div>';
+  html+='</div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+  // Set chip values after DOM insertion
+  setTimeout(function(){setChipValues('fe-rm-chips',d.revenueModel||'');setChipValues('fe-rs-chips',d.resources||'');},0);
+}
+
+function saveDealFields(id){
+  var d=gd(id);if(!d)return;
+  d.marketType=document.getElementById('fe-mt').value||'';
+  d.targetType=document.getElementById('fe-tt').value||'';
+  d.targetDetail=document.getElementById('fe-td').value||'';
+  d.revenueModel=getChipValues('fe-rm-chips');
+  d.resources=getChipValues('fe-rs-chips');
+  d.investmentScale=document.getElementById('fe-is').value||'';
+  d.targetRevenue=document.getElementById('fe-tr').value||'';
+  sv();
+  var modal=document.getElementById('m-deal-edit');
+  if(modal)modal.remove();
+  renderDeal(id);
+}
+
+function closeModal(id){var el=document.getElementById(id);if(el){if(id==='m-deal-edit'){el.remove();return;}el.classList.remove('show');setTimeout(function(){if(window._inputQueue&&window._inputQueue.length)processInputQueue();},300);}}
+
+function renderDeal(id){
+  var d=gd(id);if(!d)return;
+  var p=PHASES[Math.min(d.currentPhase,8)];var dp=d.phases[d.currentPhase];if(!dp)return;
+  var gc=dp.gc.filter(function(c){return isOk(c,p.team);}).length,gt2=dp.gc.length;
+  var rc=dp.rc.filter(function(c){return isOk(c,p.team);}).length,rt=dp.rc.length;
+  var ok=gc===gt2&&rc===rt;
+  var days=dp.startedAt?Math.floor((Date.now()-new Date(dp.startedAt).getTime())/86400000):0;
+  var pi=d.priority==='高'?'🔴':d.priority==='低'?'🔵':'🟡';
+  var linkedIssues=D.issues.filter(function(i){return i.linkType==='case'&&i.linkId===id;});
+  document.getElementById('tt').textContent=d.name;
+
+  var ri=function(item,chk,type,idx){
+    var tm=p.team;var done=type==='opt'?chk.done:isOk(chk,tm);
+    var renderSubInput=function(f){
+      var fname=typeof f==='string'?f:f.n;
+      var ftype=typeof f==='string'?'text':f.type||'text';
+      var val=(chk.sv&&chk.sv[fname])||'';
+      var esc=val.toString().replace(/"/g,'&quot;');
+      var onChange='updSub(\''+id+'\',\''+type+'\','+idx+',\''+fname+'\',this.value)';
+      var inp='';
+      if(ftype==='select'){
+        inp='<select onchange="'+onChange+'">'+(val?'':'<option value="">選択...</option>')+f.opts.map(function(o){return '<option value="'+o+'"'+(val===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select>';
+      }else if(ftype==='number'){
+        inp='<input type="number" min="0" value="'+esc+'" onchange="'+onChange+'" placeholder="0">'+(f.suffix?'<span class="input-suffix">'+f.suffix+'</span>':'');
+      }else if(ftype==='currency'){
+        inp='<span class="input-prefix">$</span><input type="number" min="0" value="'+esc+'" onchange="'+onChange+'" placeholder="0">';
+      }else if(ftype==='date'){
+        inp='<input type="date" value="'+esc+'" onchange="'+onChange+'">';
+      }else if(ftype==='url'){
+        inp='<input type="url" value="'+esc+'" onchange="'+onChange+'" placeholder="https://...">';
+      }else{
+        inp='<input value="'+esc+'" onchange="'+onChange+'" placeholder="...">';
+      }
+      return '<div class="sub"><label>'+fname+'</label>'+inp+'</div>';
+    };
+    return '<div class="chk"><div class="chk-hdr"><span class="lbl '+(done?'done':'')+'">'+item.t+(item.d?' <span style="color:var(--text-muted);font-size:10px">— '+item.d+'</span>':'')+'</span>'+(type!=='opt'?'<div class="pchk">'+M.map(function(m){return '<div class="pc '+(chk.p[m]?'on':'')+'" onclick="event.stopPropagation();toggleP(\''+id+'\',\''+type+'\','+idx+',\''+m+'\')" title="'+m+'">'+m[0]+'</div>';}).join('')+'</div>':'')+'</div>'+(item.f?'<div class="subs">'+item.f.map(renderSubInput).join('')+'</div>':'<textarea class="itxt" rows="1" placeholder="'+(item.ph||'メモ...')+'" onchange="updVal(\''+id+'\',\''+type+'\','+idx+',this.value)">'+(type==='opt'?chk.v:(chk.v||''))+'</textarea>')+'</div>';
+  };
+
+  document.getElementById('v-deal').innerHTML=
+    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap"><div style="flex:1"><h2 style="font-size:22px;font-weight:800">'+d.name+'</h2><div style="color:var(--text-dim);font-size:12px">Matsuyuki · '+d.owner+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><div class="meta-chip" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px"><div class="dot" style="background:'+p.color+';width:6px;height:6px;border-radius:50%"></div>P'+d.currentPhase+'｜'+p.name+'</div><div style="padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px">'+pi+'</div>'+(d.deadline?'<div style="padding:4px 10px;background:var(--surface);border:1px solid '+(new Date(d.deadline)<new Date()?'var(--red)':'var(--border)')+';border-radius:16px;font-size:10px;'+(new Date(d.deadline)<new Date()?'color:var(--red)':'')+'">🎯 '+new Date(d.deadline).toLocaleDateString('ja-JP')+'</div>':'')+'<div style="padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px">📅 '+days+'日目</div>'+(p.team?'<div style="padding:4px 10px;background:var(--surface);border:1px solid var(--accent);border-radius:16px;font-size:10px;color:var(--accent-light)">👥 全員チェック</div>':'')+(d.category?d.category.split(',').map(function(c){return '<span class="cat-badge">'+c+'</span>';}).join(''):'')+'</div></div>'+
+    '<div class="timeline">'+PHASES.map(function(ph){return '<div class="tstep '+(ph.id<d.currentPhase?'done':ph.id===d.currentPhase?'cur':'')+'"><div class="tdot">'+(ph.id<d.currentPhase?'✓':ph.id)+'</div><div class="tlbl">'+ph.name+'</div></div>';}).join('')+'</div>'+
+    renderDealSummaryCard(d)+
+    '<div class="tabs"><button class="tab active" onclick="stab(\'chk\',this)">📋 チェックリスト</button><button class="tab" onclick="stab(\'iss\',this)">📌 Issues ('+linkedIssues.length+')</button><button class="tab" onclick="stab(\'ai\',this)">🤖 AI</button></div>'+
+    '<div class="tab-panel active" id="tp-chk">'+
+      '<div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:700;color:'+p.color+'">Phase '+p.id+'｜'+p.name+'</span><span style="font-size:11px;padding:3px 10px;border-radius:16px;background:'+(ok?'var(--green-bg);color:var(--green)':'var(--yellow-bg);color:var(--yellow)')+'">'+(ok?'✓ 通過可能':'ゲート '+gc+'/'+gt2+' · 把握 '+rc+'/'+rt)+'</span></div><div style="font-size:12px;color:var(--text-dim);margin-top:4px"><strong>Phase達成条件:</strong> '+p.cond+'</div></div>'+
+      '<div class="section"><div class="section-title">🚪 ゲート条件 <span class="badge bg">MUST COMPLETE</span></div><div class="section-desc" style="border-color:'+SD.gate.b+'">'+SD.gate.t+'</div>'+p.gate.map(function(item,i){return ri(item,dp.gc[i],'gate',i);}).join('')+'</div>'+
+      '<div class="section"><div class="section-title">🧠 把握必須 <span class="badge br">MUST KNOW</span></div><div class="section-desc" style="border-color:'+SD.req.b+'">'+SD.req.t+'</div>'+p.req.map(function(item,i){return ri(item,dp.rc[i],'req',i);}).join('')+'</div>'+
+      '<div class="section"><div class="section-title">💡 オプション <span class="badge bo">NICE TO HAVE</span></div><div class="section-desc" style="border-color:'+SD.opt.b+'">'+SD.opt.t+'</div>'+p.opt.map(function(item,i){return ri(item,dp.oc[i],'opt',i);}).join('')+'</div>'+
+      '<div class="section"><div class="section-title">📄 成果物</div><div class="delivs">'+p.del.map(function(d2,i){return '<div class="deliv" onclick="togDel(\''+id+'\','+i+')"><span>📋</span><span>'+d2+'</span><span class="ds '+(dp.dc[i]?'on':'')+'"></span></div>';}).join('')+'</div></div>'+
+      '<div class="ks"><div class="ks-title">⚠ キルスイッチ</div>'+p.ks.map(function(k){return '<div class="ks-item">'+k+'</div>';}).join('')+'<div style="margin-top:10px"><button class="btn danger" onclick="cd=\''+id+'\';openModal(\'m-ks\')">発動記録</button></div></div>'+
+      '<div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">'+(d.currentPhase>0?'<button class="btn" onclick="retPhase(\''+id+'\')">← 後退</button>':'')+'<button class="btn primary" onclick="advPhase(\''+id+'\')" '+(ok?'':'disabled style="opacity:0.4;cursor:not-allowed"')+'>'+(d.currentPhase<8?'Phase '+(d.currentPhase+1)+' へ →':'✓ 完了')+'</button><div style="flex:1"></div><button class="btn danger" onclick="delDeal(\''+id+'\')">削除</button></div>'+
+      (d.killLogs.length?'<div style="margin-top:16px"><h4 style="font-size:13px;color:var(--red);margin-bottom:8px">キルスイッチログ</h4><table style="width:100%;border-collapse:collapse;font-size:11px"><tr style="background:var(--surface2)"><th style="text-align:left;padding:6px">日付</th><th>Phase</th><th>条件</th><th>判定</th><th>判定者</th></tr>'+d.killLogs.map(function(l){return '<tr><td style="padding:6px">'+new Date(l.date).toLocaleDateString('ja-JP')+'</td><td>P'+l.phase+'</td><td>'+l.cond+'</td><td style="color:'+(l.verdict==='撤退'?'var(--red)':'var(--green)')+'">'+l.verdict+'</td><td>'+l.judge+'</td></tr>';}).join('')+'</table></div>':'')+
+    '</div>'+
+    '<div class="tab-panel" id="tp-iss"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><h3 style="font-size:15px">この案件のIssues</h3><button class="btn primary" onclick="populateLink(\'f-il\');document.getElementById(\'f-il\').value=\''+id+'\';openModal(\'m-issue\')">＋ Issue追加</button></div>'+(!linkedIssues.length?'<div style="color:var(--text-muted);font-size:12px">まだIssueなし</div>':linkedIssues.map(renderIC).join(''))+'</div>'+
+    '<div class="tab-panel" id="tp-ai"><div style="background:var(--surface);border:1px solid var(--accent-dim);border-radius:10px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:18px">🤖</span><h3 style="font-size:14px;color:var(--accent-light)">AI アシスタント</h3></div><p style="font-size:11px;color:var(--text-muted);margin-bottom:10px">音声書き起こし・LINE会話・メモを貼り付け → AIが構造化してフィールドに自動入力（将来実装）</p><textarea class="itxt" rows="6" placeholder="ここにテキストを貼り付け..." id="ai-in"></textarea><div style="margin-top:10px"><button class="btn primary" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);border:none" onclick="alert(\'Claude API連携は次フェーズで実装予定\')">🤖 構造化して抽出</button></div></div></div>';
+}
+
+function iceScore(i){return (i.iceImpact||5)*(i.iceConfidence||5)*(i.iceEase||5);}
+function renderIC(i){
+  var pi=i.priority==='高'?'🔴':i.priority==='低'?'🔵':'🟡';
+  var dl=i.deadline?new Date(i.deadline).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}):'';
+  var od=i.deadline&&new Date(i.deadline)<new Date()&&i.status!=='done';
+  var ln=linkName(i.linkType,i.linkId);
+  var ice=iceScore(i);
+  var lang=window._lang||'ja';
+  var sIcebox=lang==='ja'?'氷':'Ice';var sBacklog=lang==='ja'?'BL':'BL';var sWip=lang==='ja'?'進':'WIP';var sWait=lang==='ja'?'止':'Wait';var sDone=lang==='ja'?'完':'Done';
+  return '<div class="ic"><div class="ic-t">'+pi+' '+i.title+'</div><div class="ic-m">'+renderMembers(i.assignee)+'<span class="ice-score">ICE:'+ice+'</span>'+(ln?'<span class="ic-tag '+(i.linkType==='case'?'case':'topic')+'">'+ln+'</span>':'')+(dl?'<span style="'+(od?'color:var(--red)':'')+'">'+(od?'⚠ ':'')+dl+'</span>':'')+(i.blockReason&&i.status==='waiting'?'<span class="block-badge">'+i.blockReason+'</span>':'')+'</div>'+(i.tags?'<div style="margin-top:3px">'+renderTags(i.tags)+'</div>':'')+(i.desc?'<div style="font-size:10px;color:var(--text-muted);margin-top:4px">'+i.desc.substring(0,80)+'</div>':'')+'<div class="ic-btns"><button class="sb '+(i.status==='icebox'?'s-icebox':'')+'" onclick="chgIssue(\''+i.id+'\',\'icebox\')" title="アイスボックス">'+sIcebox+'</button><button class="sb '+(i.status==='backlog'?'s-open':'')+'" onclick="chgIssue(\''+i.id+'\',\'backlog\')" title="バックログ">'+sBacklog+'</button><button class="sb '+(i.status==='wip'?'s-prog':'')+'" onclick="chgIssue(\''+i.id+'\',\'wip\')" title="進行中">'+sWip+'</button><button class="sb '+(i.status==='waiting'?'s-wait':'')+'" onclick="chgIssue(\''+i.id+'\',\'waiting\')" title="ブロック中">'+sWait+'</button><button class="sb '+(i.status==='done'?'s-done':'')+'" onclick="chgIssue(\''+i.id+'\',\'done\')" title="完了">'+sDone+'</button><button class="sb" style="margin-left:auto;font-size:9px" onclick="delIssue(\''+i.id+'\')">✕</button></div></div>';
+}
+
+function renderTopics(){
+  var sortBy=document.getElementById('tp-sort')?.value||'status';
+  var topics=D.topics.slice();
+  var so={open:0,discuss:1,resolved:2};
+  if(sortBy==='status')topics.sort(function(a,b){return (so[a.status]||0)-(so[b.status]||0);});
+  else if(sortBy==='name')topics.sort(function(a,b){return a.title.localeCompare(b.title);});
+  else if(sortBy==='issues')topics.sort(function(a,b){return D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===b.id;}).length-D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===a.id;}).length;});
+
+  document.getElementById('v-topics').innerHTML=
+    '<div class="list-header"><h2>💬 Topics</h2><div class="list-controls"><span class="count">'+topics.length+'件</span><select id="tp-sort" onchange="renderTopics()"><option value="status"'+(sortBy==='status'?' selected':'')+'>ステータス順</option><option value="name"'+(sortBy==='name'?' selected':'')+'>名前順</option><option value="issues"'+(sortBy==='issues'?' selected':'')+'>Issue数順</option></select><button class="btn primary" onclick="openModal(\'m-topic\')">＋ 新規Topic</button></div></div>'+
+    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">案件横断の意思決定テーマ。ゴールは結論を出すこと。</p>'+
+    (!topics.length?'<div style="color:var(--text-muted)">まだTopicなし</div>':topics.map(function(t){
+      var st=t.status==='open'?'未着手':t.status==='discuss'?'議論中':'結論済';
+      var sc=t.status==='open'?'ts-open':t.status==='discuss'?'ts-discuss':'ts-resolved';
+      var ic=D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===t.id;}).length;
+      return '<div class="list-row" onclick="openTopic(\''+t.id+'\')"><div class="lr-main"><div class="lr-title">'+t.title+'</div><div class="lr-sub"><span>Issues: '+ic+'件</span>'+(t.members?'<span>'+renderMembers(t.members)+'</span>':'')+(t.desc?'<span>'+t.desc.substring(0,50)+'</span>':'')+'</div></div><div class="lr-right"><span class="topic-status '+sc+'">'+st+'</span></div></div>';
+    }).join(''));
+}
+
+function openTopic(id){ct=id;go('topic-detail');renderTopicDetail(id);}
+
+function renderTopicDetail(id){
+  var t=gt(id);if(!t)return;
+  document.getElementById('tt').textContent=t.title;
+  var issues=D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===id;});
+  var logs=D.logs.filter(function(l){return l.linkType==='topic'&&l.linkId===id;});
+  document.getElementById('v-topic-detail').innerHTML=
+    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px"><div style="flex:1"><h2 style="font-size:20px;font-weight:800">'+t.title+'</h2><div style="color:var(--text-dim);font-size:12px;margin-top:4px">'+t.desc+'</div>'+(t.members?'<div style="margin-top:6px">'+renderMembers(t.members)+'</div>':'')+'</div><div style="display:flex;gap:6px"><button class="sb '+(t.status==='open'?'s-open':'')+'" onclick="updTopicStatus(\''+id+'\',\'open\');renderTopicDetail(\''+id+'\')">未着手</button><button class="sb '+(t.status==='discuss'?'s-prog':'')+'" onclick="updTopicStatus(\''+id+'\',\'discuss\');renderTopicDetail(\''+id+'\')">議論中</button><button class="sb '+(t.status==='done'?'s-done':'')+'" onclick="updTopicStatus(\''+id+'\',\'resolved\');renderTopicDetail(\''+id+'\')">結論済</button></div></div>'+
+    '<div class="section"><div class="section-title">📝 結論メモ</div><textarea class="itxt" rows="3" placeholder="結論が出たらここに記録..." onchange="updTopicConclusion(\''+id+'\',this.value)">'+(t.conclusion||'')+'</textarea></div>'+
+    '<div class="section"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><div class="section-title">📌 紐づくIssues</div><button class="btn primary" onclick="populateLink(\'f-il\');document.getElementById(\'f-il\').value=\''+id+'\';openModal(\'m-issue\')">＋ Issue</button></div>'+(!issues.length?'<div style="color:var(--text-muted);font-size:12px">なし</div>':issues.map(renderIC).join(''))+'</div>'+
+    '<div class="section"><div class="section-title">📝 関連Log</div>'+(!logs.length?'<div style="color:var(--text-muted);font-size:12px">なし</div>':logs.map(renderLogEntry).join(''))+'</div>'+
+    '<div style="margin-top:16px"><button class="btn danger" onclick="delTopic(\''+id+'\')">Topic削除</button></div>';
+}
+
+function renderIssues(){
+  var fa=document.getElementById('fi-a')?.value||'all';
+  var fl=document.getElementById('fi-l')?.value||'all';
+  var fs=document.getElementById('fi-s')?.value||'active';
+  var is=D.issues.slice();
+  if(fa!=='all')is=is.filter(function(i){return (i.assignee||'').split(',').indexOf(fa)>=0;});
+  if(fl!=='all'){if(fl==='none')is=is.filter(function(i){return !i.linkId;});else is=is.filter(function(i){return i.linkId===fl;});}
+  is.forEach(function(i){if(i.status==='open'||i.status==='todo')i.status='backlog';if(i.status==='progress')i.status='wip';});
+  if(fs==='active')is=is.filter(function(i){return i.status!=='done'&&i.status!=='icebox';});
+  else if(fs!=='all')is=is.filter(function(i){return i.status===fs;});
+  is.sort(function(a,b){return iceScore(b)-iceScore(a);});
+  var lang=window._lang||'ja';
+  var stLbl=function(s){return s==='icebox'?(lang==='ja'?'❄ アイスボックス':'❄ Icebox'):s==='backlog'?(lang==='ja'?'📋 バックログ':'📋 Backlog'):s==='wip'?(lang==='ja'?'🔄 進行中':'🔄 In Progress'):s==='waiting'?(lang==='ja'?'🚧 ブロック中':'🚧 Waiting'):(lang==='ja'?'✅ 完了':'✅ Done');};
+  var stClr=function(s){return s==='icebox'?'var(--text-muted)':s==='backlog'?'var(--blue)':s==='wip'?'var(--yellow)':s==='waiting'?'var(--red)':'var(--green)';};
+  var counts={icebox:0,backlog:0,wip:0,waiting:0,done:0};D.issues.forEach(function(i){var st=i.status==='open'||i.status==='todo'?'backlog':i.status==='progress'?'wip':i.status;if(counts[st]!==undefined)counts[st]++;});
+  document.getElementById('v-issues').innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px"><h2 style="font-size:18px;font-weight:800">📌 Issues</h2><button class="btn primary" onclick="populateLink(\'f-il\');openModal(\'m-issue\')">'+(lang==='ja'?'＋ 新規Issue':'＋ New Issue')+'</button></div>'+
+    '<div class="filters" style="flex-wrap:wrap"><span style="color:var(--text-muted)">'+(lang==='ja'?'担当:':'Assign:')+'</span><select id="fi-a" onchange="renderIssues()"><option value="all">'+(lang==='ja'?'全員':'All')+'</option>'+M.map(function(m){return '<option'+(fa===m?' selected':'')+'>'+m+'</option>';}).join('')+'</select><span style="color:var(--text-muted)">'+(lang==='ja'?'状態:':'Status:')+'</span><select id="fi-s" onchange="renderIssues()"><option value="active"'+(fs==='active'?' selected':'')+'>'+(lang==='ja'?'アクティブ':'Active')+'</option><option value="all"'+(fs==='all'?' selected':'')+'>'+(lang==='ja'?'全て':'All')+'</option><option value="icebox"'+(fs==='icebox'?' selected':'')+'>'+(lang==='ja'?'アイスボックス':'Icebox')+'</option><option value="backlog"'+(fs==='backlog'?' selected':'')+'>'+(lang==='ja'?'バックログ':'Backlog')+'</option><option value="wip"'+(fs==='wip'?' selected':'')+'>'+(lang==='ja'?'進行中':'In Progress')+'</option><option value="waiting"'+(fs==='waiting'?' selected':'')+'>'+(lang==='ja'?'ブロック中':'Waiting')+'</option><option value="done"'+(fs==='done'?' selected':'')+'>'+(lang==='ja'?'完了':'Done')+'</option></select><span style="color:var(--text-muted)">'+(lang==='ja'?'紐付:':'Link:')+'</span><select id="fi-l" onchange="renderIssues()"><option value="all">'+(lang==='ja'?'全て':'All')+'</option><option value="none"'+(fl==='none'?' selected':'')+'>'+(lang==='ja'?'未紐付':'Unlinked')+'</option>'+D.deals.map(function(d){return '<option value="'+d.id+'"'+(fl===d.id?' selected':'')+'>🌱 '+d.name+'</option>';}).join('')+D.topics.map(function(tp){return '<option value="'+tp.id+'"'+(fl===tp.id?' selected':'')+'>💬 '+tp.title+'</option>';}).join('')+'</select></div>'+
+    '<div style="display:flex;gap:6px;margin:8px 0 16px;flex-wrap:wrap">'+['icebox','backlog','wip','waiting','done'].map(function(s){return '<span style="font-size:10px;color:'+stClr(s)+';background:var(--surface2);padding:3px 8px;border-radius:4px">'+stLbl(s)+' '+counts[s]+'</span>';}).join('')+'</div>'+
+    (!is.length?'<div style="color:var(--text-muted);text-align:center;padding:40px">'+(lang==='ja'?'該当するIssueなし':'No issues found')+'</div>':
+    '<div class="issue-list">'+is.map(function(i){
+      var pi=i.priority==='高'?'🔴':i.priority==='低'?'🔵':'🟡';
+      var dl=i.deadline?new Date(i.deadline).toLocaleDateString(lang==='ja'?'ja-JP':'en-US',{month:'short',day:'numeric'}):'';
+      var od=i.deadline&&new Date(i.deadline)<new Date()&&i.status!=='done';
+      var ln=linkName(i.linkType,i.linkId);
+      var ice=iceScore(i);
+      var sLang=lang==='ja';
+      var sIce=sLang?'氷':'Ice';var sBL=sLang?'BL':'BL';var sWip=sLang?'進':'WIP';var sWt=sLang?'止':'Wait';var sDn=sLang?'完':'Done';
+      return '<div class="list-row" onclick="openEditIssue(\''+i.id+'\')" style="cursor:pointer;align-items:center;padding:10px 14px"><div style="min-width:50px;text-align:center;font-weight:700;color:var(--accent-light);font-size:13px">'+ice+'</div><div class="lr-main" style="min-width:0"><div class="lr-title" style="font-size:13px">'+pi+' '+i.title+'</div><div class="lr-sub" style="gap:6px"><span style="color:'+stClr(i.status)+';font-size:10px;font-weight:600">'+stLbl(i.status)+'</span>'+renderMembers(i.assignee)+(ln?'<span style="font-size:10px;color:var(--text-muted)">'+ln+'</span>':'')+(dl?'<span style="font-size:10px;'+(od?'color:var(--red)':'')+'">'+(od?'⚠ ':'')+dl+'</span>':'')+(i.blockReason&&i.status==='waiting'?'<span class="block-badge">'+i.blockReason+'</span>':'')+'</div>'+(i.tags?'<div style="margin-top:2px">'+renderTags(i.tags)+'</div>':'')+'</div><div class="ic-btns" style="flex-shrink:0;gap:2px"><button class="sb '+(i.status==='icebox'?'s-icebox':'')+'" onclick="event.stopPropagation();chgIssue(\''+i.id+'\',\'icebox\')" title="アイスボックス">'+sIce+'</button><button class="sb '+(i.status==='backlog'?'s-open':'')+'" onclick="event.stopPropagation();chgIssue(\''+i.id+'\',\'backlog\')" title="バックログ">'+sBL+'</button><button class="sb '+(i.status==='wip'?'s-prog':'')+'" onclick="event.stopPropagation();chgIssue(\''+i.id+'\',\'wip\')" title="進行中">'+sWip+'</button><button class="sb '+(i.status==='waiting'?'s-wait':'')+'" onclick="event.stopPropagation();chgIssue(\''+i.id+'\',\'waiting\')" title="ブロック中">'+sWt+'</button><button class="sb '+(i.status==='done'?'s-done':'')+'" onclick="event.stopPropagation();chgIssue(\''+i.id+'\',\'done\')" title="完了">'+sDn+'</button><button class="sb" style="margin-left:4px;font-size:9px" onclick="event.stopPropagation();delIssue(\''+i.id+'\')">✕</button></div></div>';
+    }).join('')+'</div>');
+}
+
+function renderLogEntry(l){
+  var tp=l.type==='decision'?'決定事項':l.type==='fact'?'新事実':'アクション変更';
+  var tc=l.type==='decision'?'var(--green)':l.type==='fact'?'var(--blue)':'var(--yellow)';
+  var ln=linkName(l.linkType,l.linkId);
+  return '<div class="log-entry"><div class="log-type" style="color:'+tc+'">'+tp+'</div><div class="log-text">'+l.content+'</div><div class="log-meta">'+l.by+' · '+new Date(l.createdAt).toLocaleDateString('ja-JP')+(ln?' · <span class="log-tag" style="background:'+(l.linkType==='case'?'rgba(108,92,231,0.15);color:var(--accent-light)':'var(--cyan-bg);color:var(--cyan)')+'">'+ln+'</span>':'')+'</div></div>';
+}
+
+function renderLog(){
+  document.getElementById('v-log').innerHTML=
+    '<div style="display:flex;justify-content:space-between;margin-bottom:16px"><h2 style="font-size:18px;font-weight:800">Decision Log</h2><button class="btn primary" onclick="populateLink(\'f-ll\');openModal(\'m-log\')">＋ 記録</button></div>'+
+    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:16px">決定事項・新事実・アクション変更の3カテゴリのみ記録。</p>'+
+    (!D.logs.length?'<div style="color:var(--text-muted)">まだ記録なし</div>':D.logs.slice().reverse().map(renderLogEntry).join(''));
+}
+
+function renderKB(){
+  var kbOpen=window._kbOpen||null;
+  document.getElementById('v-kb').innerHTML='<div style="max-width:780px"><h2 style="font-size:18px;font-weight:800;margin-bottom:16px">📖 Knowledge Base</h2>'+
+    '<div class="kb-card" onclick="toggleKB(\'about\')" style="border-color:var(--accent-dim)"><h4>⭐ はじめに読む — 阿吽とは何か</h4><p>このツールの目的・設計思想・3人での使い方。最初にこれを読んでください。</p></div>'+
+    '<div class="kb-detail '+(kbOpen==='about'?'show':'')+'" id="kb-about">'+
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px">'+
+        '<h2 style="font-size:20px;margin-bottom:16px">阿吽（A-Un）— 設計思想と使い方</h2>'+
+        '<div style="background:var(--accent-dim);border-radius:8px;padding:16px;margin-bottom:20px;color:var(--text)">'+
+          '<h3 style="font-size:15px;margin-bottom:8px">一言で言うと</h3>'+
+          '<p style="font-size:14px;line-height:1.6"><strong>阿吽は、白石・中野・松崎の3人が新規事業を構造的に立ち上げるための情報同期プラットフォーム。</strong><br>案件の進捗・課題・決定事項が常に3人で共有されている状態を作る。</p>'+
+        '</div>'+
+        '<h3 style="font-size:15px;margin-bottom:10px;color:var(--accent-light)">なぜこのツールが必要か</h3>'+
+        '<div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:20px">'+
+          '3人で複数の新規事業を同時に動かすとき、最大のリスクは<strong style="color:var(--text)">情報の断絶</strong>。<br>'+
+          '誰が何を進めていて、何が決まって、何が止まっているか — これが見えないと判断を間違える。<br><br>'+
+          'LINEや口頭では情報が流れて消える。このツールは<strong style="color:var(--text)">情報を構造化して蓄積する場所</strong>。<br>'+
+          '「あの話どうなった？」をゼロにする。'+
+        '</div>'+
+        '<h3 style="font-size:15px;margin-bottom:10px;color:var(--accent-light)">設計思想</h3>'+
+        '<div style="display:grid;gap:10px;margin-bottom:20px;font-size:12px">'+
+          '<div style="background:var(--surface2);padding:12px;border-radius:8px"><strong style="color:var(--text)">1. 案件はフェーズで管理する</strong><br>新規事業は9つのフェーズ（発掘→概念設計→事業モデル→チーム合意→課題検証→製品検証→顧客実証→モデル確定→組織構築）を順番にクリアしていく。各フェーズには「これができないと進めない」条件がある。感覚ではなく構造で進める。</div>'+
+          '<div style="background:var(--surface2);padding:12px;border-radius:8px"><strong style="color:var(--text)">2. やめ時も決める（キルスイッチ）</strong><br>各フェーズに撤退条件がある。「金を払いたい人が10人中0人」なら撤退。情に流されず、事前に決めた条件で判断する。</div>'+
+          '<div style="background:var(--surface2);padding:12px;border-radius:8px"><strong style="color:var(--text)">3. 案件以外の論点も管理する（Topics）</strong><br>「法人設立するか」「役割分担どうするか」など、特定の案件に紐づかないが3人で決めるべきテーマも管理する。</div>'+
+          '<div style="background:var(--surface2);padding:12px;border-radius:8px"><strong style="color:var(--text)">4. 課題は必ず誰かに紐づく（Issues）</strong><br>「誰が何をいつまでにやるか」を明確にする。案件またはTopicに必ず紐づく。宙に浮くタスクは作らない。</div>'+
+          '<div style="background:var(--surface2);padding:12px;border-radius:8px"><strong style="color:var(--text)">5. 決まったことは記録する（Decision Log）</strong><br>決定事項・新事実・アクション変更の3種類だけ記録する。日記的な「今日やったこと」は不要。</div>'+
+        '</div>'+
+        '<h3 style="font-size:15px;margin-bottom:10px;color:var(--accent-light)">画面の構成</h3>'+
+        '<div style="display:grid;gap:8px;margin-bottom:20px;font-size:12px">'+
+          '<div style="background:var(--surface2);padding:10px;border-radius:8px"><strong>📊 全体像</strong> — 全ての情報を1画面で把握するダッシュボード</div>'+
+          '<div style="background:var(--surface2);padding:10px;border-radius:8px"><strong>🌱 新規事業</strong> — 案件の一覧とフェーズ管理。パイプラインで進捗が見える</div>'+
+          '<div style="background:var(--surface2);padding:10px;border-radius:8px"><strong>💬 論点</strong> — 3人で決めるべきテーマ。ステータス: 未着手→議論中→結論済</div>'+
+          '<div style="background:var(--surface2);padding:10px;border-radius:8px"><strong>📌 課題</strong> — 誰が何をやるか。カンバン形式: アイスボックス→バックログ→進行中→ブロック中→完了。ICEスコアで優先順位付け</div>'+
+          '<div style="background:var(--surface2);padding:10px;border-radius:8px"><strong>🤖 入力</strong> — メモや会話内容をここに貼って、案件・論点・課題・ログに振り分ける</div>'+
+          '<div style="background:var(--surface2);padding:10px;border-radius:8px"><strong>📝 決定ログ</strong> — 決まったこと・わかったことの記録</div>'+
+          '<div style="background:var(--surface2);padding:10px;border-radius:8px"><strong>📖 ナレッジベース</strong> — 参考資料（今読んでいるページ）</div>'+
+          '<div style="background:var(--surface2);padding:10px;border-radius:8px"><strong>🗺️ 開発ロードマップ</strong> — このツール自体の開発計画</div>'+
+        '</div>'+
+        '<h3 style="font-size:15px;margin-bottom:10px;color:var(--accent-light)">使い方（3人共通）</h3>'+
+        '<div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:20px">'+
+          '<strong style="color:var(--text)">1.</strong> このURLをブックマークする<br>'+
+          '<strong style="color:var(--text)">2.</strong> 週1回は全体像を確認する（自分のIssueが溜まっていないか）<br>'+
+          '<strong style="color:var(--text)">3.</strong> 案件を進めたらフェーズのゲート条件をチェックしていく<br>'+
+          '<strong style="color:var(--text)">4.</strong> 何か決まったらDecision Logに記録する<br>'+
+          '<strong style="color:var(--text)">5.</strong> 3人の確認が必要なフェーズ（Phase 3: チーム合意等）では全員がチェックを入れる<br>'+
+        '</div>'+
+        '<h3 style="font-size:15px;margin-bottom:10px;color:var(--accent-light)">提案</h3>'+
+        '<div style="font-size:13px;color:var(--text);line-height:1.8;background:var(--surface2);padding:16px;border-radius:8px">'+
+          '僕ら3人の案件管理を、このツールをベースに進めていきたい。<br><br>'+
+          '理由はシンプルで、<strong>情報が1箇所に集まっていないと判断を間違える</strong>から。<br>'+
+          'LINEで話したことも、電話で決めたことも、全部ここに集約する。<br><br>'+
+          'まずは2週間使ってみて、足りないもの・余計なものを洗い出そう。<br>'+
+          'このツール自体も僕らの案件の1つ（阿吽SaaS化）として管理している。'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="kb-card" onclick="toggleKB(\'playbook\')"><h4>🌱 New Biz. Dev. Playbook</h4><p>新規事業フェーズ管理の全体像。Steve Blank × 才流 × 白石OSの統合メソッド。9フェーズ。</p></div>'+
+    '<div class="kb-detail '+(kbOpen==='playbook'?'show':'')+'" id="kb-playbook">'+
+    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px"><h3 style="font-size:13px;margin-bottom:8px">セクション</h3><div style="display:grid;gap:6px;font-size:11px"><div style="padding:8px;background:var(--red-bg);border-radius:6px"><strong style="color:var(--red)">🚪 ゲート（MUST COMPLETE）</strong> — 全項目クリアで次Phase</div><div style="padding:8px;background:var(--yellow-bg);border-radius:6px"><strong style="color:var(--yellow)">🧠 把握必須（MUST KNOW）</strong> — 「不明」不可</div><div style="padding:8px;background:var(--blue-bg);border-radius:6px"><strong style="color:var(--blue)">💡 オプション（NICE TO HAVE）</strong> — 精度向上</div></div><div style="font-size:11px;color:var(--text-dim);margin-top:10px;line-height:1.7"><strong>通常Phase:</strong> 1人以上チェックで通過<br><strong>チーム合意Phase（3・7・8）:</strong> 3人全員必須</div></div>'+
+    PHASES.map(function(p){return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px"><h3 style="color:'+p.color+';margin-bottom:4px;font-size:14px">Phase '+p.id+'｜'+p.name+'（'+p.en+'）'+(p.team?' 👥':'')+'</h3><div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">'+p.def+'</div><div style="background:var(--surface2);padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:10px"><strong>達成条件:</strong> '+p.cond+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:11px"><div><div style="font-weight:700;color:var(--red);margin-bottom:6px">🚪 ゲート</div>'+p.gate.map(function(g){return '<div style="padding:2px 0;color:var(--text-dim)">• '+g.t+'</div>';}).join('')+'</div><div><div style="font-weight:700;color:var(--yellow);margin-bottom:6px">🧠 把握必須</div>'+p.req.map(function(r){return '<div style="padding:2px 0;color:var(--text-dim)">• '+r.t+'</div>';}).join('')+'</div></div><div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px"><span style="color:var(--red);font-weight:700">⚠ KS:</span> '+p.ks.join(' / ')+'</div></div>';}).join('')+
+    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px"><h3 style="font-size:13px;margin-bottom:8px">フェーズ間ルール</h3><div style="font-size:12px;color:var(--text-dim);line-height:1.7"><strong style="color:var(--green)">前進:</strong> 全ゲート+把握必須クリア<br><strong style="color:var(--yellow)">後退:</strong> KS該当→1Phase戻り<br><strong style="color:var(--red)">停止:</strong> 3回繰返→撤退<br><strong style="color:var(--orange)">滞留:</strong> 3ヶ月→原因分析</div></div>'+
+    '</div></div>';
+}
+function toggleKB(id){window._kbOpen=window._kbOpen===id?null:id;renderKB();}
+
+function addDevLog(){
+  var v=document.getElementById('f-dlv').value.trim();
+  var c=document.getElementById('f-dlc').value.trim();
+  if(!c)return;
+  if(!D._devLog)D._devLog=[];
+  D._devLog.push({version:v||'update',content:c,date:new Date().toLocaleDateString('ja-JP')});
+  sv();closeModal('m-devlog');
+  document.getElementById('f-dlv').value='';document.getElementById('f-dlc').value='';
+  renderRoadmap();
+}
+
+function renderInput(){
+  document.getElementById('v-input').innerHTML=
+    '<div style="max-width:780px">'+
+    '<h2 style="font-size:18px;font-weight:800;margin-bottom:6px">🤖 Input</h2>'+
+    '<p style="font-size:12px;color:var(--text-dim);margin-bottom:16px">会話・メモ・音声書き起こしなどの発散情報をここに入力。内容を精査して、案件・Topic・Issue・Decision Logに振り分ける。</p>'+
+    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px">'+
+      '<textarea class="itxt" id="input-text" rows="10" placeholder="ここにテキストを貼り付けてください..." style="min-height:200px">'+(D._inputDraft||'')+'</textarea>'+
+      '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">'+
+        '<button class="btn" onclick="saveInputDraft()">💾 下書き保存</button>'+
+        '<div style="flex:1"></div>'+
+        '<span style="font-size:10px;color:var(--text-muted);padding:6px">振り分け先:</span>'+
+      '</div>'+
+    '</div>'+
+    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">振り分け先を選択（複数選択可）:</p>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:12px">'+
+      '<label class="kb-card" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin:0" onclick="event.stopPropagation()"><input type="checkbox" id="inp-issue" style="width:18px;height:18px;accent-color:var(--accent)"><div><h4 style="font-size:13px">📌 Issueとして起票</h4><p>「誰が何をすべきか」をIssueに変換</p></div></label>'+
+      '<label class="kb-card" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin:0" onclick="event.stopPropagation()"><input type="checkbox" id="inp-log" style="width:18px;height:18px;accent-color:var(--accent)"><div><h4 style="font-size:13px">📝 決定ログに記録</h4><p>決定事項・新事実・変更をLogに追加</p></div></label>'+
+      '<label class="kb-card" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin:0" onclick="event.stopPropagation()"><input type="checkbox" id="inp-topic" style="width:18px;height:18px;accent-color:var(--accent)"><div><h4 style="font-size:13px">💬 論点として追加</h4><p>新しい論点としてTopicに追加</p></div></label>'+
+      '<label class="kb-card" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin:0" onclick="event.stopPropagation()"><input type="checkbox" id="inp-case" style="width:18px;height:18px;accent-color:var(--accent)"><div><h4 style="font-size:13px">🌱 案件メモに追加</h4><p>既存案件のフェーズ情報に反映</p></div></label>'+
+    '</div>'+
+    '<button class="btn primary" onclick="inputMulti()" style="width:100%;padding:10px">選択した先に振り分ける →</button>'+
+    '<div style="margin-top:20px;padding:16px;background:var(--surface);border:1px solid var(--accent-dim);border-radius:10px">'+
+      '<h4 style="color:var(--accent-light);font-size:13px;margin-bottom:8px">🔮 将来のAI統合</h4>'+
+      '<p style="font-size:11px;color:var(--text-dim);line-height:1.6">Phase 2で実装予定: テキストを貼り付けると、AIが自動的に内容を解析し、どの案件・Topic・Issueに該当するかを提案。</p>'+
+    '</div>'+
+    '</div>';
+}
+function saveInputDraft(){D._inputDraft=document.getElementById('input-text')?.value||'';}
+function inputMulti(){
+  var text=document.getElementById('input-text')?.value||'';
+  if(!text.trim()){alert('テキストを入力してください');return;}
+  var sel=[];
+  if(document.getElementById('inp-issue')?.checked)sel.push('issue');
+  if(document.getElementById('inp-log')?.checked)sel.push('log');
+  if(document.getElementById('inp-topic')?.checked)sel.push('topic');
+  if(document.getElementById('inp-case')?.checked)sel.push('case');
+  if(!sel.length){alert('振り分け先を1つ以上選択してください');return;}
+  window._inputQueue=sel.slice();
+  window._inputText=text;
+  processInputQueue();
+}
+function processInputQueue(){
+  if(!window._inputQueue||!window._inputQueue.length)return;
+  var type=window._inputQueue.shift();
+  var text=window._inputText;
+  if(type==='issue'){populateLink('f-il');document.getElementById('f-id').value=text;openModal('m-issue');}
+  else if(type==='log'){populateLink('f-ll');document.getElementById('f-lc').value=text;openModal('m-log');}
+  else if(type==='topic'){document.getElementById('f-td').value=text;openModal('m-topic');}
+  else if(type==='case'){
+    if(!D.deals.length){alert('案件がありません');processInputQueue();return;}
+    var id=prompt('案件名を入力（部分一致）:');
+    if(id){var deal=D.deals.find(function(d){return d.name.includes(id);});if(deal)openDeal(deal.id);}
+    processInputQueue();
+  }
+}
+
+function renderRoadmap(){
+  document.getElementById('v-roadmap').innerHTML='<div style="max-width:700px"><h2 style="font-size:20px;font-weight:800;margin-bottom:6px">阿吽 開発ロードマップ</h2><p style="font-size:12px;color:var(--text-dim);margin-bottom:20px">このツール自体の開発計画・方向性</p>'+
+    '<div class="rm-phase" style="border-left:3px solid var(--green)"><h4><span class="rm-check">✅</span> Phase 1 — MVP</h4><div class="rm-item"><span class="rm-check">✅</span> 案件管理（9フェーズ × ゲート条件 × 3人チェック）</div><div class="rm-item"><span class="rm-check">✅</span> Issue管理（Case/Topic紐付き × カンバン）</div><div class="rm-item"><span class="rm-check">✅</span> Topics（論点管理 × 結論メモ）</div><div class="rm-item"><span class="rm-check">✅</span> Decision Log（決定事項/新事実/アクション変更）</div><div class="rm-item"><span class="rm-check">✅</span> Playbook（全フェーズ定義一覧）</div></div>'+
+    '<div class="rm-phase" style="border-left:3px solid var(--green)"><h4><span class="rm-check">✅</span> Phase 1.5 — GAS WebApp化（現在）</h4><div class="rm-item"><span class="rm-check">✅</span> Google Sheets連携（自動保存）</div><div class="rm-item"><span class="rm-check">✅</span> マルチデバイス対応</div><div class="rm-item"><span class="rm-check">✅</span> ローカルストレージ依存排除</div></div>'+
+    '<div class="rm-phase" style="border-left:3px solid var(--yellow)"><h4>🔄 Phase 2 — AI統合</h4><div class="rm-item">⬜ Claude API接続（テキスト→構造化自動入力）</div><div class="rm-item">⬜ LINE Webhook連携（グループ会話→自動抽出）</div><div class="rm-item">⬜ 音声ファイルアップロード→文字起こし→構造化</div></div>'+
+    '<div class="rm-phase" style="border-left:3px solid var(--blue)"><h4>⬜ Phase 3 — マルチユーザー</h4><div class="rm-item">⬜ 認証（白石/中野/松崎の個別ログイン）</div><div class="rm-item">⬜ リアルタイム同期</div><div class="rm-item">⬜ 通知（Telegram連携）</div></div>'+
+    '<div class="rm-phase" style="border-left:3px solid var(--accent)"><h4>⬜ Phase 4 — 商品化</h4><div class="rm-item">⬜ 汎用テンプレート化</div><div class="rm-item">⬜ マルチチーム対応</div><div class="rm-item">⬜ 課金機能</div></div>'+
+    '<h3 style="font-size:16px;font-weight:800;margin:28px 0 12px">📋 開発ログ</h3>'+
+    (D._devLog&&D._devLog.length?D._devLog.slice().reverse().map(function(l){return '<div class="log-entry"><div class="log-type" style="color:var(--accent-light)">'+l.version+'</div><div class="log-text">'+l.content+'</div><div class="log-meta">'+l.date+'</div></div>';}).join(''):'')+
+    '<div style="margin-top:12px"><button class="btn primary" onclick="openModal(\'m-devlog\')">＋ 手動追加</button></div>'+
+    '<h3 style="font-size:16px;font-weight:800;margin:28px 0 12px">📊 アクティビティ（自動記録）</h3>'+
+    (D.activities&&D.activities.length?D.activities.map(function(a){var ic=a.action==='created'?'🆕':a.action==='updated'?'✏️':a.action==='deleted'?'🗑️':a.action==='commented'?'💬':a.action==='saved'?'💾':'📝';var ts=a.timestamp?new Date(a.timestamp).toLocaleDateString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';return '<div class="log-entry"><div class="log-type" style="color:var(--text-dim)">'+ic+' '+a.action+'</div><div class="log-text">'+a.target+(a.targetId?' ('+a.targetId+')':'')+'</div><div class="log-meta">'+(a.by||'')+' · '+ts+'</div></div>';}).join(''):'<div style="color:var(--text-muted);font-size:12px">アクティビティなし</div>')+
+  '</div>';
+}
+
+function stab(id,btn){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});btn.classList.add('active');document.getElementById('tp-'+id).classList.add('active');}
+
+// ============================================================
+// NAV
+// ============================================================
+function go(v){cv=v;document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  var viewId='v-'+v;var el=document.getElementById(viewId);if(el)el.classList.add('active');
+  var navBtn=document.querySelector('[data-view="'+v+'"]');if(navBtn)navBtn.classList.add('active');
+  var lang=window._lang||'ja';
+  var titles=lang==='ja'?{overview:'全体像',cases:'新規事業',topics:'論点',issues:'課題',input:'入力',log:'決定ログ',kb:'ナレッジベース',roadmap:'開発ロードマップ'}:{overview:'Overview',cases:'New Biz. Dev.',topics:'Topics',issues:'Issues',input:'Input',log:'Decision Log',kb:'Knowledge Base',roadmap:'Dev Roadmap'};
+  if(titles[v])document.getElementById('tt').textContent=titles[v];
+  // Close sidebar on mobile after navigation
+  var sb=document.getElementById('sidebar');if(sb){sb.classList.remove('open');var ov=document.getElementById('sidebar-overlay');if(ov)ov.style.display='none';}
+  render();
+}
+function openModal(id){populateLink('f-il');populateLink('f-ll');document.getElementById(id).classList.add('show');}
+document.querySelectorAll('.modal-bg').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el){el.classList.remove('show');if(el.id==='m-issue'&&window._editIssueId)resetIssueForm();}});});
+
+// Menu button always visible (sidebar is slide-to-open on all sizes)
+
+// Language & i18n
+window._lang='ja';
+var T={};
+var _i18n={
+  ja:{cases_count:'件',open_issues:'未完了Issue',topics_label:'論点',unresolved:'未解決',recorded:'記録済',alerts:'⚠ アラート',pipeline:'🌱 New Biz. Dev. Pipeline',issues_by_person:'📌 担当者別Issue',recent_log:'📝 最新Log',no_log:'まだ記録なし',new_deal:'＋ 新規案件',sort_priority:'優先度順',sort_phase:'Phase順',sort_owner:'責任者順',sort_deadline:'期限順',sort_name:'名前順',gate:'ゲート',stall_days:'日滞留',overdue:'期限超過',new_issue:'＋ 新規Issue',new_topic:'＋ 新規論点',add_log:'＋ 記録',status_icebox:'アイスボックス',status_backlog:'バックログ',status_todo:'未着手',status_wip:'進行中',status_waiting:'ブロック中',status_done:'完了',status_discussing:'議論中',status_resolved:'結論済',conclusion:'結論',linked_issues:'関連Issue',back:'← 戻る',advance:'次フェーズへ →',retreat:'← 前フェーズに戻る',killswitch:'⚠ キルスイッチ判定',gate_cond:'ゲート条件（必須）',required_info:'把握必須項目',optional_info:'オプション情報',deliverables:'成果物',all_gate_clear:'全ゲート+把握必須を完了してください',confirm_retreat:'前フェーズに戻る？',filter_all:'全て',filter_mine:'自分のみ',new_biz:'🌱 New Biz. Dev.',decision:'決定',fact:'新事実',change:'変更',input_title:'入力',input_placeholder:'テキストを貼り付けてください...（LINEの会話、音声書き起こし、メモなど）',input_analyze:'構造化して振り分け',input_result:'振り分け結果',kb_title:'📖 ナレッジベース',roadmap_title:'🗺️ 阿吽 開発ロードマップ',add_dev_log:'＋ 開発ログ追加',dev_log:'開発ログ',no_topics:'論点なし',no_issues:'課題なし',cases_num:'案件数'},
+  en:{cases_count:' deals',open_issues:'Open Issues',topics_label:'Topics',unresolved:'Unresolved',recorded:'Recorded',alerts:'⚠ Alerts',pipeline:'🌱 New Biz. Dev. Pipeline',issues_by_person:'📌 Issues by Person',recent_log:'📝 Recent Log',no_log:'No entries yet',new_deal:'＋ New Deal',sort_priority:'By Priority',sort_phase:'By Phase',sort_owner:'By Owner',sort_deadline:'By Deadline',sort_name:'By Name',gate:'Gate',stall_days:' days stalled',overdue:'Overdue',new_issue:'＋ New Issue',new_topic:'＋ New Topic',add_log:'＋ Add Log',status_icebox:'Icebox',status_backlog:'Backlog',status_todo:'To Do',status_wip:'In Progress',status_waiting:'Waiting',status_done:'Done',status_discussing:'Discussing',status_resolved:'Resolved',conclusion:'Conclusion',linked_issues:'Linked Issues',back:'← Back',advance:'Next Phase →',retreat:'← Previous Phase',killswitch:'⚠ Kill Switch',gate_cond:'Gate Conditions (Required)',required_info:'Required Info',optional_info:'Optional Info',deliverables:'Deliverables',all_gate_clear:'Complete all gate & required items first',confirm_retreat:'Go back to previous phase?',filter_all:'All',filter_mine:'Mine',new_biz:'🌱 New Biz. Dev.',decision:'Decision',fact:'New Fact',change:'Change',input_title:'Input',input_placeholder:'Paste text here... (LINE chats, voice transcripts, notes)',input_analyze:'Analyze & Route',input_result:'Routing Result',kb_title:'📖 Knowledge Base',roadmap_title:'🗺️ A-Un OS Dev Roadmap',add_dev_log:'＋ Add Dev Log',dev_log:'Dev Log',no_topics:'No topics',no_issues:'No issues',cases_num:'Deals'}
+};
+function t(k){return (_i18n[window._lang]||_i18n.ja)[k]||(_i18n.ja)[k]||k;}
+function setLang(l){
+  window._lang=l==='en'?'en':'ja';
+  document.getElementById('lb-jp').style.opacity=window._lang==='ja'?'1':'0.4';
+  document.getElementById('lb-jp').style.fontWeight=window._lang==='ja'?'700':'400';
+  document.getElementById('lb-en').style.opacity=window._lang==='en'?'1':'0.4';
+  document.getElementById('lb-en').style.fontWeight=window._lang==='en'?'700':'400';
+  document.getElementById('logo-title').textContent=window._lang==='ja'?'阿吽':'A-Un';
+  document.getElementById('logo-sub').textContent=window._lang==='ja'?'事業構築OS v3.0':'Venture Phase OS v3.0';
+  document.getElementById('nav-sec-main').textContent=window._lang==='ja'?'メイン':'MAIN';
+  var ref=document.getElementById('nav-sec-ref');
+  if(ref)ref.textContent=window._lang==='ja'?'リファレンス':'REFERENCE';
+  document.querySelectorAll('.nav-label').forEach(function(el){el.textContent=el.dataset[window._lang]||el.dataset.ja;});
+  go(cv);
+}
+
+// Page-specific help
+var _pageHelp={
+  ja:{
+    overview:'<h4>📊 全体像</h4><p>全ての情報を1画面で確認するダッシュボード。</p><div class="ph-tip">💡 案件・Issue・論点の件数で全体の状態を把握。アラートは見逃さないで。</div>',
+    cases:'<h4>🌱 新規事業</h4><p>案件（事業の種）を管理。9つのフェーズを順番にクリアしていく。</p><div class="ph-tip">💡 案件をクリック → フェーズ詳細。ゲート条件を全員チェックしないと次に進めない。</div>',
+    deal:'<h4>🌱 案件詳細</h4><p>各フェーズのゲート条件・把握必須項目を確認・チェック。</p><div class="ph-tip">💡 白・中・松 のボタンで自分がチェックしたことを記録。全員チェックで次フェーズへ。</div>',
+    topics:'<h4>💬 論点</h4><p>案件に紐づかない、3人で決めるべきテーマ。</p><div class="ph-tip">💡 「法人設立するか？」のような意思決定テーマ。結論が出たら結論メモに記録。</div>',
+    issues:'<h4>📌 課題</h4><p>「誰が何をいつまでに」を管理。ICEスコア順に並ぶ。</p><p style="margin:8px 0 4px;font-weight:700;color:var(--text)">ステータスの流れ</p><p>❄ <b>アイスボックス</b> — いつかやる。今は動かさない<br>📋 <b>バックログ</b> — やると決めた。まだ着手しない<br>🔄 <b>進行中</b> — 誰かが今やっている<br>🚧 <b>ブロック中</b> — 外部依存で止まっている<br>✅ <b>完了</b> — 終わった</p><p style="margin:8px 0 4px;font-weight:700;color:var(--text)">ICEスコアとは</p><p><b>I</b>mpact（影響度）× <b>C</b>onfidence（確信度）× <b>E</b>ase（容易さ）<br>各1〜10。スコアが高い順にやるのが最も合理的。</p><div class="ph-tip">💡 行をクリックで編集。ステータスボタンで即座に状態変更。</div>',
+    input:'<h4>🤖 入力</h4><p>メモや会話テキストを貼り付けて、案件・Issue・論点に振り分ける。</p><div class="ph-tip">💡 LINEの会話をコピペ → 「構造化して振り分け」で適切な場所に送れる。</div>',
+    log:'<h4>📝 決定ログ</h4><p>3人で共有すべき重要な記録のみ。日記ではない。</p><div class="ph-tip">💡 記録するのは「決定事項」「新事実」「アクション変更」の3種類だけ。</div>',
+    kb:'<h4>📖 ナレッジベース</h4><p>参考資料やプレイブックをまとめた場所。</p><div class="ph-tip">💡 新規事業の進め方に迷ったらここを確認。</div>',
+    roadmap:'<h4>🗺️ 開発ロードマップ</h4><p>このツール自体の開発計画と変更履歴。</p><div class="ph-tip">💡 アクティビティは自動記録。手動で開発ログも追加可能。</div>'
+  },
+  en:{
+    overview:'<h4>📊 Overview</h4><p>Dashboard showing all key metrics at a glance.</p><div class="ph-tip">💡 Check deal/issue/topic counts and alerts here.</div>',
+    cases:'<h4>🌱 New Biz. Dev.</h4><p>Manage venture deals through 9 phases with gate conditions.</p><div class="ph-tip">💡 Click a deal → phase details. All 3 members must check gates to advance.</div>',
+    deal:'<h4>🌱 Deal Detail</h4><p>Check and mark gate conditions for each phase.</p><div class="ph-tip">💡 Use 白/中/松 buttons to record your check. All checked = next phase.</div>',
+    topics:'<h4>💬 Topics</h4><p>Decision themes shared among the 3 founders.</p><div class="ph-tip">💡 Record conclusions when decisions are made.</div>',
+    issues:'<h4>📌 Issues</h4><p>Task management sorted by ICE score (highest first).</p><p style="margin:8px 0 4px;font-weight:700;color:var(--text)">Status Flow</p><p>❄ <b>Icebox</b> — Someday. Not active now<br>📋 <b>Backlog</b> — Decided to do. Not started yet<br>🔄 <b>In Progress</b> — Someone is working on it<br>🚧 <b>Waiting</b> — Blocked by external dependency<br>✅ <b>Done</b> — Completed</p><p style="margin:8px 0 4px;font-weight:700;color:var(--text)">ICE Score</p><p><b>I</b>mpact × <b>C</b>onfidence × <b>E</b>ase (1-10 each)<br>Higher score = do it first.</p><div class="ph-tip">💡 Click a row to edit. Use status buttons for quick changes.</div>',
+    input:'<h4>🤖 Input</h4><p>Paste notes or chat logs to route to deals/issues/topics.</p><div class="ph-tip">💡 Copy LINE chats → paste → "Analyze & Route" to structure the info.</div>',
+    log:'<h4>📝 Decision Log</h4><p>Important records only: Decisions, New Facts, Action Changes.</p><div class="ph-tip">💡 Not a diary. Only log what the 3 of you need to remember.</div>',
+    kb:'<h4>📖 Knowledge Base</h4><p>Reference materials and playbooks.</p><div class="ph-tip">💡 Check here when unsure about the venture-building process.</div>',
+    roadmap:'<h4>🗺️ Dev Roadmap</h4><p>Development plan and changelog for this tool.</p><div class="ph-tip">💡 Activities are auto-logged. Manual dev log entries also supported.</div>'
+  }
+};
+function togglePageHelp(){
+  var el=document.getElementById('page-help');if(!el)return;
+  if(el.classList.contains('show')){el.classList.remove('show');return;}
+  var lang=window._lang||'ja';
+  var v=cv||'overview';
+  var help=(_pageHelp[lang]||_pageHelp.ja)[v]||(_pageHelp.ja)[v]||'';
+  if(!help){el.classList.remove('show');return;}
+  el.innerHTML=help;
+  el.classList.add('show');
+}
+
+// ICE preview auto-update
+['f-ice-i','f-ice-c','f-ice-e'].forEach(function(id){var el=document.getElementById(id);if(el){el.addEventListener('input',updIcePrev);el.addEventListener('change',updIcePrev);}});
+// Clock
+(function tick(){var now=new Date();var el=document.getElementById('clock');var loc=window._lang==='en'?'en-US':'ja-JP';if(el)el.textContent=now.toLocaleDateString(loc,{month:'short',day:'numeric',weekday:'short'})+' '+now.toLocaleTimeString(loc,{hour:'2-digit',minute:'2-digit'});setTimeout(tick,30000);})();
+</script>
+
+</body>
+</html>
