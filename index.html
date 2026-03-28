@@ -689,12 +689,7 @@ function doSave() {
       return {version:d.version,content:d.content,date:d.date};
     })
   };
-  fetch(GAS_API, {
-    method: 'POST',
-    redirect: 'follow',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: 'saveAllData', data: payload })
-  })
+  fetch(GAS_API + '?action=saveAllData&data=' + encodeURIComponent(JSON.stringify(payload)), { redirect: 'follow' })
   .then(function() { showSaveStatus('saved'); })
   .catch(function(e) { showSaveStatus('error'); console.error(e); });
 }
@@ -942,12 +937,7 @@ function submitComment(issueId) {
   if (!text) return;
   var by = byEl.value;
   textEl.value = '';
-  fetch(GAS_API, {
-    method: 'POST',
-    redirect: 'follow',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: 'addComment', issueId: issueId, text: text, by: by })
-  })
+  fetch(GAS_API + '?action=addComment&issueId=' + encodeURIComponent(issueId) + '&text=' + encodeURIComponent(text) + '&by=' + encodeURIComponent(by), { redirect: 'follow' })
   .then(function() { loadComments(issueId); })
   .catch(function(e) {
     alert('コメント送信エラー: ' + e.message);
