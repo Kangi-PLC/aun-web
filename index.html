@@ -891,6 +891,29 @@ function retPhase(did){if(!confirm(t('confirm_retreat')))return;var d=gd(did);if
 function logKS(){var d=gd(cd);d.killLogs.push({date:new Date().toISOString(),phase:d.currentPhase,cond:document.getElementById('f-kc').value,verdict:document.getElementById('f-kv').value,judge:document.getElementById('f-kw').value});if(document.getElementById('f-kv').value==='後退'&&d.currentPhase>0){d.phases[d.currentPhase].status='locked';d.currentPhase--;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].completedAt=null;}sv();closeModal('m-ks');render();}
 function updTopicStatus(id,st){var t=gt(id);t.status=st;sv();render();}
 function updTopicConclusion(id,v){var t=gt(id);t.conclusion=v;sv();}
+function editTopicInline(id){
+  var t=gt(id);if(!t)return;
+  var el=document.getElementById('topic-edit-area');
+  if(el){el.remove();renderTopicDetail(id);return;}
+  var hdr=document.querySelector('#v-topic-detail h2');
+  if(!hdr)return;
+  var container=hdr.parentElement.parentElement;
+  var editHtml='<div id="topic-edit-area" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px">'+
+    '<div class="fg" style="margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted)">タイトル</label><input id="te-title" value="'+t.title.replace(/"/g,'&quot;')+'" style="width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px"></div>'+
+    '<div class="fg" style="margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted)">概要</label><textarea id="te-desc" rows="3" style="width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px">'+(t.desc||'')+'</textarea></div>'+
+    '<div class="fg" style="margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted)">関与者</label><div class="chip-select" id="te-members">'+M.map(function(m){return '<span class="chip'+((t.members||'').indexOf(m)>=0?' active':'')+'" data-val="'+m+'" onclick="toggleChip(this)">'+m+'</span>';}).join('')+'</div></div>'+
+    '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" onclick="document.getElementById(\'topic-edit-area\').remove()">キャンセル</button><button class="btn primary" onclick="saveTopicEdit(\''+id+'\')">保存</button></div>'+
+    '</div>';
+  container.insertAdjacentHTML('afterend',editHtml);
+}
+function saveTopicEdit(id){
+  var t=gt(id);if(!t)return;
+  t.title=document.getElementById('te-title').value.trim()||t.title;
+  t.desc=document.getElementById('te-desc').value;
+  var chips=document.querySelectorAll('#te-members .chip.active');
+  t.members=Array.from(chips).map(function(c){return c.getAttribute('data-val');}).join(',');
+  sv();renderTopicDetail(id);
+}
 
 // ============================================================
 // Comments system (Task 3)
@@ -1211,7 +1234,7 @@ function renderTopicDetail(id){
   var issues=D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===id;});
   var logs=D.logs.filter(function(l){return l.linkType==='topic'&&l.linkId===id;});
   document.getElementById('v-topic-detail').innerHTML=
-    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px"><div style="flex:1"><h2 style="font-size:20px;font-weight:800">'+t.title+'</h2><div style="color:var(--text-dim);font-size:12px;margin-top:4px">'+t.desc+'</div>'+(t.members?'<div style="margin-top:6px">'+renderMembers(t.members)+'</div>':'')+'</div><div style="display:flex;gap:6px"><button class="sb '+(t.status==='open'?'s-open':'')+'" onclick="updTopicStatus(\''+id+'\',\'open\');renderTopicDetail(\''+id+'\')">未着手</button><button class="sb '+(t.status==='discuss'?'s-prog':'')+'" onclick="updTopicStatus(\''+id+'\',\'discuss\');renderTopicDetail(\''+id+'\')">議論中</button><button class="sb '+(t.status==='done'?'s-done':'')+'" onclick="updTopicStatus(\''+id+'\',\'resolved\');renderTopicDetail(\''+id+'\')">結論済</button></div></div>'+
+    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px"><div style="flex:1"><h2 style="font-size:20px;font-weight:800">'+t.title+'</h2><div style="color:var(--text-dim);font-size:12px;margin-top:4px">'+t.desc+'</div>'+(t.members?'<div style="margin-top:6px">'+renderMembers(t.members)+'</div>':'')+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="editTopicInline(\''+id+'\')">✏ 編集</button><button class="sb '+(t.status==='open'?'s-open':'')+'" onclick="updTopicStatus(\''+id+'\',\'open\');renderTopicDetail(\''+id+'\')">未着手</button><button class="sb '+(t.status==='discuss'?'s-prog':'')+'" onclick="updTopicStatus(\''+id+'\',\'discuss\');renderTopicDetail(\''+id+'\')">議論中</button><button class="sb '+(t.status==='resolved'?'s-done':'')+'" onclick="updTopicStatus(\''+id+'\',\'resolved\');renderTopicDetail(\''+id+'\')">結論済</button></div></div>'+
     '<div class="section"><div class="section-title">📝 結論メモ</div><textarea class="itxt" rows="3" placeholder="結論が出たらここに記録..." onchange="updTopicConclusion(\''+id+'\',this.value)">'+(t.conclusion||'')+'</textarea></div>'+
     '<div class="section"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><div class="section-title">📌 紐づくIssues</div><button class="btn primary" onclick="populateLink(\'f-il\');document.getElementById(\'f-il\').value=\''+id+'\';openModal(\'m-issue\')">＋ Issue</button></div>'+(!issues.length?'<div style="color:var(--text-muted);font-size:12px">なし</div>':issues.map(renderIC).join(''))+'</div>'+
     '<div class="section"><div class="section-title">📝 関連Log</div>'+(!logs.length?'<div style="color:var(--text-muted);font-size:12px">なし</div>':logs.map(renderLogEntry).join(''))+'</div>'+
