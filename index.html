@@ -460,6 +460,52 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 
 <script>
 var GAS_API = 'https://script.google.com/macros/s/AKfycbzx1Q5owOLzY9shQI3-YXrHZdc5oF6_GLSJ54ypAC4tqJ5fYVB-pfUjHsMVCOxDij0/exec';
+
+// ============================================================
+// Hidden iframe form POST (bypasses CORS for GAS ANYONE_ANONYMOUS)
+// ============================================================
+function gasFormPost(action, payload) {
+  return new Promise(function(resolve, reject) {
+    try {
+      var frameName = 'gas-post-' + Date.now();
+      var iframe = document.createElement('iframe');
+      iframe.name = frameName;
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = GAS_API;
+      form.target = frameName;
+      form.style.display = 'none';
+
+      var inpAction = document.createElement('input');
+      inpAction.type = 'hidden';
+      inpAction.name = 'action';
+      inpAction.value = action;
+      form.appendChild(inpAction);
+
+      var inpPayload = document.createElement('input');
+      inpPayload.type = 'hidden';
+      inpPayload.name = 'payload';
+      inpPayload.value = payload;
+      form.appendChild(inpPayload);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      // Clean up and resolve after timeout (no way to read cross-origin iframe response)
+      setTimeout(function() {
+        try { document.body.removeChild(form); } catch(ex) {}
+        try { document.body.removeChild(iframe); } catch(ex) {}
+        resolve();
+      }, 4000);
+    } catch(e) {
+      reject(e);
+    }
+  });
+}
+
 // ============================================================
 // PHASES — hardcoded, never stored in sheet
 // ============================================================
@@ -689,7 +735,7 @@ function doSave() {
       return {version:d.version,content:d.content,date:d.date};
     })
   };
-  fetch(GAS_API + '?action=saveAllData&data=' + encodeURIComponent(JSON.stringify(payload)), { redirect: 'follow' })
+  gasFormPost('saveAllData', JSON.stringify(payload))
   .then(function() { showSaveStatus('saved'); })
   .catch(function(e) { showSaveStatus('error'); console.error(e); });
 }
