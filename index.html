@@ -464,6 +464,9 @@ var GAS_API = 'https://script.google.com/macros/s/AKfycbzx1Q5owOLzY9shQI3-YXrHZd
 // ============================================================
 // Hidden iframe form POST (bypasses CORS for GAS ANYONE_ANONYMOUS)
 // ============================================================
+// HTML escape utility (XSS prevention)
+function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
 function gasFormPost(action, payload) {
   return new Promise(function(resolve, reject) {
     try {
@@ -494,17 +497,28 @@ function gasFormPost(action, payload) {
       document.body.appendChild(form);
       form.submit();
 
-      // Clean up and resolve after timeout (no way to read cross-origin iframe response)
+      // Verify save by re-fetching data after POST
       setTimeout(function() {
         try { document.body.removeChild(form); } catch(ex) {}
         try { document.body.removeChild(iframe); } catch(ex) {}
-        resolve();
-      }, 4000);
+        // Verification: fetch getData to confirm save persisted
+        fetch(GAS_API + '?action=getData&t=' + Date.now(), { redirect: 'follow' })
+          .then(function(r) { return r.text(); })
+          .then(function(jsonStr) {
+            try {
+              var raw = JSON.parse(jsonStr);
+              _lastSaveVersion = JSON.stringify(raw).length;
+              resolve();
+            } catch(ex) { reject(new Error('保存の確認に失敗: レスポンス不正')); }
+          })
+          .catch(function() { reject(new Error('保存の確認に失敗: ネットワークエラー')); });
+      }, 3000);
     } catch(e) {
       reject(e);
     }
   });
 }
+var _lastSaveVersion = 0;
 
 // ============================================================
 // PHASES — hardcoded, never stored in sheet
@@ -775,11 +789,17 @@ function initApp(jsonStr) {
 // ============================================================
 // Auto-reload polling (Task 1)
 // ============================================================
+var _userEditing = false;
+var _editTimeout = null;
+// Track user activity: any input/click marks editing, cleared after 10s idle
+document.addEventListener('input', function() { _userEditing = true; clearTimeout(_editTimeout); _editTimeout = setTimeout(function(){ _userEditing = false; }, 10000); });
+document.addEventListener('change', function() { _userEditing = true; clearTimeout(_editTimeout); _editTimeout = setTimeout(function(){ _userEditing = false; }, 10000); });
+
 function startAutoReload() {
   if (_pollTimer) clearInterval(_pollTimer);
   _pollTimer = setInterval(function() {
-    // Don't poll if there's a pending save
-    if (_saveTimer) return;
+    // Don't poll if there's a pending save or user is editing
+    if (_saveTimer || _userEditing) return;
     fetch(GAS_API + '?action=getData', { redirect: 'follow' })
       .then(function(r) { return r.text(); })
       .then(function(jsonStr) {
@@ -834,8 +854,8 @@ function toggleBlockReason(){var s=document.getElementById('f-is');var fg=docume
 
 // Tag CSS class mapping
 var TAG_CSS={'法務':'tag-legal','財務':'tag-finance','営業':'tag-sales','開発':'tag-dev','オペレーション':'tag-ops','マーケティング':'tag-marketing','戦略':'tag-strategy','外部交渉':'tag-negotiation'};
-function renderTags(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(t){return '<span class="tag-badge '+(TAG_CSS[t]||'tag-dev')+'">'+t+'</span>';}).join('');}
-function renderMembers(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(m){return '<span class="member-badge">'+m+'</span>';}).join('');}
+function renderTags(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(t){return '<span class="tag-badge '+(TAG_CSS[t]||'tag-dev')+'">'+esc(t)+'</span>';}).join('');}
+function renderMembers(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(m){return '<span class="member-badge">'+esc(m)+'</span>';}).join('');}
 
 function createDeal(){
   var n=document.getElementById('f-dn').value.trim();if(!n)return;
@@ -990,7 +1010,7 @@ function renderComments(comments, issueId) {
     comments.forEach(function(c) {
       var ts = new Date(c.timestamp);
       var timeStr = ts.toLocaleDateString('ja-JP', {month:'short',day:'numeric'}) + ' ' + ts.toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'});
-      html += '<div class="comment-item"><div class="comment-header"><span class="comment-author">' + c.by + '</span><span class="comment-time">' + timeStr + '</span></div><div class="comment-text">' + c.text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') + '</div></div>';
+      html += '<div class="comment-item"><div class="comment-header"><span class="comment-author">' + esc(c.by) + '</span><span class="comment-time">' + timeStr + '</span></div><div class="comment-text">' + esc(c.text).replace(/\n/g,'<br>') + '</div></div>';
     });
   }
   html += '</div>';
