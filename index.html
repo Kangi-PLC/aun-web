@@ -22,7 +22,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 .sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;position:fixed;left:-240px;z-index:100;height:100vh;transition:left .3s}
 .sidebar.open{left:0}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
-.sidebar.open~.sidebar-overlay{display:block}
+.sidebar-overlay.show{display:block}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
 .content{flex:1;overflow-y:auto;padding:24px}
@@ -241,6 +241,11 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 .page-help p{margin-bottom:6px}
 .page-help .ph-tip{background:var(--surface3);border-radius:6px;padding:6px 10px;margin-top:6px;font-size:11px;color:var(--accent-light)}
 .help-btn:hover{background:var(--accent-dim)!important;color:var(--text)!important}
+/* Inline help tooltip */
+.ihelp{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);font-size:9px;font-weight:700;cursor:help;margin-left:4px;vertical-align:middle;position:relative}
+.ihelp:hover .ihelp-tip{display:block}
+.ihelp-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);width:240px;padding:10px 12px;background:var(--surface);border:1px solid var(--accent-dim);border-radius:8px;font-size:11px;font-weight:400;color:var(--text-dim);line-height:1.5;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4)}
+.ihelp-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--accent-dim)}
 /* Chip multi-select */
 .chip-select{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);transition:all .15s;user-select:none}
@@ -307,10 +312,10 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <button class="nav-btn" onclick="openModal('m-help')" style="margin:4px 6px;font-size:10px;color:var(--text-muted);justify-content:center">📖 使い方ガイド</button>
 <div style="padding:10px;border-top:1px solid var(--border);font-size:9px;color:var(--text-muted);text-align:center">阿吽 v4.1</div>
 </div>
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('open');this.style.display='none'"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div class="main">
 <div class="topbar">
-<button class="btn" onclick="var sb=document.getElementById('sidebar');sb.classList.toggle('open');document.getElementById('sidebar-overlay').style.display=sb.classList.contains('open')?'block':'none'" id="menu-btn">☰</button>
+<button class="btn" onclick="toggleSidebar()" id="menu-btn">☰</button>
 <div class="topbar-title" id="tt">Overview</div>
 <button class="btn help-btn" onclick="togglePageHelp()" id="page-help-btn" title="このページのヘルプ" style="font-size:12px;width:24px;height:24px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer">?</button>
 <div id="save-indicator"></div>
@@ -341,9 +346,9 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="fg"><label>優先度</label><select id="f-dp"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
 <div class="fg"><label>完了目標日</label><input type="date" id="f-dd"></div>
 <div class="fg"><label>事業カテゴリ</label><div class="chip-select" id="f-dcat-chips"><span class="chip" data-val="M&A" onclick="toggleChip(this)">M&A</span><span class="chip" data-val="D2C" onclick="toggleChip(this)">D2C</span><span class="chip" data-val="SaaS" onclick="toggleChip(this)">SaaS</span><span class="chip" data-val="貿易" onclick="toggleChip(this)">貿易</span><span class="chip" data-val="製造" onclick="toggleChip(this)">製造</span><span class="chip" data-val="サービス" onclick="toggleChip(this)">サービス</span></div></div>
-<div class="fg"><label>市場タイプ</label><select id="f-dmt"><option value="">未選択</option><option value="既存市場">既存市場</option><option value="再セグメント市場">再セグメント市場</option><option value="新規市場">新規市場</option><option value="クローン市場">クローン市場</option></select></div>
+<div class="fg"><label>市場タイプ<span class="ihelp">?<span class="ihelp-tip"><b>Steve Blank分類:</b><br>既存市場=競合が明確<br>再セグメント=既存市場の隙間<br>新規市場=前例なし<br>クローン=海外成功モデルの輸入</span></span></label><select id="f-dmt"><option value="">未選択</option><option value="既存市場">既存市場</option><option value="再セグメント市場">再セグメント市場</option><option value="新規市場">新規市場</option><option value="クローン市場">クローン市場</option></select></div>
 <div class="fg"><label>ターゲット顧客</label><div style="display:flex;gap:8px;align-items:center"><select id="f-dtt" style="width:120px"><option value="">未選択</option><option value="B2B">B2B</option><option value="B2C">B2C</option><option value="B2B2C">B2B2C</option></select><input id="f-dtd" placeholder="例: カンボジアの飲食店" style="flex:1"></div></div>
-<div class="fg"><label>収益モデル</label><div class="chip-select" id="f-drm-chips"><span class="chip" data-val="サブスクリプション" onclick="toggleChip(this)">サブスクリプション</span><span class="chip" data-val="トランザクション" onclick="toggleChip(this)">トランザクション</span><span class="chip" data-val="物販" onclick="toggleChip(this)">物販</span><span class="chip" data-val="ライセンス" onclick="toggleChip(this)">ライセンス</span><span class="chip" data-val="コミッション" onclick="toggleChip(this)">コミッション</span><span class="chip" data-val="広告" onclick="toggleChip(this)">広告</span><span class="chip" data-val="コンサル" onclick="toggleChip(this)">コンサル</span></div></div>
+<div class="fg"><label>収益モデル<span class="ihelp">?<span class="ihelp-tip"><b>サブスク</b>=月/年額課金<br><b>トランザクション</b>=取引ごと手数料<br><b>物販</b>=商品販売<br><b>ライセンス</b>=使用権販売<br><b>コミッション</b>=仲介手数料<br><b>コンサル</b>=時間/PJ課金</span></span></label><div class="chip-select" id="f-drm-chips"><span class="chip" data-val="サブスクリプション" onclick="toggleChip(this)">サブスクリプション</span><span class="chip" data-val="トランザクション" onclick="toggleChip(this)">トランザクション</span><span class="chip" data-val="物販" onclick="toggleChip(this)">物販</span><span class="chip" data-val="ライセンス" onclick="toggleChip(this)">ライセンス</span><span class="chip" data-val="コミッション" onclick="toggleChip(this)">コミッション</span><span class="chip" data-val="広告" onclick="toggleChip(this)">広告</span><span class="chip" data-val="コンサル" onclick="toggleChip(this)">コンサル</span></div></div>
 <div class="fg"><label>必要リソース</label><div class="chip-select" id="f-drs-chips"><span class="chip" data-val="資金" onclick="toggleChip(this)">資金</span><span class="chip" data-val="人材" onclick="toggleChip(this)">人材</span><span class="chip" data-val="技術" onclick="toggleChip(this)">技術</span><span class="chip" data-val="許認可" onclick="toggleChip(this)">許認可</span><span class="chip" data-val="パートナー" onclick="toggleChip(this)">パートナー</span><span class="chip" data-val="設備" onclick="toggleChip(this)">設備</span></div></div>
 <div class="fg"><label>初期投資規模</label><select id="f-dis"><option value="">未選択</option><option value="$0-1K">$0-1K (ほぼゼロ)</option><option value="$1K-10K">$1K-10K (少額)</option><option value="$10K-50K">$10K-50K (中額)</option><option value="$50K-100K">$50K-100K (大額)</option><option value="$100K+">$100K+ (要大型資金)</option></select></div>
 <div class="fg"><label>想定月商</label><select id="f-dtr"><option value="">未定</option><option value="~$1K">~$1K</option><option value="$1K-5K">$1K-5K</option><option value="$5K-20K">$5K-20K</option><option value="$20K-100K">$20K-100K</option><option value="$100K+">$100K+</option></select></div>
@@ -356,11 +361,11 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="fg"><label>タイトル <span style="color:var(--red);font-size:9px">必須</span></label><input id="f-it" placeholder="何をすべきか"></div>
 <div class="fg"><label>担当者 <span style="color:var(--red);font-size:9px">必須（複数可）</span></label><div class="chip-select" id="f-ia-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip" data-val="中野" onclick="toggleChip(this)">中野</span><span class="chip" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
 <div class="fg"><label>紐付け先 <span style="color:var(--red);font-size:9px">必須</span></label><select id="f-il"></select></div>
-<div class="fg"><label>ステータス</label><select id="f-is" onchange="toggleBlockReason()"><option value="icebox">アイスボックス</option><option value="backlog" selected>バックログ</option><option value="wip">進行中</option><option value="waiting">ブロック中</option><option value="done">完了</option></select></div>
+<div class="fg"><label>ステータス<span class="ihelp">?<span class="ihelp-tip">❄ <b>アイスボックス</b>=いつかやる<br>📋 <b>バックログ</b>=やると決めた<br>🔄 <b>進行中</b>=今やってる<br>🚧 <b>ブロック中</b>=外部待ち<br>✅ <b>完了</b>=終わった</span></span></label><select id="f-is" onchange="toggleBlockReason()"><option value="icebox">アイスボックス</option><option value="backlog" selected>バックログ</option><option value="wip">進行中</option><option value="waiting">ブロック中</option><option value="done">完了</option></select></div>
 <div class="fg" id="fg-block-reason" style="display:none"><label>ブロック理由</label><select id="f-ibr"><option value="">選択...</option><option value="外部返答待ち">外部返答待ち</option><option value="資金確保待ち">資金確保待ち</option><option value="法的確認待ち">法的確認待ち</option><option value="他タスク依存">他タスク依存</option><option value="その他">その他</option></select></div>
 <div class="fg"><label>タグ</label><div class="chip-select" id="f-itags-chips"><span class="chip" data-val="法務" onclick="toggleChip(this)">法務</span><span class="chip" data-val="財務" onclick="toggleChip(this)">財務</span><span class="chip" data-val="営業" onclick="toggleChip(this)">営業</span><span class="chip" data-val="開発" onclick="toggleChip(this)">開発</span><span class="chip" data-val="オペレーション" onclick="toggleChip(this)">オペレーション</span><span class="chip" data-val="マーケティング" onclick="toggleChip(this)">マーケティング</span><span class="chip" data-val="戦略" onclick="toggleChip(this)">戦略</span><span class="chip" data-val="外部交渉" onclick="toggleChip(this)">外部交渉</span></div></div>
 <div class="fg"><label>優先度</label><select id="f-ip"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
-<div class="fg"><label>ICE スコア <span style="font-size:9px;color:var(--text-muted)">（高い順に実行）</span></label>
+<div class="fg"><label>ICE スコア<span class="ihelp">?<span class="ihelp-tip"><b>Impact</b>=成功時の影響度<br><b>Confidence</b>=成功する確信度<br><b>Ease</b>=実行の容易さ<br>各1-10。スコア=I×C×E<br>高い順にやるのが最も合理的</span></span> <span style="font-size:9px;color:var(--text-muted)">（高い順に実行）</span></label>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
 <div><label style="font-size:9px;color:var(--text-muted)">Impact (1-10)</label><input type="number" id="f-ice-i" min="1" max="10" value="5" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px"></div>
 <div><label style="font-size:9px;color:var(--text-muted)">Confidence (1-10)</label><input type="number" id="f-ice-c" min="1" max="10" value="5" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px"></div>
@@ -1510,8 +1515,8 @@ function go(v){cv=v;document.querySelectorAll('.view').forEach(function(el){el.c
   var lang=window._lang||'ja';
   var titles=lang==='ja'?{overview:'全体像',cases:'新規事業',topics:'論点',issues:'課題',input:'入力',log:'決定ログ',kb:'ナレッジベース',roadmap:'開発ロードマップ'}:{overview:'Overview',cases:'New Biz. Dev.',topics:'Topics',issues:'Issues',input:'Input',log:'Decision Log',kb:'Knowledge Base',roadmap:'Dev Roadmap'};
   if(titles[v])document.getElementById('tt').textContent=titles[v];
-  // Close sidebar on mobile after navigation
-  var sb=document.getElementById('sidebar');if(sb){sb.classList.remove('open');var ov=document.getElementById('sidebar-overlay');if(ov)ov.style.display='none';}
+  // Close sidebar after navigation
+  closeSidebar();
   render();
 }
 function openModal(id){populateLink('f-il');populateLink('f-ll');document.getElementById(id).classList.add('show');}
@@ -1567,6 +1572,9 @@ var _pageHelp={
     roadmap:'<h4>🗺️ Dev Roadmap</h4><p>Development plan and changelog for this tool.</p><div class="ph-tip">💡 Activities are auto-logged. Manual dev log entries also supported.</div>'
   }
 };
+function toggleSidebar(){var sb=document.getElementById('sidebar');var ov=document.getElementById('sidebar-overlay');if(sb.classList.contains('open')){closeSidebar();}else{sb.classList.add('open');ov.classList.add('show');}}
+function closeSidebar(){var sb=document.getElementById('sidebar');var ov=document.getElementById('sidebar-overlay');sb.classList.remove('open');ov.classList.remove('show');}
+
 function togglePageHelp(){
   var el=document.getElementById('page-help');if(!el)return;
   if(el.classList.contains('show')){el.classList.remove('show');return;}
