@@ -342,7 +342,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="modal-bg" id="m-deal"><div class="modal">
 <h3>新規案件</h3>
 <div class="fg"><label>案件名</label><input id="f-dn" placeholder="例: 抹茶D2Cブランド"></div>
-<div class="fg"><label>責任者</label><select id="f-do"><option>白石</option><option>中野</option><option>松崎</option></select></div>
+<div class="fg"><label>責任者</label><select id="f-do"><option>白石</option><option>松崎</option></select></div>
 <div class="fg"><label>優先度</label><select id="f-dp"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
 <div class="fg"><label>完了目標日</label><input type="date" id="f-dd"></div>
 <div class="fg"><label>事業カテゴリ</label><div class="chip-select" id="f-dcat-chips"><span class="chip" data-val="M&A" onclick="toggleChip(this)">M&A</span><span class="chip" data-val="D2C" onclick="toggleChip(this)">D2C</span><span class="chip" data-val="SaaS" onclick="toggleChip(this)">SaaS</span><span class="chip" data-val="貿易" onclick="toggleChip(this)">貿易</span><span class="chip" data-val="製造" onclick="toggleChip(this)">製造</span><span class="chip" data-val="サービス" onclick="toggleChip(this)">サービス</span></div></div>
@@ -359,7 +359,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="modal-bg" id="m-issue"><div class="modal">
 <h3 id="m-issue-title">新規Issue</h3>
 <div class="fg"><label>タイトル <span style="color:var(--red);font-size:9px">必須</span></label><input id="f-it" placeholder="何をすべきか"></div>
-<div class="fg"><label>担当者 <span style="color:var(--red);font-size:9px">必須（複数可）</span></label><div class="chip-select" id="f-ia-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip" data-val="中野" onclick="toggleChip(this)">中野</span><span class="chip" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
+<div class="fg"><label>担当者 <span style="color:var(--red);font-size:9px">必須（複数可）</span></label><div class="chip-select" id="f-ia-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
 <div class="fg"><label>紐付け先 <span style="color:var(--red);font-size:9px">必須</span></label><select id="f-il"></select></div>
 <div class="fg"><label>ステータス<span class="ihelp">?<span class="ihelp-tip">❄ <b>アイスボックス</b>=いつかやる<br>📋 <b>バックログ</b>=やると決めた<br>🔄 <b>進行中</b>=今やってる<br>🚧 <b>ブロック中</b>=外部待ち<br>✅ <b>完了</b>=終わった</span></span></label><select id="f-is" onchange="toggleBlockReason()"><option value="icebox">アイスボックス</option><option value="backlog" selected>バックログ</option><option value="wip">進行中</option><option value="waiting">ブロック中</option><option value="done">完了</option></select></div>
 <div class="fg" id="fg-block-reason" style="display:none"><label>ブロック理由</label><select id="f-ibr"><option value="">選択...</option><option value="外部返答待ち">外部返答待ち</option><option value="資金確保待ち">資金確保待ち</option><option value="法的確認待ち">法的確認待ち</option><option value="他タスク依存">他タスク依存</option><option value="その他">その他</option></select></div>
@@ -384,7 +384,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <h3>新規Topic（論点）</h3>
 <div class="fg"><label>論点タイトル</label><input id="f-tt" placeholder="例: 法人設立の是非"></div>
 <div class="fg"><label>ステータス</label><select id="f-ts"><option value="open">未着手</option><option value="discuss">議論中</option><option value="resolved">結論済</option></select></div>
-<div class="fg"><label>関与者</label><div class="chip-select" id="f-tmembers-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip active" data-val="中野" onclick="toggleChip(this)">中野</span><span class="chip active" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
+<div class="fg"><label>関与者</label><div class="chip-select" id="f-tmembers-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip active" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
 <div class="fg"><label>概要</label><textarea id="f-td" rows="3" placeholder="何について決める必要があるか"></textarea></div>
 <div class="fa"><button class="btn" onclick="closeModal('m-topic')">取消</button><button class="btn primary" onclick="createTopic()">作成</button></div>
 </div></div>
@@ -394,7 +394,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="fg"><label>種別</label><select id="f-lt"><option value="decision">決定事項</option><option value="fact">新事実</option><option value="change">アクション変更</option></select></div>
 <div class="fg"><label>内容</label><textarea id="f-lc" rows="3" placeholder="何が決まった / 何がわかった / 何が変わったか"></textarea></div>
 <div class="fg"><label>紐付け先</label><select id="f-ll"></select></div>
-<div class="fg"><label>記録者</label><select id="f-lw"><option>白石</option><option>中野</option><option>松崎</option></select></div>
+<div class="fg"><label>記録者</label><select id="f-lw"><option>白石</option><option>松崎</option></select></div>
 <div class="fa"><button class="btn" onclick="closeModal('m-log')">取消</button><button class="btn primary" onclick="createLog()">記録</button></div>
 </div></div>
 
@@ -402,7 +402,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <h3 style="color:var(--red)">⚠ キルスイッチ判定</h3>
 <div class="fg"><label>該当条件</label><textarea id="f-kc" rows="2"></textarea></div>
 <div class="fg"><label>判定</label><select id="f-kv"><option value="続行">続行</option><option value="後退">後退</option><option value="撤退">撤退</option></select></div>
-<div class="fg"><label>判定者</label><select id="f-kw"><option>全員</option><option>白石</option><option>中野</option><option>松崎</option></select></div>
+<div class="fg"><label>判定者</label><select id="f-kw"><option>全員</option><option>白石</option><option>松崎</option></select></div>
 <div class="fa"><button class="btn" onclick="closeModal('m-ks')">取消</button><button class="btn danger" onclick="logKS()">記録</button></div>
 </div></div>
 
@@ -417,7 +417,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="modal-bg" id="m-help"><div class="modal" style="width:560px;max-height:85vh">
 <h3>阿吽（あうん）— 使い方ガイド</h3>
 <div style="font-size:13px;line-height:1.8;color:var(--text-dim)">
-<p style="margin-bottom:16px;color:var(--text)"><strong>阿吽は、3人（白石・中野・松崎）で新規事業を立ち上げるための情報同期プラットフォームです。</strong></p>
+<p style="margin-bottom:16px;color:var(--text)"><strong>阿吽は、白石・松崎で新規事業を立ち上げるための情報同期プラットフォームです。</strong></p>
 <div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
 <h4 style="color:var(--accent-light);margin-bottom:6px">📊 Overview（全体像）</h4>
 全ての情報を1画面で把握するダッシュボード。案件の進捗、未完了の課題、最近の決定事項が一覧で見える。
@@ -528,7 +528,9 @@ var _lastSaveVersion = 0;
 // ============================================================
 // PHASES — hardcoded, never stored in sheet
 // ============================================================
-var M=['白石','中野','松崎'];
+// Core active members (中野 removed 2026-04-02). Historical data may still reference 中野.
+var M=['白石','松崎'];
+var M_ALL=['白石','中野','松崎']; // for historical display only
 var PHASES=[
 {id:0,name:'発掘',en:'Discovery',color:'#6c5ce7',def:'案件の種を見つけて持ち帰る',cond:'ペインステートメント1文＋「なぜ俺らがやるか」の理由',team:false,
 gate:[{t:'ペインステートメント',d:'「[誰]は[どんな状況で][何に困っている]」',ph:'',f:null},{t:'解決の方向性',d:'「だから[手段で][こう解決する]」',ph:'',f:null},{t:'自分たちがやる理由',d:'構造的理由1つ以上',ph:'',f:null},{t:'市場タイプ仮判定',d:'',ph:'',f:[{n:'市場タイプ',type:'select',opts:['既存市場','再セグメント','新規市場','クローン']}]}],
@@ -933,7 +935,7 @@ function createTopic(){
   var t=document.getElementById('f-tt').value.trim();if(!t)return;
   var members=getChipValues('f-tmembers-chips');
   D.topics.push({id:'t'+Date.now().toString(36),title:t,status:document.getElementById('f-ts').value,desc:document.getElementById('f-td').value,conclusion:'',members:members,createdAt:new Date().toISOString()});
-  sv();closeModal('m-topic');document.getElementById('f-tt').value='';document.getElementById('f-td').value='';setChipValues('f-tmembers-chips','白石,中野,松崎');render();
+  sv();closeModal('m-topic');document.getElementById('f-tt').value='';document.getElementById('f-td').value='';setChipValues('f-tmembers-chips','白石,松崎');render();
 }
 function createLog(){
   var c=document.getElementById('f-lc').value.trim();if(!c)return;
@@ -1019,7 +1021,7 @@ function renderComments(comments, issueId) {
     });
   }
   html += '</div>';
-  html += '<div class="comment-input-row"><textarea class="itxt" id="comment-text" rows="2" placeholder="コメントを入力..."></textarea><select id="comment-by"><option>白石</option><option>中野</option><option>松崎</option></select><button class="btn primary" onclick="submitComment(\'' + issueId + '\')">送信</button></div>';
+  html += '<div class="comment-input-row"><textarea class="itxt" id="comment-text" rows="2" placeholder="コメントを入力..."></textarea><select id="comment-by"><option>白石</option><option>松崎</option></select><button class="btn primary" onclick="submitComment(\'' + issueId + '\')">送信</button></div>';
   container.innerHTML = html;
 }
 
@@ -1367,7 +1369,7 @@ function renderKB(){
         '<h2 style="font-size:20px;margin-bottom:16px">阿吽（A-Un）— 設計思想と使い方</h2>'+
         '<div style="background:var(--accent-dim);border-radius:8px;padding:16px;margin-bottom:20px;color:var(--text)">'+
           '<h3 style="font-size:15px;margin-bottom:8px">一言で言うと</h3>'+
-          '<p style="font-size:14px;line-height:1.6"><strong>阿吽は、白石・中野・松崎の3人が新規事業を構造的に立ち上げるための情報同期プラットフォーム。</strong><br>案件の進捗・課題・決定事項が常に3人で共有されている状態を作る。</p>'+
+          '<p style="font-size:14px;line-height:1.6"><strong>阿吽は、白石・松崎が新規事業を構造的に立ち上げるための情報同期プラットフォーム。</strong><br>案件の進捗・課題・決定事項が常にチームで共有されている状態を作る。</p>'+
         '</div>'+
         '<h3 style="font-size:15px;margin-bottom:10px;color:var(--accent-light)">なぜこのツールが必要か</h3>'+
         '<div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:20px">'+
