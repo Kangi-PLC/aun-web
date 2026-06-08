@@ -300,6 +300,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="sidebar-logo"><h1 id="logo-title">阿吽</h1><span id="logo-sub">事業構築プラットフォーム</span></div>
 <div class="sidebar-section" id="nav-sec-main">メイン</div>
 <button class="nav-btn active" data-view="overview" onclick="go('overview')"><span class="icon">📊</span> <span class="nav-label" data-ja="全体像" data-en="Overview">全体像</span></button>
+<button class="nav-btn" data-view="ideas" onclick="go('ideas')"><span class="icon">💡</span> <span class="nav-label" data-ja="アイデア" data-en="Ideas">アイデア</span></button>
 <button class="nav-btn" data-view="cases" onclick="go('cases')"><span class="icon">🌱</span> <span class="nav-label" data-ja="新規事業" data-en="New Biz. Dev.">新規事業</span></button>
 <button class="nav-btn" data-view="topics" onclick="go('topics')"><span class="icon">💬</span> <span class="nav-label" data-ja="論点" data-en="Topics">論点</span></button>
 <button class="nav-btn" data-view="issues" onclick="go('issues')"><span class="icon">📌</span> <span class="nav-label" data-ja="課題" data-en="Issues">課題</span></button>
@@ -310,7 +311,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <button class="nav-btn" data-view="roadmap" onclick="go('roadmap')"><span class="icon">🗺️</span> <span class="nav-label" data-ja="開発ロードマップ" data-en="Dev Roadmap">開発ロードマップ</span></button>
 <div style="flex:1"></div>
 <button class="nav-btn" onclick="openModal('m-help')" style="margin:4px 6px;font-size:10px;color:var(--text-muted);justify-content:center">📖 使い方ガイド</button>
-<div style="padding:10px;border-top:1px solid var(--border);font-size:9px;color:var(--text-muted);text-align:center">阿吽 v4.1</div>
+<div style="padding:10px;border-top:1px solid var(--border);font-size:9px;color:var(--text-muted);text-align:center">阿吽 v6.0</div>
 </div>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div class="main">
@@ -325,6 +326,7 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="page-help" id="page-help"></div>
 <div class="content" onclick="var ph=document.getElementById('page-help');if(ph)ph.classList.remove('show')">
 <div class="view active" id="v-overview"></div>
+<div class="view" id="v-ideas"></div>
 <div class="view" id="v-cases"></div>
 <div class="view" id="v-deal"></div>
 <div class="view" id="v-topics"></div>
@@ -354,6 +356,18 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="fg"><label>想定月商</label><select id="f-dtr"><option value="">未定</option><option value="~$1K">~$1K</option><option value="$1K-5K">$1K-5K</option><option value="$5K-20K">$5K-20K</option><option value="$20K-100K">$20K-100K</option><option value="$100K+">$100K+</option></select></div>
 <div class="fg"><label>メモ</label><textarea id="f-dm" rows="2"></textarea></div>
 <div class="fa"><button class="btn" onclick="closeModal('m-deal')">取消</button><button class="btn primary" onclick="createDeal()">作成</button></div>
+</div></div>
+
+<!-- v6: Idea 追加モーダル -->
+<div class="modal-bg" id="m-idea"><div class="modal">
+<h3>💡 アイデア記録</h3>
+<p style="font-size:11px;color:var(--text-muted);margin-bottom:10px">後で案件化できる種を記録。今思いついた1行をすぐ投げ込む。</p>
+<div class="fg"><label>タイトル <span style="color:var(--red);font-size:9px">必須</span></label><input id="f-it-title" placeholder="例: 松崎の四柱推命app・ポケモンGO型"></div>
+<div class="fg"><label>カテゴリ</label><select id="f-it-cat"><option value="新規事業" selected>新規事業</option><option value="既存改善">既存改善</option><option value="仕組み">仕組み</option><option value="その他">その他</option></select></div>
+<div class="fg"><label>ソース</label><select id="f-it-src"><option value="自分の思いつき" selected>自分の思いつき</option><option value="録音">録音</option><option value="雑談">雑談</option><option value="読書">読書</option><option value="他人提案">他人提案</option><option value="その他">その他</option></select></div>
+<div class="fg"><label>記録者</label><select id="f-it-by"><option>白石</option><option>松崎</option></select></div>
+<div class="fg"><label>メモ（任意）</label><textarea id="f-it-memo" rows="2" placeholder="思いついた背景・要点"></textarea></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-idea')">取消</button><button class="btn primary" onclick="createIdea()">記録</button></div>
 </div></div>
 
 <div class="modal-bg" id="m-issue"><div class="modal">
@@ -754,6 +768,14 @@ function doSave() {
     }),
     dev_log: (D._devLog||[]).map(function(d) {
       return {version:d.version,content:d.content,date:d.date};
+    }),
+    ideas: (D.ideas||[]).map(function(idea) {
+      return {
+        id: idea.id, title: idea.title || '', category: idea.category || '',
+        source: idea.source || '', status: idea.status || 'raw',
+        linked_deal_id: idea.linked_deal_id || '', memo: idea.memo || '',
+        created_at: idea.created_at, created_by: idea.created_by || ''
+      };
     })
   };
   gasFormPost('saveAllData', JSON.stringify(payload))
@@ -784,6 +806,7 @@ function initApp(jsonStr) {
   D.logs = raw.logs || [];
   D._devLog = raw.dev_log || [];
   D.activities = raw.activities || [];
+  D.ideas = raw.ideas || []; // v6: アイデア記録
   D._inputDraft = '';
   _loaded = true;
   // Hide loading overlay
@@ -828,6 +851,7 @@ function startAutoReload() {
         D.logs = raw.logs || [];
         D._devLog = raw.dev_log || [];
         D.activities = raw.activities || [];
+        D.ideas = raw.ideas || []; // v6
         // Re-render current view without disruption
         render();
       })
@@ -1079,6 +1103,7 @@ function renderActivityFeed() {
 // ============================================================
 function render(){
   if(cv==='overview')renderOverview();
+  if(cv==='ideas')renderIdeas();
   if(cv==='cases')renderCases();
   if(cv==='deal'&&cd)renderDeal(cd);
   if(cv==='topics')renderTopics();
@@ -1515,7 +1540,7 @@ function go(v){cv=v;document.querySelectorAll('.view').forEach(function(el){el.c
   var viewId='v-'+v;var el=document.getElementById(viewId);if(el)el.classList.add('active');
   var navBtn=document.querySelector('[data-view="'+v+'"]');if(navBtn)navBtn.classList.add('active');
   var lang=window._lang||'ja';
-  var titles=lang==='ja'?{overview:'全体像',cases:'新規事業',topics:'論点',issues:'課題',input:'入力',log:'決定ログ',kb:'ナレッジベース',roadmap:'開発ロードマップ'}:{overview:'Overview',cases:'New Biz. Dev.',topics:'Topics',issues:'Issues',input:'Input',log:'Decision Log',kb:'Knowledge Base',roadmap:'Dev Roadmap'};
+  var titles=lang==='ja'?{overview:'全体像',ideas:'アイデア',cases:'新規事業',topics:'論点',issues:'課題',input:'入力',log:'決定ログ',kb:'ナレッジベース',roadmap:'開発ロードマップ'}:{overview:'Overview',ideas:'Ideas',cases:'New Biz. Dev.',topics:'Topics',issues:'Issues',input:'Input',log:'Decision Log',kb:'Knowledge Base',roadmap:'Dev Roadmap'};
   if(titles[v])document.getElementById('tt').textContent=titles[v];
   // Close sidebar after navigation
   closeSidebar();
@@ -1560,7 +1585,8 @@ var _pageHelp={
     input:'<h4>🤖 入力</h4><p>メモや会話テキストを貼り付けて、案件・Issue・論点に振り分ける。</p><div class="ph-tip">💡 LINEの会話をコピペ → 「構造化して振り分け」で適切な場所に送れる。</div>',
     log:'<h4>📝 決定ログ</h4><p>3人で共有すべき重要な記録のみ。日記ではない。</p><div class="ph-tip">💡 記録するのは「決定事項」「新事実」「アクション変更」の3種類だけ。</div>',
     kb:'<h4>📖 ナレッジベース</h4><p>参考資料やプレイブックをまとめた場所。</p><div class="ph-tip">💡 新規事業の進め方に迷ったらここを確認。</div>',
-    roadmap:'<h4>🗺️ 開発ロードマップ</h4><p>このツール自体の開発計画と変更履歴。</p><div class="ph-tip">💡 アクティビティは自動記録。手動で開発ログも追加可能。</div>'
+    roadmap:'<h4>🗺️ 開発ロードマップ</h4><p>このツール自体の開発計画と変更履歴。</p><div class="ph-tip">💡 アクティビティは自動記録。手動で開発ログも追加可能。</div>',
+    ideas:'<h4>💡 アイデア</h4><p>ビジネスの種・発想・思いつきを即記録する場所。後で「案件化」ボタンで Deal に昇格可能。</p><p style="margin:8px 0 4px;font-weight:700;color:var(--text)">ステータスの流れ</p><p>🌱 <b>種</b> → 🤔 <b>検討中</b> → 🚀 <b>案件化</b> / ❌ <b>却下</b></p><div class="ph-tip">💡 1行追加でいい。詳細は後で書く。</div>'
   },
   en:{
     overview:'<h4>📊 Overview</h4><p>Dashboard showing all key metrics at a glance.</p><div class="ph-tip">💡 Check deal/issue/topic counts and alerts here.</div>',
@@ -1571,9 +1597,160 @@ var _pageHelp={
     input:'<h4>🤖 Input</h4><p>Paste notes or chat logs to route to deals/issues/topics.</p><div class="ph-tip">💡 Copy LINE chats → paste → "Analyze & Route" to structure the info.</div>',
     log:'<h4>📝 Decision Log</h4><p>Important records only: Decisions, New Facts, Action Changes.</p><div class="ph-tip">💡 Not a diary. Only log what the 3 of you need to remember.</div>',
     kb:'<h4>📖 Knowledge Base</h4><p>Reference materials and playbooks.</p><div class="ph-tip">💡 Check here when unsure about the venture-building process.</div>',
-    roadmap:'<h4>🗺️ Dev Roadmap</h4><p>Development plan and changelog for this tool.</p><div class="ph-tip">💡 Activities are auto-logged. Manual dev log entries also supported.</div>'
+    roadmap:'<h4>🗺️ Dev Roadmap</h4><p>Development plan and changelog for this tool.</p><div class="ph-tip">💡 Activities are auto-logged. Manual dev log entries also supported.</div>',
+    ideas:'<h4>💡 Ideas</h4><p>Capture business seeds and sparks. Promote to a Deal later.</p><p>🌱 Raw → 🤔 Considering → 🚀 Promoted / ❌ Rejected</p><div class="ph-tip">💡 One-line entry is enough. Add details later.</div>'
   }
 };
+
+// ============================================================
+// IDEAS (v6)
+// ============================================================
+function createIdea(){
+  var title = document.getElementById('f-it-title').value.trim();
+  if(!title){ alert('タイトルは必須'); return; }
+  var idea = {
+    id: 'idea-'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),
+    title: title,
+    category: document.getElementById('f-it-cat').value,
+    source: document.getElementById('f-it-src').value,
+    status: 'raw',
+    linked_deal_id: '',
+    memo: document.getElementById('f-it-memo').value,
+    created_at: new Date().toISOString(),
+    created_by: document.getElementById('f-it-by').value
+  };
+  if(!D.ideas) D.ideas = [];
+  D.ideas.push(idea);
+  sv();
+  closeModal('m-idea');
+  document.getElementById('f-it-title').value='';
+  document.getElementById('f-it-memo').value='';
+  document.getElementById('f-it-cat').value='新規事業';
+  document.getElementById('f-it-src').value='自分の思いつき';
+  render();
+}
+
+function updIdeaStatus(id, newStatus){
+  var idea = (D.ideas||[]).find(function(x){ return x.id===id; });
+  if(!idea) return;
+  idea.status = newStatus;
+  sv();
+  render();
+}
+
+function delIdea(id){
+  if(!confirm('このアイデアを削除？（履歴も消える）')) return;
+  D.ideas = (D.ideas||[]).filter(function(x){ return x.id!==id; });
+  sv();
+  render();
+}
+
+function promoteIdea(id){
+  var idea = (D.ideas||[]).find(function(x){ return x.id===id; });
+  if(!idea){ alert('アイデアが見つかりません'); return; }
+  if(idea.status === 'promoted'){ alert('既に案件化済'); return; }
+  if(!confirm('「' + idea.title + '」を案件化（Dealに昇格）しますか？')) return;
+  var dealId = 'd'+Date.now().toString(36)+Math.random().toString(36).slice(2,4);
+  var nowIso = new Date().toISOString();
+  var newDeal = {
+    id: dealId, name: idea.title, entity: 'Matsuyuki',
+    owner: idea.created_by || '白石', priority: '中',
+    deadline: null, memo: (idea.memo || '') + ' [from idea ' + id + ']',
+    category: '', currentPhase: 0, createdAt: nowIso,
+    marketType: '', targetType: '', targetDetail: '',
+    revenueModel: '', resources: '', investmentScale: '', targetRevenue: '',
+    killLogs: [],
+    phases: PHASES.map(function(p){
+      return {
+        id: p.id,
+        status: p.id===0 ? 'active' : 'locked',
+        startedAt: p.id===0 ? nowIso : null,
+        completedAt: null,
+        gc: p.gate.map(function(){ return {p:{白石:false,中野:false,松崎:false},v:'',sv:{}}; }),
+        rc: p.req.map(function(){ return {p:{白石:false,中野:false,松崎:false},v:'',sv:{}}; }),
+        oc: p.opt.map(function(){ return {done:false,v:'',sv:{}}; }),
+        dc: p.del.map(function(){ return false; })
+      };
+    })
+  };
+  D.deals.push(newDeal);
+  idea.status = 'promoted';
+  idea.linked_deal_id = dealId;
+  sv();
+  render();
+  if(typeof openDeal === 'function') openDeal(dealId);
+}
+
+function renderIdeas(){
+  var ideas = (D.ideas || []).slice();
+  var fs = document.getElementById('id-fs')?.value || 'active';
+  if(fs === 'active') ideas = ideas.filter(function(x){ return x.status !== 'rejected' && x.status !== 'promoted'; });
+  else if(fs !== 'all') ideas = ideas.filter(function(x){ return x.status === fs; });
+  ideas.sort(function(a,b){ return (b.created_at||'').localeCompare(a.created_at||''); });
+
+  var statusLabel = function(s){
+    return s==='raw'?'🌱 種':s==='considering'?'🤔 検討中':s==='promoted'?'🚀 案件化':s==='rejected'?'❌ 却下':s;
+  };
+  var statusColor = function(s){
+    return s==='raw'?'var(--text-dim)':s==='considering'?'var(--yellow)':s==='promoted'?'var(--green)':s==='rejected'?'var(--text-muted)':'var(--text)';
+  };
+
+  var counts = {raw:0, considering:0, promoted:0, rejected:0};
+  (D.ideas||[]).forEach(function(x){ if(counts[x.status]!==undefined) counts[x.status]++; });
+
+  var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">' +
+    '<h2 style="font-size:18px;font-weight:800">💡 アイデア</h2>' +
+    '<button class="btn primary" onclick="openModal(\'m-idea\')">＋ 新規アイデア</button>' +
+    '</div>' +
+    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">ビジネスの種・発想・思いつきの一時置き場。後で「案件化」ボタンで Deal に昇格できる。</p>';
+  html += '<div class="filters" style="flex-wrap:wrap;margin-bottom:12px">' +
+    '<span style="color:var(--text-muted)">状態:</span>' +
+    '<select id="id-fs" onchange="render()">' +
+    '<option value="active"' + (fs==='active'?' selected':'') + '>アクティブ（種+検討中）</option>' +
+    '<option value="all"' + (fs==='all'?' selected':'') + '>全て</option>' +
+    '<option value="raw"' + (fs==='raw'?' selected':'') + '>🌱 種</option>' +
+    '<option value="considering"' + (fs==='considering'?' selected':'') + '>🤔 検討中</option>' +
+    '<option value="promoted"' + (fs==='promoted'?' selected':'') + '>🚀 案件化済</option>' +
+    '<option value="rejected"' + (fs==='rejected'?' selected':'') + '>❌ 却下</option>' +
+    '</select></div>';
+  html += '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">' +
+    ['raw','considering','promoted','rejected'].map(function(s){
+      return '<span style="font-size:10px;color:' + statusColor(s) + ';background:var(--surface2);padding:3px 8px;border-radius:4px">' + statusLabel(s) + ' ' + counts[s] + '</span>';
+    }).join('') + '</div>';
+
+  if(!ideas.length){
+    html += '<div style="color:var(--text-muted);text-align:center;padding:40px">該当するアイデアなし。＋新規アイデア で1行投げ込もう。</div>';
+  } else {
+    html += '<div class="idea-list">' + ideas.map(function(x){
+      var dateStr = x.created_at ? new Date(x.created_at).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}) : '';
+      var linkedNote = x.linked_deal_id ? ' → <span style="color:var(--green)">Deal: ' + x.linked_deal_id + '</span>' : '';
+      var actions = '';
+      if(x.status !== 'promoted'){
+        actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'considering\')" title="検討中に">🤔</button>';
+        actions += '<button class="sb s-done" onclick="promoteIdea(\'' + x.id + '\')" title="案件化">🚀</button>';
+        actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'rejected\')" title="却下">❌</button>';
+      }
+      actions += '<button class="sb" style="margin-left:4px;font-size:9px" onclick="delIdea(\'' + x.id + '\')">✕</button>';
+      return '<div class="list-row" style="align-items:center;padding:10px 14px">' +
+        '<div class="lr-main" style="min-width:0">' +
+          '<div class="lr-title" style="font-size:13px">' + esc(x.title) + linkedNote + '</div>' +
+          '<div class="lr-sub" style="gap:6px">' +
+            '<span style="color:' + statusColor(x.status) + ';font-size:10px;font-weight:600">' + statusLabel(x.status) + '</span>' +
+            (x.category ? '<span style="font-size:10px;color:var(--text-muted)">' + esc(x.category) + '</span>' : '') +
+            (x.source ? '<span style="font-size:10px;color:var(--text-muted)">📥 ' + esc(x.source) + '</span>' : '') +
+            (x.created_by ? '<span style="font-size:10px;color:var(--accent-light)">' + esc(x.created_by) + '</span>' : '') +
+            (dateStr ? '<span style="font-size:10px;color:var(--text-muted)">' + dateStr + '</span>' : '') +
+          '</div>' +
+          (x.memo ? '<div style="font-size:10px;color:var(--text-muted);margin-top:4px">' + esc(x.memo.substring(0,120)) + (x.memo.length>120?'...':'') + '</div>' : '') +
+        '</div>' +
+        '<div class="ic-btns" style="flex-shrink:0;gap:2px">' + actions + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  document.getElementById('v-ideas').innerHTML = html;
+}
+
 function toggleSidebar(){var sb=document.getElementById('sidebar');var ov=document.getElementById('sidebar-overlay');if(sb.classList.contains('open')){closeSidebar();}else{sb.classList.add('open');ov.classList.add('show');}}
 function closeSidebar(){var sb=document.getElementById('sidebar');var ov=document.getElementById('sidebar-overlay');sb.classList.remove('open');ov.classList.remove('show');}
 
