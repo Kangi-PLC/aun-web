@@ -358,14 +358,27 @@ body{font-family:'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color
 <div class="fa"><button class="btn" onclick="closeModal('m-deal')">取消</button><button class="btn primary" onclick="createDeal()">作成</button></div>
 </div></div>
 
-<!-- v6: Idea 追加モーダル -->
-<div class="modal-bg" id="m-idea"><div class="modal">
+<!-- v6.1: Idea 追加モーダル（早見表化） -->
+<div class="modal-bg" id="m-idea"><div class="modal" style="width:560px">
 <h3>💡 アイデア記録</h3>
-<p style="font-size:11px;color:var(--text-muted);margin-bottom:10px">後で案件化できる種を記録。今思いついた1行をすぐ投げ込む。</p>
+<p style="font-size:11px;color:var(--text-muted);margin-bottom:6px"><strong>種を数えるな。評価して間引け。</strong>後で案件化できる種を記録し、HRCP-RICEで優先順位を付ける。</p>
 <div class="fg"><label>タイトル <span style="color:var(--red);font-size:9px">必須</span></label><input id="f-it-title" placeholder="例: 松崎の四柱推命app・ポケモンGO型"></div>
-<div class="fg"><label>カテゴリ</label><select id="f-it-cat"><option value="新規事業" selected>新規事業</option><option value="既存改善">既存改善</option><option value="仕組み">仕組み</option><option value="その他">その他</option></select></div>
-<div class="fg"><label>ソース</label><select id="f-it-src"><option value="自分の思いつき" selected>自分の思いつき</option><option value="録音">録音</option><option value="雑談">雑談</option><option value="読書">読書</option><option value="他人提案">他人提案</option><option value="その他">その他</option></select></div>
-<div class="fg"><label>記録者</label><select id="f-it-by"><option>白石</option><option>松崎</option></select></div>
+<div style="display:flex;gap:8px">
+  <div class="fg" style="flex:1"><label>カテゴリ</label><select id="f-it-cat"><option value="新規事業" selected>新規事業</option><option value="既存改善">既存改善</option><option value="仕組み">仕組み</option><option value="その他">その他</option></select></div>
+  <div class="fg" style="flex:1"><label>ソース</label><select id="f-it-src"><option value="自分の思いつき" selected>自分の思いつき</option><option value="録音">録音</option><option value="雑談">雑談</option><option value="読書">読書</option><option value="他人提案">他人提案</option><option value="その他">その他</option></select></div>
+  <div class="fg" style="width:90px"><label>記録者</label><select id="f-it-by"><option>白石</option><option>松崎</option></select></div>
+</div>
+<div style="background:var(--surface2);border-radius:8px;padding:10px;margin:6px 0">
+  <div style="font-size:11px;font-weight:700;color:var(--accent-light);margin-bottom:6px">📊 早見表評価（HRCP-RICEで自動スコア化）</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">層</label><select id="f-it-layer"><option value="">未分類</option><option value="③旗艦">③旗艦</option><option value="②a">②a</option><option value="②b">②b</option><option value="②c">②c</option><option value="②/③">②/③</option><option value="②/Kangi">②/Kangi</option><option value="Kangi">Kangi</option><option value="Black">Black</option></select></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">HRCP適合 1-5</label><input type="number" id="f-it-hrcp" min="1" max="5" value="3"></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">蓋然性 1-5</label><input type="number" id="f-it-prob" min="1" max="5" value="3"></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">額</label><select id="f-it-scale"><option value="?">?</option><option value="小">小</option><option value="中" selected>中</option><option value="大">大</option><option value="特大">特大</option></select></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">工数</label><select id="f-it-effort"><option value="小">小</option><option value="中" selected>中</option><option value="大">大</option><option value="特大">特大</option></select></div>
+  </div>
+  <div id="f-it-score" style="text-align:right;font-size:11px;color:var(--accent-light);margin-top:4px">HRCP-RICE = 3.0</div>
+</div>
 <div class="fg"><label>メモ（任意）</label><textarea id="f-it-memo" rows="2" placeholder="思いついた背景・要点"></textarea></div>
 <div class="fa"><button class="btn" onclick="closeModal('m-idea')">取消</button><button class="btn primary" onclick="createIdea()">記録</button></div>
 </div></div>
@@ -774,7 +787,10 @@ function doSave() {
         id: idea.id, title: idea.title || '', category: idea.category || '',
         source: idea.source || '', status: idea.status || 'raw',
         linked_deal_id: idea.linked_deal_id || '', memo: idea.memo || '',
-        created_at: idea.created_at, created_by: idea.created_by || ''
+        created_at: idea.created_at, created_by: idea.created_by || '',
+        layer: idea.layer || '', hrcp: idea.hrcp || 3, probability: idea.probability || 3,
+        scale: idea.scale || '中', effort: idea.effort || '中',
+        hrcp_rice_score: idea.hrcp_rice_score || 0
       };
     })
   };
@@ -1603,11 +1619,37 @@ var _pageHelp={
 };
 
 // ============================================================
-// IDEAS (v6)
+// IDEAS (v6.1: 早見表化・HRCP-RICE評価付き)
 // ============================================================
+function calcHrcpRice(hrcp, probability, scale, effort){
+  var scaleMap = { '小':1, '中':3, '大':5, '特大':10, '?':1 };
+  var effortMap = { '小':1, '中':3, '大':5, '特大':10 };
+  var s = scaleMap[scale] || 3;
+  var e = effortMap[effort] || 3;
+  var h = Number(hrcp) || 3;
+  var p = Number(probability) || 3;
+  return Math.round((h * p * s) / e * 10) / 10;
+}
+
+function updIdeaScorePreview(){
+  var el = document.getElementById('f-it-score');
+  if(!el) return;
+  var s = calcHrcpRice(
+    document.getElementById('f-it-hrcp').value,
+    document.getElementById('f-it-prob').value,
+    document.getElementById('f-it-scale').value,
+    document.getElementById('f-it-effort').value
+  );
+  el.textContent = 'HRCP-RICE = ' + s;
+}
+
 function createIdea(){
   var title = document.getElementById('f-it-title').value.trim();
   if(!title){ alert('タイトルは必須'); return; }
+  var h = Number(document.getElementById('f-it-hrcp').value) || 3;
+  var p = Number(document.getElementById('f-it-prob').value) || 3;
+  var sc = document.getElementById('f-it-scale').value || '中';
+  var ef = document.getElementById('f-it-effort').value || '中';
   var idea = {
     id: 'idea-'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),
     title: title,
@@ -1617,7 +1659,13 @@ function createIdea(){
     linked_deal_id: '',
     memo: document.getElementById('f-it-memo').value,
     created_at: new Date().toISOString(),
-    created_by: document.getElementById('f-it-by').value
+    created_by: document.getElementById('f-it-by').value,
+    layer: document.getElementById('f-it-layer').value,
+    hrcp: h,
+    probability: p,
+    scale: sc,
+    effort: ef,
+    hrcp_rice_score: calcHrcpRice(h, p, sc, ef)
   };
   if(!D.ideas) D.ideas = [];
   D.ideas.push(idea);
@@ -1627,6 +1675,12 @@ function createIdea(){
   document.getElementById('f-it-memo').value='';
   document.getElementById('f-it-cat').value='新規事業';
   document.getElementById('f-it-src').value='自分の思いつき';
+  document.getElementById('f-it-layer').value='';
+  document.getElementById('f-it-hrcp').value='3';
+  document.getElementById('f-it-prob').value='3';
+  document.getElementById('f-it-scale').value='中';
+  document.getElementById('f-it-effort').value='中';
+  updIdeaScorePreview();
   render();
 }
 
@@ -1683,38 +1737,58 @@ function promoteIdea(id){
 
 function renderIdeas(){
   var ideas = (D.ideas || []).slice();
+  ideas.forEach(function(x){
+    if(x.hrcp_rice_score === undefined || x.hrcp_rice_score === 0){
+      x.hrcp_rice_score = calcHrcpRice(x.hrcp||3, x.probability||3, x.scale||'中', x.effort||'中');
+    }
+  });
+
   var fs = document.getElementById('id-fs')?.value || 'active';
-  if(fs === 'active') ideas = ideas.filter(function(x){ return x.status !== 'rejected' && x.status !== 'promoted'; });
+  if(fs === 'active') ideas = ideas.filter(function(x){ return ['raw','considering','validating'].indexOf(x.status) >= 0; });
   else if(fs !== 'all') ideas = ideas.filter(function(x){ return x.status === fs; });
-  ideas.sort(function(a,b){ return (b.created_at||'').localeCompare(a.created_at||''); });
+  ideas.sort(function(a,b){ return (b.hrcp_rice_score||0) - (a.hrcp_rice_score||0); });
 
   var statusLabel = function(s){
-    return s==='raw'?'🌱 種':s==='considering'?'🤔 検討中':s==='promoted'?'🚀 案件化':s==='rejected'?'❌ 却下':s;
+    return s==='raw'?'🌱 種':s==='considering'?'🤔 検討中':s==='validating'?'🔬 検証中':s==='promoted'?'🚀 案件化':s==='rejected'?'❌ 却下':s==='parking'?'🛌 寝かせる':s;
   };
   var statusColor = function(s){
-    return s==='raw'?'var(--text-dim)':s==='considering'?'var(--yellow)':s==='promoted'?'var(--green)':s==='rejected'?'var(--text-muted)':'var(--text)';
+    return s==='raw'?'var(--text-dim)':s==='considering'?'var(--yellow)':s==='validating'?'var(--red)':s==='promoted'?'var(--green)':s==='rejected'?'var(--text-muted)':s==='parking'?'var(--blue)':'var(--text)';
   };
 
-  var counts = {raw:0, considering:0, promoted:0, rejected:0};
+  var counts = {raw:0, considering:0, validating:0, promoted:0, rejected:0, parking:0};
   (D.ideas||[]).forEach(function(x){ if(counts[x.status]!==undefined) counts[x.status]++; });
 
-  var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">' +
-    '<h2 style="font-size:18px;font-weight:800">💡 アイデア</h2>' +
+  var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">' +
+    '<h2 style="font-size:18px;font-weight:800">💡 アイデア早見表</h2>' +
     '<button class="btn primary" onclick="openModal(\'m-idea\')">＋ 新規アイデア</button>' +
     '</div>' +
-    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">ビジネスの種・発想・思いつきの一時置き場。後で「案件化」ボタンで Deal に昇格できる。</p>';
+    '<div style="background:var(--surface2);border-left:3px solid var(--accent);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--text-dim);line-height:1.6">' +
+      '<strong style="color:var(--accent-light)">種を数えるな。評価して間引け。</strong><br>' +
+      '本当の収穫は種ではなく「種を評価する仕組み」。HRCP-RICEスコア降順で並ぶ。' +
+      '<strong style="color:var(--yellow)">「1個実証」原則</strong>: 同時検証は最大3本まで。残りは寝かせて（parking）Ω保持。' +
+    '</div>';
+
+  if(counts.validating > 3){
+    html += '<div style="background:rgba(255,76,76,0.1);border:1px solid var(--red);border-radius:6px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--red);font-weight:600">' +
+      '⚠ 検証中が ' + counts.validating + ' 本。3本を超えています。優先1-3本に絞り、残りは「🛌 寝かせる」に。工数（Ω）の浪費を防ぐ。' +
+      '</div>';
+  }
+
   html += '<div class="filters" style="flex-wrap:wrap;margin-bottom:12px">' +
     '<span style="color:var(--text-muted)">状態:</span>' +
     '<select id="id-fs" onchange="render()">' +
-    '<option value="active"' + (fs==='active'?' selected':'') + '>アクティブ（種+検討中）</option>' +
+    '<option value="active"' + (fs==='active'?' selected':'') + '>アクティブ（種+検討中+検証中）</option>' +
     '<option value="all"' + (fs==='all'?' selected':'') + '>全て</option>' +
     '<option value="raw"' + (fs==='raw'?' selected':'') + '>🌱 種</option>' +
     '<option value="considering"' + (fs==='considering'?' selected':'') + '>🤔 検討中</option>' +
+    '<option value="validating"' + (fs==='validating'?' selected':'') + '>🔬 検証中</option>' +
+    '<option value="parking"' + (fs==='parking'?' selected':'') + '>🛌 寝かせる</option>' +
     '<option value="promoted"' + (fs==='promoted'?' selected':'') + '>🚀 案件化済</option>' +
     '<option value="rejected"' + (fs==='rejected'?' selected':'') + '>❌ 却下</option>' +
     '</select></div>';
+
   html += '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">' +
-    ['raw','considering','promoted','rejected'].map(function(s){
+    ['raw','considering','validating','parking','promoted','rejected'].map(function(s){
       return '<span style="font-size:10px;color:' + statusColor(s) + ';background:var(--surface2);padding:3px 8px;border-radius:4px">' + statusLabel(s) + ' ' + counts[s] + '</span>';
     }).join('') + '</div>';
 
@@ -1726,30 +1800,45 @@ function renderIdeas(){
       var linkedNote = x.linked_deal_id ? ' → <span style="color:var(--green)">Deal: ' + x.linked_deal_id + '</span>' : '';
       var actions = '';
       if(x.status !== 'promoted'){
-        actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'considering\')" title="検討中に">🤔</button>';
+        if(x.status !== 'considering') actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'considering\')" title="検討中">🤔</button>';
+        if(x.status !== 'validating') actions += '<button class="sb s-prog" onclick="updIdeaStatus(\'' + x.id + '\',\'validating\')" title="検証中（1個実証）">🔬</button>';
+        if(x.status !== 'parking') actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'parking\')" title="寝かせる（Ω保持）">🛌</button>';
         actions += '<button class="sb s-done" onclick="promoteIdea(\'' + x.id + '\')" title="案件化">🚀</button>';
-        actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'rejected\')" title="却下">❌</button>';
+        if(x.status !== 'rejected') actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'rejected\')" title="却下">❌</button>';
       }
       actions += '<button class="sb" style="margin-left:4px;font-size:9px" onclick="delIdea(\'' + x.id + '\')">✕</button>';
-      return '<div class="list-row" style="align-items:center;padding:10px 14px">' +
+
+      var score = x.hrcp_rice_score || 0;
+      var scoreColor = score >= 10 ? 'var(--green)' : score >= 5 ? 'var(--yellow)' : 'var(--text-muted)';
+
+      return '<div class="list-row" style="align-items:center;padding:10px 14px;gap:10px">' +
+        '<div style="min-width:50px;text-align:center;font-weight:800;color:' + scoreColor + ';font-size:14px">' + score + '</div>' +
         '<div class="lr-main" style="min-width:0">' +
           '<div class="lr-title" style="font-size:13px">' + esc(x.title) + linkedNote + '</div>' +
-          '<div class="lr-sub" style="gap:6px">' +
+          '<div class="lr-sub" style="gap:6px;flex-wrap:wrap">' +
             '<span style="color:' + statusColor(x.status) + ';font-size:10px;font-weight:600">' + statusLabel(x.status) + '</span>' +
+            (x.layer ? '<span style="font-size:10px;color:var(--accent-light);background:var(--surface2);padding:1px 6px;border-radius:3px">' + esc(x.layer) + '</span>' : '') +
+            '<span style="font-size:10px;color:var(--text-muted)">HRCP=' + (x.hrcp||3) + ' / 蓋=' + (x.probability||3) + ' / 額=' + esc(x.scale||'?') + ' / 工=' + esc(x.effort||'?') + '</span>' +
             (x.category ? '<span style="font-size:10px;color:var(--text-muted)">' + esc(x.category) + '</span>' : '') +
             (x.source ? '<span style="font-size:10px;color:var(--text-muted)">📥 ' + esc(x.source) + '</span>' : '') +
             (x.created_by ? '<span style="font-size:10px;color:var(--accent-light)">' + esc(x.created_by) + '</span>' : '') +
             (dateStr ? '<span style="font-size:10px;color:var(--text-muted)">' + dateStr + '</span>' : '') +
           '</div>' +
-          (x.memo ? '<div style="font-size:10px;color:var(--text-muted);margin-top:4px">' + esc(x.memo.substring(0,120)) + (x.memo.length>120?'...':'') + '</div>' : '') +
+          (x.memo ? '<div style="font-size:10px;color:var(--text-muted);margin-top:4px">' + esc(x.memo.substring(0,140)) + (x.memo.length>140?'...':'') + '</div>' : '') +
         '</div>' +
-        '<div class="ic-btns" style="flex-shrink:0;gap:2px">' + actions + '</div>' +
+        '<div class="ic-btns" style="flex-shrink:0;gap:2px;flex-wrap:wrap">' + actions + '</div>' +
       '</div>';
     }).join('') + '</div>';
   }
 
   document.getElementById('v-ideas').innerHTML = html;
 }
+
+// score preview realtime
+['f-it-hrcp','f-it-prob','f-it-scale','f-it-effort'].forEach(function(id){
+  var bind = function(){ var el=document.getElementById(id); if(el){ el.addEventListener('input', updIdeaScorePreview); el.addEventListener('change', updIdeaScorePreview); } };
+  if(document.readyState !== 'loading') bind(); else document.addEventListener('DOMContentLoaded', bind);
+});
 
 function toggleSidebar(){var sb=document.getElementById('sidebar');var ov=document.getElementById('sidebar-overlay');if(sb.classList.contains('open')){closeSidebar();}else{sb.classList.add('open');ov.classList.add('show');}}
 function closeSidebar(){var sb=document.getElementById('sidebar');var ov=document.getElementById('sidebar-overlay');sb.classList.remove('open');ov.classList.remove('show');}
