@@ -1,3 +1,4 @@
+<!-- AUTO-GENERATED from aun-gas by build.py — 直接編集禁止。aun-gas を編集して python build.py -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -22,7 +23,7 @@ body{line-height:1.55;font-family:'Segoe UI','Noto Sans JP',sans-serif;backgroun
 .sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;position:fixed;left:-240px;z-index:100;height:100vh;transition:left .3s}
 .sidebar.open{left:0}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
-.sidebar-overlay.show{display:block}
+.sidebar.open~.sidebar-overlay{display:block}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
 .content{flex:1;overflow-y:auto;padding:24px}
@@ -241,11 +242,6 @@ body{line-height:1.55;font-family:'Segoe UI','Noto Sans JP',sans-serif;backgroun
 .page-help p{margin-bottom:6px}
 .page-help .ph-tip{background:var(--surface3);border-radius:6px;padding:6px 10px;margin-top:6px;font-size:13px;color:var(--accent-light)}
 .help-btn:hover{background:var(--accent-dim)!important;color:var(--text)!important}
-/* Inline help tooltip */
-.ihelp{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);font-size:10px;font-weight:700;cursor:help;margin-left:4px;vertical-align:middle;position:relative}
-.ihelp:hover .ihelp-tip{display:block}
-.ihelp-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);width:240px;padding:10px 12px;background:var(--surface);border:1px solid var(--accent-dim);border-radius:8px;font-size:13px;font-weight:400;color:var(--text-dim);line-height:1.5;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4)}
-.ihelp-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--accent-dim)}
 /* Chip multi-select */
 .chip-select{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);transition:all .15s;user-select:none}
@@ -283,6 +279,14 @@ body{line-height:1.55;font-family:'Segoe UI','Noto Sans JP',sans-serif;backgroun
 .deal-badge-revenue{background:rgba(0,184,148,0.15);color:var(--green)}
 .deal-badge-resource{background:rgba(253,203,110,0.15);color:var(--yellow)}
 .deal-badge-invest{background:rgba(225,112,85,0.15);color:var(--red)}
+/* v6.3: BMC / Lean Canvas grid */
+.canvas-grid{display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:auto auto auto;gap:6px}
+.canvas-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;min-height:130px;transition:border-color .15s}
+.canvas-block:hover{border-color:var(--accent-dim)}
+.canvas-block h5{font-size:11px;font-weight:700;color:var(--accent-light);margin-bottom:6px;letter-spacing:0.3px}
+.canvas-block textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:12px;line-height:1.5;resize:vertical;min-height:86px;font-family:inherit}
+.canvas-block textarea::placeholder{color:var(--text-muted);font-size:10px}
+@media(max-width:820px){.canvas-grid{display:flex;flex-direction:column}.canvas-block{min-height:90px}.canvas-block textarea{min-height:56px}}
 </style>
 
 </head>
@@ -311,13 +315,13 @@ body{line-height:1.55;font-family:'Segoe UI','Noto Sans JP',sans-serif;backgroun
 <button class="nav-btn" data-view="kb" onclick="go('kb')"><span class="icon">📖</span> <span class="nav-label" data-ja="ナレッジベース" data-en="Knowledge Base">ナレッジベース</span></button>
 <button class="nav-btn" data-view="roadmap" onclick="go('roadmap')"><span class="icon">🗺️</span> <span class="nav-label" data-ja="開発ロードマップ" data-en="Dev Roadmap">開発ロードマップ</span></button>
 <div style="flex:1"></div>
-<button class="nav-btn" onclick="openModal('m-help')" style="margin:4px 6px;font-size:10px;color:var(--text-muted);justify-content:center">📖 使い方ガイド</button>
-<div style="padding:10px;border-top:1px solid var(--border);font-size:9px;color:var(--text-muted);text-align:center">阿吽 v6.0</div>
+<button class="nav-btn" onclick="openModal('m-help')" style="margin:4px 6px;font-size:10px;color:var(--text-muted);justify-content:center" data-ja="📖 使い方ガイド" data-en="📖 User Guide">📖 使い方ガイド</button>
+<div style="padding:10px;border-top:1px solid var(--border);font-size:9px;color:var(--text-muted);text-align:center">阿吽 v6.3</div>
 </div>
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('open');this.style.display='none'"></div>
 <div class="main">
 <div class="topbar">
-<button class="btn" onclick="toggleSidebar()" id="menu-btn">☰</button>
+<button class="btn" onclick="var sb=document.getElementById('sidebar');sb.classList.toggle('open');document.getElementById('sidebar-overlay').style.display=sb.classList.contains('open')?'block':'none'" id="menu-btn">☰</button>
 <div class="topbar-title" id="tt">Overview</div>
 <button class="btn help-btn" onclick="togglePageHelp()" id="page-help-btn" title="このページのヘルプ" style="font-size:12px;width:24px;height:24px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer">?</button>
 <div id="save-indicator"></div>
@@ -344,57 +348,57 @@ body{line-height:1.55;font-family:'Segoe UI','Noto Sans JP',sans-serif;backgroun
 
 <!-- Modals -->
 <div class="modal-bg" id="m-deal"><div class="modal">
-<h3>新規案件</h3>
-<div class="fg"><label>案件名</label><input id="f-dn" placeholder="例: 抹茶D2Cブランド"></div>
-<div class="fg"><label>責任者</label><select id="f-do"><option>白石</option><option>松崎</option></select></div>
-<div class="fg"><label>優先度</label><select id="f-dp"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
-<div class="fg"><label>完了目標日</label><input type="date" id="f-dd"></div>
-<div class="fg"><label>事業カテゴリ</label><div class="chip-select" id="f-dcat-chips"><span class="chip" data-val="M&A" onclick="toggleChip(this)">M&A</span><span class="chip" data-val="D2C" onclick="toggleChip(this)">D2C</span><span class="chip" data-val="SaaS" onclick="toggleChip(this)">SaaS</span><span class="chip" data-val="貿易" onclick="toggleChip(this)">貿易</span><span class="chip" data-val="製造" onclick="toggleChip(this)">製造</span><span class="chip" data-val="サービス" onclick="toggleChip(this)">サービス</span></div></div>
-<div class="fg"><label>市場タイプ<span class="ihelp">?<span class="ihelp-tip"><b>Steve Blank分類:</b><br>既存市場=競合が明確<br>再セグメント=既存市場の隙間<br>新規市場=前例なし<br>クローン=海外成功モデルの輸入</span></span></label><select id="f-dmt"><option value="">未選択</option><option value="既存市場">既存市場</option><option value="再セグメント市場">再セグメント市場</option><option value="新規市場">新規市場</option><option value="クローン市場">クローン市場</option></select></div>
-<div class="fg"><label>ターゲット顧客</label><div style="display:flex;gap:8px;align-items:center"><select id="f-dtt" style="width:120px"><option value="">未選択</option><option value="B2B">B2B</option><option value="B2C">B2C</option><option value="B2B2C">B2B2C</option></select><input id="f-dtd" placeholder="例: カンボジアの飲食店" style="flex:1"></div></div>
-<div class="fg"><label>収益モデル<span class="ihelp">?<span class="ihelp-tip"><b>サブスク</b>=月/年額課金<br><b>トランザクション</b>=取引ごと手数料<br><b>物販</b>=商品販売<br><b>ライセンス</b>=使用権販売<br><b>コミッション</b>=仲介手数料<br><b>コンサル</b>=時間/PJ課金</span></span></label><div class="chip-select" id="f-drm-chips"><span class="chip" data-val="サブスクリプション" onclick="toggleChip(this)">サブスクリプション</span><span class="chip" data-val="トランザクション" onclick="toggleChip(this)">トランザクション</span><span class="chip" data-val="物販" onclick="toggleChip(this)">物販</span><span class="chip" data-val="ライセンス" onclick="toggleChip(this)">ライセンス</span><span class="chip" data-val="コミッション" onclick="toggleChip(this)">コミッション</span><span class="chip" data-val="広告" onclick="toggleChip(this)">広告</span><span class="chip" data-val="コンサル" onclick="toggleChip(this)">コンサル</span></div></div>
-<div class="fg"><label>必要リソース</label><div class="chip-select" id="f-drs-chips"><span class="chip" data-val="資金" onclick="toggleChip(this)">資金</span><span class="chip" data-val="人材" onclick="toggleChip(this)">人材</span><span class="chip" data-val="技術" onclick="toggleChip(this)">技術</span><span class="chip" data-val="許認可" onclick="toggleChip(this)">許認可</span><span class="chip" data-val="パートナー" onclick="toggleChip(this)">パートナー</span><span class="chip" data-val="設備" onclick="toggleChip(this)">設備</span></div></div>
-<div class="fg"><label>初期投資規模</label><select id="f-dis"><option value="">未選択</option><option value="$0-1K">$0-1K (ほぼゼロ)</option><option value="$1K-10K">$1K-10K (少額)</option><option value="$10K-50K">$10K-50K (中額)</option><option value="$50K-100K">$50K-100K (大額)</option><option value="$100K+">$100K+ (要大型資金)</option></select></div>
-<div class="fg"><label>想定月商</label><select id="f-dtr"><option value="">未定</option><option value="~$1K">~$1K</option><option value="$1K-5K">$1K-5K</option><option value="$5K-20K">$5K-20K</option><option value="$20K-100K">$20K-100K</option><option value="$100K+">$100K+</option></select></div>
-<div class="fg"><label>メモ</label><textarea id="f-dm" rows="2"></textarea></div>
-<div class="fa"><button class="btn" onclick="closeModal('m-deal')">取消</button><button class="btn primary" onclick="createDeal()">作成</button></div>
+<h3 data-ja="新規案件" data-en="New Deal">新規案件</h3>
+<div class="fg"><label data-ja="案件名" data-en="Deal name">案件名</label><input id="f-dn" placeholder="例: 抹茶D2Cブランド" data-ja-ph="例: 抹茶D2Cブランド" data-en-ph="e.g. Matcha D2C brand"></div>
+<div class="fg"><label data-ja="責任者" data-en="Owner">責任者</label><select id="f-do"><option>白石</option><option>松崎</option></select></div>
+<div class="fg"><label data-ja="優先度" data-en="Priority">優先度</label><select id="f-dp"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
+<div class="fg"><label data-ja="完了目標日" data-en="Target date">完了目標日</label><input type="date" id="f-dd"></div>
+<div class="fg"><label data-ja="事業カテゴリ" data-en="Category">事業カテゴリ</label><div class="chip-select" id="f-dcat-chips"><span class="chip" data-val="M&A" onclick="toggleChip(this)">M&A</span><span class="chip" data-val="D2C" onclick="toggleChip(this)">D2C</span><span class="chip" data-val="SaaS" onclick="toggleChip(this)">SaaS</span><span class="chip" data-val="貿易" onclick="toggleChip(this)">貿易</span><span class="chip" data-val="製造" onclick="toggleChip(this)">製造</span><span class="chip" data-val="サービス" onclick="toggleChip(this)">サービス</span></div></div>
+<div class="fg"><label data-ja="市場タイプ" data-en="Market type">市場タイプ</label><select id="f-dmt"><option value="">未選択</option><option value="既存市場">既存市場</option><option value="再セグメント市場">再セグメント市場</option><option value="新規市場">新規市場</option><option value="クローン市場">クローン市場</option></select></div>
+<div class="fg"><label data-ja="ターゲット顧客" data-en="Target customer">ターゲット顧客</label><div style="display:flex;gap:8px;align-items:center"><select id="f-dtt" style="width:120px"><option value="">未選択</option><option value="B2B">B2B</option><option value="B2C">B2C</option><option value="B2B2C">B2B2C</option></select><input id="f-dtd" placeholder="例: カンボジアの飲食店" data-ja-ph="例: カンボジアの飲食店" data-en-ph="e.g. restaurants in Cambodia" style="flex:1"></div></div>
+<div class="fg"><label data-ja="収益モデル" data-en="Revenue model">収益モデル</label><div class="chip-select" id="f-drm-chips"><span class="chip" data-val="サブスクリプション" onclick="toggleChip(this)">サブスクリプション</span><span class="chip" data-val="トランザクション" onclick="toggleChip(this)">トランザクション</span><span class="chip" data-val="物販" onclick="toggleChip(this)">物販</span><span class="chip" data-val="ライセンス" onclick="toggleChip(this)">ライセンス</span><span class="chip" data-val="コミッション" onclick="toggleChip(this)">コミッション</span><span class="chip" data-val="広告" onclick="toggleChip(this)">広告</span><span class="chip" data-val="コンサル" onclick="toggleChip(this)">コンサル</span></div></div>
+<div class="fg"><label data-ja="必要リソース" data-en="Resources needed">必要リソース</label><div class="chip-select" id="f-drs-chips"><span class="chip" data-val="資金" onclick="toggleChip(this)">資金</span><span class="chip" data-val="人材" onclick="toggleChip(this)">人材</span><span class="chip" data-val="技術" onclick="toggleChip(this)">技術</span><span class="chip" data-val="許認可" onclick="toggleChip(this)">許認可</span><span class="chip" data-val="パートナー" onclick="toggleChip(this)">パートナー</span><span class="chip" data-val="設備" onclick="toggleChip(this)">設備</span></div></div>
+<div class="fg"><label data-ja="初期投資規模" data-en="Initial investment">初期投資規模</label><select id="f-dis"><option value="">未選択</option><option value="$0-1K">$0-1K (ほぼゼロ)</option><option value="$1K-10K">$1K-10K (少額)</option><option value="$10K-50K">$10K-50K (中額)</option><option value="$50K-100K">$50K-100K (大額)</option><option value="$100K+">$100K+ (要大型資金)</option></select></div>
+<div class="fg"><label data-ja="想定月商" data-en="Target monthly revenue">想定月商</label><select id="f-dtr"><option value="">未定</option><option value="~$1K">~$1K</option><option value="$1K-5K">$1K-5K</option><option value="$5K-20K">$5K-20K</option><option value="$20K-100K">$20K-100K</option><option value="$100K+">$100K+</option></select></div>
+<div class="fg"><label data-ja="メモ" data-en="Notes">メモ</label><textarea id="f-dm" rows="2"></textarea></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-deal')" data-ja="取消" data-en="Cancel">取消</button><button class="btn primary" onclick="createDeal()" data-ja="作成" data-en="Create">作成</button></div>
 </div></div>
 
-<!-- v6.1: Idea 追加モーダル（早見表化） -->
+<!-- v6.1: Idea 追加モーダル（早見表化・HRCP-RICE評価フィールド付き） -->
 <div class="modal-bg" id="m-idea"><div class="modal" style="width:560px">
-<h3>💡 アイデア記録</h3>
-<p style="font-size:11px;color:var(--text-muted);margin-bottom:6px"><strong>種を数えるな。評価して間引け。</strong>後で案件化できる種を記録し、HRCP-RICEで優先順位を付ける。</p>
-<div class="fg"><label>タイトル <span style="color:var(--red);font-size:9px">必須</span></label><input id="f-it-title" placeholder="例: 松崎の四柱推命app・ポケモンGO型"></div>
+<h3 data-ja="💡 アイデア記録" data-en="💡 Capture Idea">💡 アイデア記録</h3>
+<p style="font-size:11px;color:var(--text-muted);margin-bottom:6px" data-ja="種を数えるな。評価して間引け。後で案件化できる種を記録し、HRCP-RICEで優先順位を付ける。" data-en="Don't count seeds — score and cull. Capture seeds now, prioritize by HRCP-RICE.">種を数えるな。評価して間引け。後で案件化できる種を記録し、HRCP-RICEで優先順位を付ける。</p>
+<div class="fg"><label><span data-ja="タイトル" data-en="Title">タイトル</span> <span style="color:var(--red);font-size:9px" data-ja="必須" data-en="required">必須</span></label><input id="f-it-title" placeholder="例: 松崎の四柱推命app・ポケモンGO型" data-ja-ph="例: 松崎の四柱推命app・ポケモンGO型" data-en-ph="e.g. Matsuzaki's fortune-telling app"></div>
 <div style="display:flex;gap:8px">
-  <div class="fg" style="flex:1"><label>カテゴリ</label><select id="f-it-cat"><option value="新規事業" selected>新規事業</option><option value="既存改善">既存改善</option><option value="仕組み">仕組み</option><option value="その他">その他</option></select></div>
-  <div class="fg" style="flex:1"><label>ソース</label><select id="f-it-src"><option value="自分の思いつき" selected>自分の思いつき</option><option value="録音">録音</option><option value="雑談">雑談</option><option value="読書">読書</option><option value="他人提案">他人提案</option><option value="その他">その他</option></select></div>
-  <div class="fg" style="width:90px"><label>記録者</label><select id="f-it-by"><option>白石</option><option>松崎</option></select></div>
+  <div class="fg" style="flex:1"><label data-ja="カテゴリ" data-en="Category">カテゴリ</label><select id="f-it-cat"><option value="新規事業" selected>新規事業</option><option value="既存改善">既存改善</option><option value="仕組み">仕組み</option><option value="その他">その他</option></select></div>
+  <div class="fg" style="flex:1"><label data-ja="ソース" data-en="Source">ソース</label><select id="f-it-src"><option value="自分の思いつき" selected>自分の思いつき</option><option value="録音">録音</option><option value="雑談">雑談</option><option value="読書">読書</option><option value="他人提案">他人提案</option><option value="その他">その他</option></select></div>
+  <div class="fg" style="width:90px"><label data-ja="記録者" data-en="By">記録者</label><select id="f-it-by"><option>白石</option><option>松崎</option></select></div>
 </div>
 <div style="background:var(--surface2);border-radius:8px;padding:10px;margin:6px 0">
-  <div style="font-size:11px;font-weight:700;color:var(--accent-light);margin-bottom:6px">📊 早見表評価（HRCP-RICEで自動スコア化）</div>
+  <div style="font-size:11px;font-weight:700;color:var(--accent-light);margin-bottom:6px" data-ja="📊 早見表評価（HRCP-RICEで自動スコア化）" data-en="📊 Scoreboard rating (auto HRCP-RICE)">📊 早見表評価（HRCP-RICEで自動スコア化）</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">層</label><select id="f-it-layer"><option value="">未分類</option><option value="③旗艦">③旗艦</option><option value="②a">②a</option><option value="②b">②b</option><option value="②c">②c</option><option value="②/③">②/③</option><option value="②/Kangi">②/Kangi</option><option value="Kangi">Kangi</option><option value="Black">Black</option></select></div>
-    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">HRCP適合 1-5</label><input type="number" id="f-it-hrcp" min="1" max="5" value="3"></div>
-    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">蓋然性 1-5</label><input type="number" id="f-it-prob" min="1" max="5" value="3"></div>
-    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">額</label><select id="f-it-scale"><option value="?">?</option><option value="小">小</option><option value="中" selected>中</option><option value="大">大</option><option value="特大">特大</option></select></div>
-    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px">工数</label><select id="f-it-effort"><option value="小">小</option><option value="中" selected>中</option><option value="大">大</option><option value="特大">特大</option></select></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px" data-ja="層" data-en="Layer">層</label><select id="f-it-layer"><option value="">未分類</option><option value="③旗艦">③旗艦</option><option value="②a">②a</option><option value="②b">②b</option><option value="②c">②c</option><option value="②/③">②/③</option><option value="②/Kangi">②/Kangi</option><option value="Kangi">Kangi</option><option value="Black">Black</option></select></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px" data-ja="HRCP適合 1-5" data-en="HRCP fit 1-5">HRCP適合 1-5</label><input type="number" id="f-it-hrcp" min="1" max="5" value="3"></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px" data-ja="蓋然性 1-5" data-en="Probability 1-5">蓋然性 1-5</label><input type="number" id="f-it-prob" min="1" max="5" value="3"></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px" data-ja="額" data-en="Scale">額</label><select id="f-it-scale"><option value="?">?</option><option value="小">小</option><option value="中" selected>中</option><option value="大">大</option><option value="特大">特大</option></select></div>
+    <div class="fg" style="flex:1;min-width:100px"><label style="font-size:10px" data-ja="工数" data-en="Effort">工数</label><select id="f-it-effort"><option value="小">小</option><option value="中" selected>中</option><option value="大">大</option><option value="特大">特大</option></select></div>
   </div>
   <div id="f-it-score" style="text-align:right;font-size:11px;color:var(--accent-light);margin-top:4px">HRCP-RICE = 3.0</div>
 </div>
-<div class="fg"><label>メモ（任意）</label><textarea id="f-it-memo" rows="2" placeholder="思いついた背景・要点"></textarea></div>
-<div class="fa"><button class="btn" onclick="closeModal('m-idea')">取消</button><button class="btn primary" onclick="createIdea()">記録</button></div>
+<div class="fg"><label data-ja="メモ（任意・後で詳細を足してもOK）" data-en="Notes (optional)">メモ（任意・後で詳細を足してもOK）</label><textarea id="f-it-memo" rows="2" placeholder="思いついた背景・要点・気になるポイント" data-ja-ph="思いついた背景・要点・気になるポイント" data-en-ph="Background, key points, open questions"></textarea></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-idea')" data-ja="取消" data-en="Cancel">取消</button><button class="btn primary" onclick="createIdea()" data-ja="記録" data-en="Save">記録</button></div>
 </div></div>
 
 <div class="modal-bg" id="m-issue"><div class="modal">
 <h3 id="m-issue-title">新規Issue</h3>
-<div class="fg"><label>タイトル <span style="color:var(--red);font-size:9px">必須</span></label><input id="f-it" placeholder="何をすべきか"></div>
-<div class="fg"><label>担当者 <span style="color:var(--red);font-size:9px">必須（複数可）</span></label><div class="chip-select" id="f-ia-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
-<div class="fg"><label>紐付け先 <span style="color:var(--red);font-size:9px">必須</span></label><select id="f-il"></select></div>
-<div class="fg"><label>ステータス<span class="ihelp">?<span class="ihelp-tip">❄ <b>アイスボックス</b>=いつかやる<br>📋 <b>バックログ</b>=やると決めた<br>🔄 <b>進行中</b>=今やってる<br>🚧 <b>ブロック中</b>=外部待ち<br>✅ <b>完了</b>=終わった</span></span></label><select id="f-is" onchange="toggleBlockReason()"><option value="icebox">アイスボックス</option><option value="backlog" selected>バックログ</option><option value="wip">進行中</option><option value="waiting">ブロック中</option><option value="done">完了</option></select></div>
-<div class="fg" id="fg-block-reason" style="display:none"><label>ブロック理由</label><select id="f-ibr"><option value="">選択...</option><option value="外部返答待ち">外部返答待ち</option><option value="資金確保待ち">資金確保待ち</option><option value="法的確認待ち">法的確認待ち</option><option value="他タスク依存">他タスク依存</option><option value="その他">その他</option></select></div>
-<div class="fg"><label>タグ</label><div class="chip-select" id="f-itags-chips"><span class="chip" data-val="法務" onclick="toggleChip(this)">法務</span><span class="chip" data-val="財務" onclick="toggleChip(this)">財務</span><span class="chip" data-val="営業" onclick="toggleChip(this)">営業</span><span class="chip" data-val="開発" onclick="toggleChip(this)">開発</span><span class="chip" data-val="オペレーション" onclick="toggleChip(this)">オペレーション</span><span class="chip" data-val="マーケティング" onclick="toggleChip(this)">マーケティング</span><span class="chip" data-val="戦略" onclick="toggleChip(this)">戦略</span><span class="chip" data-val="外部交渉" onclick="toggleChip(this)">外部交渉</span></div></div>
-<div class="fg"><label>優先度</label><select id="f-ip"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
-<div class="fg"><label>ICE スコア<span class="ihelp">?<span class="ihelp-tip"><b>Impact</b>=成功時の影響度<br><b>Confidence</b>=成功する確信度<br><b>Ease</b>=実行の容易さ<br>各1-10。スコア=I×C×E<br>高い順にやるのが最も合理的</span></span> <span style="font-size:9px;color:var(--text-muted)">（高い順に実行）</span></label>
+<div class="fg"><label><span data-ja="タイトル" data-en="Title">タイトル</span> <span style="color:var(--red);font-size:9px" data-ja="必須" data-en="required">必須</span></label><input id="f-it" placeholder="何をすべきか" data-ja-ph="何をすべきか" data-en-ph="What must be done"></div>
+<div class="fg"><label><span data-ja="担当者" data-en="Assignee">担当者</span> <span style="color:var(--red);font-size:9px" data-ja="必須（複数可）" data-en="required (multi)">必須（複数可）</span></label><div class="chip-select" id="f-ia-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
+<div class="fg"><label><span data-ja="紐付け先" data-en="Linked to">紐付け先</span> <span style="color:var(--red);font-size:9px" data-ja="必須" data-en="required">必須</span></label><select id="f-il"></select></div>
+<div class="fg"><label data-ja="ステータス" data-en="Status">ステータス</label><select id="f-is" onchange="toggleBlockReason()"><option value="icebox">アイスボックス</option><option value="backlog" selected>バックログ</option><option value="wip">進行中</option><option value="waiting">ブロック中</option><option value="done">完了</option></select></div>
+<div class="fg" id="fg-block-reason" style="display:none"><label data-ja="ブロック理由" data-en="Block reason">ブロック理由</label><select id="f-ibr"><option value="">選択...</option><option value="外部返答待ち">外部返答待ち</option><option value="資金確保待ち">資金確保待ち</option><option value="法的確認待ち">法的確認待ち</option><option value="他タスク依存">他タスク依存</option><option value="その他">その他</option></select></div>
+<div class="fg"><label data-ja="タグ" data-en="Tags">タグ</label><div class="chip-select" id="f-itags-chips"><span class="chip" data-val="法務" onclick="toggleChip(this)">法務</span><span class="chip" data-val="財務" onclick="toggleChip(this)">財務</span><span class="chip" data-val="営業" onclick="toggleChip(this)">営業</span><span class="chip" data-val="開発" onclick="toggleChip(this)">開発</span><span class="chip" data-val="オペレーション" onclick="toggleChip(this)">オペレーション</span><span class="chip" data-val="マーケティング" onclick="toggleChip(this)">マーケティング</span><span class="chip" data-val="戦略" onclick="toggleChip(this)">戦略</span><span class="chip" data-val="外部交渉" onclick="toggleChip(this)">外部交渉</span></div></div>
+<div class="fg"><label data-ja="優先度" data-en="Priority">優先度</label><select id="f-ip"><option value="高">🔴 高</option><option value="中" selected>🟡 中</option><option value="低">🔵 低</option></select></div>
+<div class="fg"><label><span data-ja="ICE スコア" data-en="ICE score">ICE スコア</span> <span style="font-size:9px;color:var(--text-muted)" data-ja="（高い順に実行）" data-en="(execute highest first)">（高い順に実行）</span></label>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
 <div><label style="font-size:9px;color:var(--text-muted)">Impact (1-10)</label><input type="number" id="f-ice-i" min="1" max="10" value="5" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px"></div>
 <div><label style="font-size:9px;color:var(--text-muted)">Confidence (1-10)</label><input type="number" id="f-ice-c" min="1" max="10" value="5" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px"></div>
@@ -402,60 +406,75 @@ body{line-height:1.55;font-family:'Segoe UI','Noto Sans JP',sans-serif;backgroun
 </div>
 <div id="f-ice-preview" style="text-align:right;font-size:11px;color:var(--accent-light);margin-top:4px">ICE = 125</div>
 </div>
-<div class="fg"><label>期限</label><input type="date" id="f-idd"></div>
-<div class="fg"><label>詳細</label><textarea id="f-id" rows="2"></textarea></div>
+<div class="fg"><label data-ja="期限" data-en="Deadline">期限</label><input type="date" id="f-idd"></div>
+<div class="fg"><label data-ja="詳細" data-en="Details">詳細</label><textarea id="f-id" rows="2"></textarea></div>
 <!-- Comments section (loaded dynamically when editing) -->
 <div id="issue-comments" style="margin-top:8px;border-top:1px solid var(--border);padding-top:12px"></div>
 <div class="fa" id="m-issue-actions"><button class="btn" onclick="closeModal('m-issue')">取消</button><button class="btn primary" onclick="createIssue()">作成</button></div>
 </div></div>
 
 <div class="modal-bg" id="m-topic"><div class="modal">
-<h3>新規Topic（論点）</h3>
-<div class="fg"><label>論点タイトル</label><input id="f-tt" placeholder="例: 法人設立の是非"></div>
-<div class="fg"><label>ステータス</label><select id="f-ts"><option value="open">未着手</option><option value="discuss">議論中</option><option value="resolved">結論済</option></select></div>
-<div class="fg"><label>関与者</label><div class="chip-select" id="f-tmembers-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip active" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
-<div class="fg"><label>概要</label><textarea id="f-td" rows="3" placeholder="何について決める必要があるか"></textarea></div>
-<div class="fa"><button class="btn" onclick="closeModal('m-topic')">取消</button><button class="btn primary" onclick="createTopic()">作成</button></div>
+<h3 data-ja="新規Topic（論点）" data-en="New Topic">新規Topic（論点）</h3>
+<div class="fg"><label data-ja="論点タイトル" data-en="Topic title">論点タイトル</label><input id="f-tt" placeholder="例: 法人設立の是非" data-ja-ph="例: 法人設立の是非" data-en-ph="e.g. Should we incorporate?"></div>
+<div class="fg"><label data-ja="ステータス" data-en="Status">ステータス</label><select id="f-ts"><option value="open">未着手</option><option value="discuss">議論中</option><option value="resolved">結論済</option></select></div>
+<div class="fg"><label data-ja="関与者" data-en="Members">関与者</label><div class="chip-select" id="f-tmembers-chips"><span class="chip active" data-val="白石" onclick="toggleChip(this)">白石</span><span class="chip active" data-val="松崎" onclick="toggleChip(this)">松崎</span></div></div>
+<div class="fg"><label data-ja="概要" data-en="Summary">概要</label><textarea id="f-td" rows="3" placeholder="何について決める必要があるか" data-ja-ph="何について決める必要があるか" data-en-ph="What needs to be decided"></textarea></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-topic')" data-ja="取消" data-en="Cancel">取消</button><button class="btn primary" onclick="createTopic()" data-ja="作成" data-en="Create">作成</button></div>
 </div></div>
 
 <div class="modal-bg" id="m-log"><div class="modal">
-<h3>Decision Log に追加</h3>
-<div class="fg"><label>種別</label><select id="f-lt"><option value="decision">決定事項</option><option value="fact">新事実</option><option value="change">アクション変更</option></select></div>
-<div class="fg"><label>内容</label><textarea id="f-lc" rows="3" placeholder="何が決まった / 何がわかった / 何が変わったか"></textarea></div>
-<div class="fg"><label>紐付け先</label><select id="f-ll"></select></div>
-<div class="fg"><label>記録者</label><select id="f-lw"><option>白石</option><option>松崎</option></select></div>
-<div class="fa"><button class="btn" onclick="closeModal('m-log')">取消</button><button class="btn primary" onclick="createLog()">記録</button></div>
+<h3 data-ja="Decision Log に追加" data-en="Add to Decision Log">Decision Log に追加</h3>
+<div class="fg"><label data-ja="種別" data-en="Type">種別</label><select id="f-lt"><option value="decision">決定事項</option><option value="fact">新事実</option><option value="change">アクション変更</option></select></div>
+<div class="fg"><label data-ja="内容" data-en="Content">内容</label><textarea id="f-lc" rows="3" placeholder="何が決まった / 何がわかった / 何が変わったか" data-ja-ph="何が決まった / 何がわかった / 何が変わったか" data-en-ph="What was decided / learned / changed"></textarea></div>
+<div class="fg"><label data-ja="紐付け先" data-en="Linked to">紐付け先</label><select id="f-ll"></select></div>
+<div class="fg"><label data-ja="記録者" data-en="By">記録者</label><select id="f-lw"><option>白石</option><option>松崎</option></select></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-log')" data-ja="取消" data-en="Cancel">取消</button><button class="btn primary" onclick="createLog()" data-ja="記録" data-en="Save">記録</button></div>
 </div></div>
 
 <div class="modal-bg" id="m-ks"><div class="modal">
-<h3 style="color:var(--red)">⚠ キルスイッチ判定</h3>
-<div class="fg"><label>該当条件</label><textarea id="f-kc" rows="2"></textarea></div>
-<div class="fg"><label>判定</label><select id="f-kv"><option value="続行">続行</option><option value="後退">後退</option><option value="撤退">撤退</option></select></div>
-<div class="fg"><label>判定者</label><select id="f-kw"><option>全員</option><option>白石</option><option>松崎</option></select></div>
-<div class="fa"><button class="btn" onclick="closeModal('m-ks')">取消</button><button class="btn danger" onclick="logKS()">記録</button></div>
+<h3 style="color:var(--red)" data-ja="⚠ キルスイッチ判定" data-en="⚠ Kill Switch Decision">⚠ キルスイッチ判定</h3>
+<div class="fg"><label data-ja="該当条件" data-en="Triggered condition">該当条件</label><textarea id="f-kc" rows="2"></textarea></div>
+<div class="fg"><label data-ja="判定" data-en="Verdict">判定</label><select id="f-kv"><option value="続行">続行</option><option value="後退">後退</option><option value="撤退">撤退</option></select></div>
+<div class="fg"><label data-ja="判定者" data-en="Judge">判定者</label><select id="f-kw"><option>全員</option><option>白石</option><option>松崎</option></select></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-ks')" data-ja="取消" data-en="Cancel">取消</button><button class="btn danger" onclick="logKS()" data-ja="記録" data-en="Record">記録</button></div>
 </div></div>
 
 <div class="modal-bg" id="m-devlog"><div class="modal">
-<h3>開発ログを追加</h3>
-<div class="fg"><label>バージョン / タグ</label><input id="f-dlv" placeholder="例: v3.0 / MVP完成"></div>
-<div class="fg"><label>内容</label><textarea id="f-dlc" rows="4" placeholder="何を作った / 何を変更した"></textarea></div>
-<div class="fa"><button class="btn" onclick="closeModal('m-devlog')">取消</button><button class="btn primary" onclick="addDevLog()">記録</button></div>
+<h3 data-ja="開発ログを追加" data-en="Add Dev Log">開発ログを追加</h3>
+<div class="fg"><label data-ja="バージョン / タグ" data-en="Version / tag">バージョン / タグ</label><input id="f-dlv" placeholder="例: v3.0 / MVP完成"></div>
+<div class="fg"><label data-ja="内容" data-en="Content">内容</label><textarea id="f-dlc" rows="4" placeholder="何を作った / 何を変更した" data-ja-ph="何を作った / 何を変更した" data-en-ph="What was built / changed"></textarea></div>
+<div class="fa"><button class="btn" onclick="closeModal('m-devlog')" data-ja="取消" data-en="Cancel">取消</button><button class="btn primary" onclick="addDevLog()" data-ja="記録" data-en="Save">記録</button></div>
 </div></div>
 
 <!-- Help Modal -->
 <div class="modal-bg" id="m-help"><div class="modal" style="width:560px;max-height:85vh">
-<h3>阿吽（あうん）— 使い方ガイド</h3>
-<div style="font-size:13px;line-height:1.8;color:var(--text-dim)">
-<p style="margin-bottom:16px;color:var(--text)"><strong>阿吽は、白石・松崎で新規事業を立ち上げるための情報同期プラットフォームです。</strong></p>
+<h3 data-ja="阿吽（あうん）— 使い方ガイド" data-en="A-Un — User Guide">阿吽（あうん）— 使い方ガイド</h3>
+<div id="help-en" style="display:none;font-size:13px;line-height:1.8;color:var(--text-dim)">
+<p style="margin-bottom:16px;color:var(--text)"><strong>A-Un is the venture-building platform for the two founders (Shiraishi &amp; Matsuzaki).</strong></p>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px"><h4 style="color:var(--accent-light);margin-bottom:6px">📅 Today</h4>Daily start screen: what's in validation, top issues, top seeds, and auto-detected alerts (stalled deals, missing next actions, kill-switch prompts).</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px"><h4 style="color:var(--accent-light);margin-bottom:6px">💡 Ideas</h4>Capture business seeds in one line. Scored by HRCP-RICE = (philosophy fit × probability × scale) ÷ effort. Promote the best to a Deal. Max 3 in validation at once.</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px"><h4 style="color:var(--accent-light);margin-bottom:6px">🌱 New Biz. Dev.</h4>Each deal advances through 4 stages: <strong>S0 Validate → S1 Plan → S2 Sell → S3 Systemize</strong>. Gates must be checked (both founders on team stages). Every stage has pre-committed kill conditions.</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px"><h4 style="color:var(--accent-light);margin-bottom:6px">🎨 Canvas</h4>Inside each deal: build a <strong>Lean Canvas or Business Model Canvas per stage</strong>. S0 hypotheses stay side-by-side with S2 reality. Auto-saved.</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px"><h4 style="color:var(--accent-light);margin-bottom:6px">💬 Topics / 📌 Issues / 📝 Decision Log</h4>Topics = decisions to make together. Issues = who does what by when (ICE-scored). Decision Log = decisions, new facts, action changes only.</div>
+<div style="background:var(--accent-dim);border-radius:8px;padding:14px;margin-bottom:12px;color:var(--text)"><h4 style="margin-bottom:6px">💾 Data</h4>Everything auto-saves to Google Sheets. Same data from any device.</div>
+</div>
+<div id="help-ja" style="font-size:13px;line-height:1.8;color:var(--text-dim)">
+<p style="margin-bottom:16px;color:var(--text)"><strong>阿吽は、2人（白石・松崎）で新規事業を立ち上げるための情報同期プラットフォームです。</strong></p>
 <div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
 <h4 style="color:var(--accent-light);margin-bottom:6px">📊 Overview（全体像）</h4>
 全ての情報を1画面で把握するダッシュボード。案件の進捗、未完了の課題、最近の決定事項が一覧で見える。
 </div>
 <div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
+<h4 style="color:var(--accent-light);margin-bottom:6px">💡 アイデア（v6）</h4>
+ビジネスの種・発想・思いつきを即記録する場所。<br>
+1行入力でOK。後で<strong>「🚀 案件化」</strong>ボタンで Deal（新規事業）に昇格できる。<br>
+ステータス: 🌱種 → 🤔検討中 → 🚀案件化 / ❌却下
+</div>
+<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
 <h4 style="color:var(--accent-light);margin-bottom:6px">🌱 New Biz. Dev.（新規事業）</h4>
 事業の種（案件）を管理する場所。各案件は9つのフェーズを順番にクリアしていく。<br>
 各フェーズには<strong style="color:var(--red)">ゲート条件（必須）</strong>と<strong style="color:var(--yellow)">把握必須項目</strong>があり、全てクリアしないと次に進めない。<br>
-<strong>白・中・松</strong>のチェックマークで誰が確認したかを記録する。
+<strong>白・松</strong>のチェックマークで誰が確認したかを記録する。
 </div>
 <div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px">
 <h4 style="color:var(--accent-light);margin-bottom:6px">💬 Topics（論点）</h4>
@@ -489,16 +508,16 @@ body{line-height:1.55;font-family:'Segoe UI','Noto Sans JP',sans-serif;backgroun
 <strong>複数デバイスから同じデータにアクセスできます。</strong>
 </div>
 </div>
-<div class="fa"><button class="btn primary" onclick="closeModal('m-help')">閉じる</button></div>
+<div class="fa"><button class="btn primary" onclick="closeModal('m-help')" data-ja="閉じる" data-en="Close">閉じる</button></div>
 </div></div>
 
 <script>
 var GAS_API = 'https://script.google.com/macros/s/AKfycbzx1Q5owOLzY9shQI3-YXrHZdc5oF6_GLSJ54ypAC4tqJ5fYVB-pfUjHsMVCOxDij0/exec';
 
 // ============================================================
-// Hidden iframe form POST (bypasses CORS for GAS ANYONE_ANONYMOUS)
+// Web adapter (GitHub Pages版): hidden iframe form POST + fetch
+// (bypasses CORS for GAS ANYONE_ANONYMOUS)
 // ============================================================
-// HTML escape utility (XSS prevention)
 function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 function gasFormPost(action, payload) {
@@ -535,7 +554,6 @@ function gasFormPost(action, payload) {
       setTimeout(function() {
         try { document.body.removeChild(form); } catch(ex) {}
         try { document.body.removeChild(iframe); } catch(ex) {}
-        // Verification: fetch getData to confirm save persisted
         fetch(GAS_API + '?action=getData&t=' + Date.now(), { redirect: 'follow' })
           .then(function(r) { return r.text(); })
           .then(function(jsonStr) {
@@ -557,40 +575,46 @@ var _lastSaveVersion = 0;
 // ============================================================
 // PHASES — hardcoded, never stored in sheet
 // ============================================================
-// Core active members (中野 removed 2026-04-02). Historical data may still reference 中野.
 var M=['白石','松崎'];
-var M_ALL=['白石','中野','松崎']; // 歴史データ表示用
+var M_ALL=['白石','松崎']; // 中野除去済(2026-06-15 離脱・接触禁止)
 // v6.2: 実践4ステージ（2026-06-08 監査再設計）
 // 旧9フェーズ（Steve Blank教科書版）は Knowledge Base に退避。
 // 設計原則: 種を数えるな・1個実証・金と計画のチェックラインはS1計画に集約
 var PHASES=[
-{id:0,name:'検証',en:'Validate',color:'#00b894',def:'金を払う人が実在するか確かめる',cond:'金を払うと言った人3人＋検証期限内',team:false,
-gate:[{t:'痛みの一文',d:'「[誰]が[状況]で[何に]困っている」',ph:'1文で書けないなら種（アイデア）に戻す',f:null},{t:'金を払うと言った人',d:'口約束でOK。名前を書く',ph:'',f:[{n:'人数',type:'number'},'名前1','名前2','名前3']},{t:'最小検証の方法と期限',d:'何を誰に見せて反応を見るか',ph:'',f:['検証方法',{n:'期限',type:'date'}]}],
-req:[{t:'経営者思考チェック',d:'自責で語れるか・出口はあるか',ph:'',f:['誰の選択肢(Ω)が増えるか','撤退条件（事前コミット）','白石不在でも回せる設計か']}],
-opt:[{t:'競合・代替手段',ph:'顧客は今どう凌いでいるか'},{t:'市場規模感',ph:'ざっくりで可'}],
-del:['痛みの一文','検証メモ'],ks:['期限内に払う人ゼロ→寝かせる(アイデアparking行き)']},
-{id:1,name:'計画',en:'Plan',color:'#74b9ff',def:'金と計画を1枚に固める',cond:'必要資金＋暫定P/L＋事業計画1枚＋2人の取り決め',team:true,
-gate:[{t:'必要資金と調達方法',d:'いくら要るか・どこから出すか',ph:'',f:[{n:'必要資金',type:'currency'},{n:'調達方法',type:'select',opts:['自己資金','松雪共同','売上先行','借入','出資']}]},{t:'暫定P/L',d:'ざっくりでいい。数字で書く',ph:'',f:[{n:'月商目標',type:'currency'},{n:'月コスト',type:'currency'},{n:'客単価',type:'currency'},{n:'粗利率',type:'number',suffix:'%'}]},{t:'事業計画1枚',d:'BMC/スライド/メモ、形式自由。URLで',ph:'',f:[{n:'計画URL',type:'url'}]},{t:'2人の取り決め',d:'白石×松崎で合意',ph:'',f:['役割分担','レベニューシェア','撤退条件']}],
-req:[{t:'損益分岐の概算',d:'月いくら売れたらトントンか',ph:'',f:[{n:'BEP月商',type:'currency'},'前提メモ']}],
-opt:[{t:'規制・法務面',ph:'許認可・カンボジア規制は階層3'},{t:'最悪シナリオと対処',ph:''}],
-del:['事業計画1枚','暫定P/Lメモ'],ks:['資金調達の目処なし→撤退','顧客と価値が論理で繋がらない→検証に戻る']},
-{id:2,name:'売る',en:'Sell',color:'#fdcb6e',def:'実際に金が入ることを証明する',cond:'初売上＋再現できる売り方＋単位経済が黒',team:false,
-gate:[{t:'初売上',d:'実際の入金',ph:'',f:[{n:'初売上日',type:'date'},{n:'累計売上',type:'currency'}]},{t:'再現できる売り方',d:'次の1件をどう取るか1文で言えるか',ph:'',f:['売り方1文']},{t:'単位経済が黒',d:'1件売って儲かるか',ph:'',f:[{n:'1件あたり粗利',type:'currency'},{n:'1件あたり獲得コスト',type:'currency'}]}],
-req:[{t:'有料顧客リスト',ph:'',f:['顧客1','顧客2','顧客3']}],
-opt:[{t:'リピート・紹介の兆候',ph:''},{t:'価格の手応え',ph:'高い/安いの反応'}],
-del:['販売実績メモ'],ks:['3ヶ月売上ゼロ→撤退','単位経済が黒にならない→計画に戻る']},
-{id:3,name:'仕組み化',en:'Systemize',color:'#d63031',def:'白石不在で回る形にする',cond:'不在1ヶ月で売上維持＋次の判断済み',team:true,
-gate:[{t:'白石不在で回るか',d:'',ph:'',f:[{n:'不在テスト日数',type:'number'},'誰が回すか']},{t:'手順の言語化',d:'マニュアル/テンプレ/Bot、形式自由',ph:'',f:[{n:'手順書URL',type:'url'}]},{t:'次の判断',d:'2人で決める',ph:'',f:[{n:'判断',type:'select',opts:['スケール','維持','売却','撤退']}]}],
-req:[{t:'数字の自動可視化',d:'売上・コストをどこで見るか',ph:'',f:['見る場所(シート/ダッシュボード)']}],
-opt:[{t:'採用・外注の仕組み',ph:''},{t:'Exitシナリオ',ph:''}],
-del:['手順書'],ks:['属人化が外れない→維持運用に格下げ（スケール断念）']}
+{id:0,name:'検証',en:'Validate',color:'#00b894',def:'N1＝名前のある1人の困りごとを深く検証する（馬場式）',defEn:'Deep-validate one named person\'s (N1) pain point',cond:'N1事例が深い＋金を払う＋なぜ俺らか',condEn:'Deep N1 case + willing to pay + why us',team:false,
+gate:[{t:'N1事例（実名の1人）',te:'N1 case (one real, named person)',d:'「[名前]が[状況]で[何に]困っている」',de:'"[Name] struggles with [what] in [situation]"',ph:'匿名ペルソナ禁止。身近な実名で書く',f:['名前',{n:'困りごと一文',type:'text'},'現状どう凌いでいるか','失っているもの（金額/時間）']},{t:'その人は金を払うか',te:'Will they pay?',d:'いくらなら払うか・既に払っている額',de:'How much would they pay / already pay',ph:'',f:[{n:'払える額',type:'currency'},{n:'現在の代替コスト',type:'currency'}]},{t:'なぜ俺らが解決できるか',te:'Why can WE solve it?',d:'アセット・関係・信頼',de:'Assets, relationships, trust',ph:'',f:['使えるアセット','関係・信頼の根拠']}],
+req:[{t:'経営者思考チェック',te:'Owner-mindset check',d:'自責で語れるか・出口はあるか',de:'Self-accountability & pre-committed exit',ph:'',f:['誰の選択肢(Ω)が増えるか','撤退条件（事前コミット）','白石不在でも回せる設計か']}],
+opt:[{t:'横展開（評価加点）',te:'Same pain, other real names (bonus)',d:'同じ困りごとを持つ人の実名。0人でも通過可・多いほど蓋然性↑',de:'Real names sharing the pain. 0 is OK; more = higher probability',ph:'',f:['実名1','実名2','実名3']},{t:'競合・代替手段',te:'Competitors / alternatives',ph:'顧客は今どう凌いでいるか'},{t:'市場規模感',te:'Rough market size',ph:'ざっくりで可'}],
+del:['N1事例メモ','検証メモ'],delEn:['N1 case memo','Validation memo'],ks:['深掘りしても痛みが浅い→寝かせる(parking)','金を払う理由が作れない→寝かせる'],ksEn:['Pain stays shallow after digging → park it','No credible reason to pay → park it']},
+{id:1,name:'計画',en:'Plan',color:'#74b9ff',def:'金と計画を1枚に固める',defEn:'Lock money & plan on one page',cond:'必要資金＋暫定P/L＋事業計画1枚＋2人の取り決め',condEn:'Capital + rough P/L + 1-page plan + founder agreement',team:true,
+gate:[{t:'必要資金と調達方法',te:'Capital needed & funding source',d:'いくら要るか・どこから出すか',de:'How much & from where',ph:'',f:[{n:'必要資金',type:'currency'},{n:'調達方法',type:'select',opts:['自己資金','松雪共同','売上先行','借入','出資']}]},{t:'暫定P/L',te:'Rough P/L',d:'ざっくりでいい。数字で書く',de:'Rough is fine — but in numbers',ph:'',f:[{n:'月商目標',type:'currency'},{n:'月コスト',type:'currency'},{n:'客単価',type:'currency'},{n:'粗利率',type:'number',suffix:'%'}]},{t:'事業計画1枚',te:'1-page business plan',d:'BMC/スライド/メモ、形式自由。URLで',de:'BMC / slides / memo — any format, paste URL (or use Canvas tab)',ph:'',f:[{n:'計画URL',type:'url'}]},{t:'2人の取り決め',te:'Founder agreement',d:'白石×松崎で合意',de:'Shiraishi × Matsuzaki agreement',ph:'',f:['役割分担','レベニューシェア','撤退条件']}],
+req:[{t:'損益分岐の概算',te:'Break-even estimate',d:'月いくら売れたらトントンか',de:'Monthly sales needed to break even',ph:'',f:[{n:'BEP月商',type:'currency'},'前提メモ']}],
+opt:[{t:'規制・法務面',te:'Regulatory / legal',ph:'許認可・カンボジア規制は階層3'},{t:'最悪シナリオと対処',te:'Worst case & response',ph:''}],
+del:['事業計画1枚','暫定P/Lメモ'],delEn:['1-page business plan','Rough P/L memo'],ks:['資金調達の目処なし→撤退','顧客と価値が論理で繋がらない→検証に戻る'],ksEn:['No funding path → kill','Customer-value logic broken → back to Validate']},
+{id:2,name:'売る',en:'Sell',color:'#fdcb6e',def:'実際に金が入ることを証明する',defEn:'Prove real money comes in',cond:'初売上＋再現できる売り方＋単位経済が黒',condEn:'First revenue + repeatable motion + positive unit economics',team:false,
+gate:[{t:'初売上',te:'First revenue',d:'実際の入金',de:'Actual cash received',ph:'',f:[{n:'初売上日',type:'date'},{n:'累計売上',type:'currency'}]},{t:'再現できる売り方',te:'Repeatable sales motion',d:'次の1件をどう取るか1文で言えるか',de:'Can you state how to win the next deal in one line?',ph:'',f:['売り方1文']},{t:'単位経済が黒',te:'Positive unit economics',d:'1件売って儲かるか',de:'Profitable per unit sold?',ph:'',f:[{n:'1件あたり粗利',type:'currency'},{n:'1件あたり獲得コスト',type:'currency'}]}],
+req:[{t:'有料顧客リスト',te:'Paying customer list',ph:'',f:['顧客1','顧客2','顧客3']}],
+opt:[{t:'リピート・紹介の兆候',te:'Repeat / referral signals',ph:''},{t:'価格の手応え',te:'Pricing feedback',ph:'高い/安いの反応'}],
+del:['販売実績メモ'],delEn:['Sales results memo'],ks:['3ヶ月売上ゼロ→撤退','単位経済が黒にならない→計画に戻る'],ksEn:['Zero revenue for 3 months → kill','Unit economics never turn positive → back to Plan']},
+{id:3,name:'仕組み化',en:'Systemize',color:'#d63031',def:'白石不在で回る形にする',defEn:'Make it run without Shiraishi',cond:'不在1ヶ月で売上維持＋次の判断済み',condEn:'Revenue holds through 1-month absence + next decision made',team:true,
+gate:[{t:'白石不在で回るか',te:'Runs without Shiraishi?',d:'',de:'',ph:'',f:[{n:'不在テスト日数',type:'number'},'誰が回すか']},{t:'手順の言語化',te:'Documented procedures',d:'マニュアル/テンプレ/Bot、形式自由',de:'Manual / template / bot — any format',ph:'',f:[{n:'手順書URL',type:'url'}]},{t:'次の判断',te:'Next decision',d:'2人で決める',de:'Decide together',ph:'',f:[{n:'判断',type:'select',opts:['スケール','維持','売却','撤退']}]}],
+req:[{t:'数字の自動可視化',te:'Auto-visible numbers',d:'売上・コストをどこで見るか',de:'Where do you watch sales & costs',ph:'',f:['見る場所(シート/ダッシュボード)']}],
+opt:[{t:'採用・外注の仕組み',te:'Hiring / outsourcing system',ph:''},{t:'Exitシナリオ',te:'Exit scenario',ph:''}],
+del:['手順書'],delEn:['Procedure doc'],ks:['属人化が外れない→維持運用に格下げ（スケール断念）'],ksEn:['Key-person dependency stays → downgrade to maintain (no scale)']}
 ];
-var SD={gate:{b:'var(--red)',t:'通過に必ず完了が必要。全項目クリアで次へ。'},req:{b:'var(--yellow)',t:'必ず把握すべき情報。「不明」不可。'},opt:{b:'var(--blue)',t:'あると精度が上がる。なくても進行可。'}};
+var SD={gate:{b:'var(--red)',t:'通過に必ず完了が必要。全項目クリアで次へ。',te:'Must complete every item to advance.'},req:{b:'var(--yellow)',t:'必ず把握すべき情報。「不明」不可。',te:'Must-know info. "Unknown" not allowed.'},opt:{b:'var(--blue)',t:'あると精度が上がる。なくても進行可。',te:'Nice to have — improves precision.'}};
+// 英語表示ヘルパー: フィールド名は保存キー＝日本語のまま、表示だけ翻訳する
+var FLD_EN={'名前':'Name','困りごと一文':'Pain in one line','現状どう凌いでいるか':'Current workaround','失っているもの（金額/時間）':'What they lose ($/time)','払える額':'Willing to pay','現在の代替コスト':'Current alternative cost','使えるアセット':'Usable assets','関係・信頼の根拠':'Relationship / trust basis','誰の選択肢(Ω)が増えるか':'Whose options (Ω) increase','撤退条件（事前コミット）':'Kill condition (pre-committed)','白石不在でも回せる設計か':'Runs without Shiraishi?','実名1':'Name 1','実名2':'Name 2','実名3':'Name 3','必要資金':'Capital needed','調達方法':'Funding source','月商目標':'Monthly revenue target','月コスト':'Monthly cost','客単価':'Avg. ticket','粗利率':'Gross margin','計画URL':'Plan URL','役割分担':'Role split','レベニューシェア':'Revenue share','撤退条件':'Kill condition','BEP月商':'Break-even monthly rev.','前提メモ':'Assumptions','初売上日':'First revenue date','累計売上':'Cumulative revenue','売り方1文':'Sales motion (1 line)','1件あたり粗利':'Gross profit / unit','1件あたり獲得コスト':'CAC / unit','顧客1':'Customer 1','顧客2':'Customer 2','顧客3':'Customer 3','不在テスト日数':'Absence test days','誰が回すか':'Who runs it','手順書URL':'Manual URL','判断':'Decision','見る場所(シート/ダッシュボード)':'Where to watch (sheet/dashboard)'};
+function fld(n){return window._lang==='en'?(FLD_EN[n]||n):n;}
+function pName(p){return window._lang==='en'?p.en:p.name;}
+function iTitle(item){return window._lang==='en'&&item.te?item.te:item.t;}
+function iDesc(item){return window._lang==='en'?(item.de!==undefined?item.de:item.d):item.d;}
+function escH(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ============================================================
 // Data & State
 // ============================================================
-var D={deals:[],issues:[],topics:[],logs:[],_devLog:[],_inputDraft:'',activities:[]};
+var D={deals:[],issues:[],topics:[],logs:[],_devLog:[],_inputDraft:'',activities:[],canvases:[],settings:{staleDays:7,killDays:14,wHrcp:1,wProb:1,wScale:1,wEffort:1}};
 var cv='today',cd=null,ct=null;
 var _saveTimer=null;
 var _loaded=false;
@@ -611,6 +635,7 @@ function buildDealsFromSheetData(rawDeals, rawChecks) {
       marketType: rd.marketType || '', targetType: rd.targetType || '', targetDetail: rd.targetDetail || '',
       revenueModel: rd.revenueModel || '', resources: rd.resources || '',
       investmentScale: rd.investmentScale || '', targetRevenue: rd.targetRevenue || '',
+      nextAction: rd.nextAction || '', nextActionDue: rd.nextActionDue || '', updatedAt: rd.updatedAt || '',
       killLogs: (function(){ try { return JSON.parse(rd.killLogs || '[]'); } catch(e) { return []; } })(),
       phases: PHASES.map(function(p) {
         return {
@@ -618,8 +643,8 @@ function buildDealsFromSheetData(rawDeals, rawChecks) {
           status: p.id === 0 ? 'active' : 'locked',
           startedAt: p.id === 0 ? rd.createdAt : null,
           completedAt: null,
-          gc: p.gate.map(function() { return {p:{白石:false,中野:false,松崎:false},v:'',sv:{}}; }),
-          rc: p.req.map(function() { return {p:{白石:false,中野:false,松崎:false},v:'',sv:{}}; }),
+          gc: p.gate.map(function() { return {p:{白石:false,松崎:false},v:'',sv:{}}; }),
+          rc: p.req.map(function() { return {p:{白石:false,松崎:false},v:'',sv:{}}; }),
           oc: p.opt.map(function() { return {done:false,v:'',sv:{}}; }),
           dc: p.del.map(function() { return false; })
         };
@@ -724,9 +749,27 @@ function flattenDeals(deals) {
       marketType: d.marketType || '', targetType: d.targetType || '', targetDetail: d.targetDetail || '',
       revenueModel: d.revenueModel || '', resources: d.resources || '',
       investmentScale: d.investmentScale || '', targetRevenue: d.targetRevenue || '',
-      killLogs: JSON.stringify(d.killLogs || [])
+      killLogs: JSON.stringify(d.killLogs || []),
+      nextAction: d.nextAction || '', nextActionDue: d.nextActionDue || '', updatedAt: d.updatedAt || ''
     };
   });
+}
+
+// v6.3: 変更時刻タッチ（滞留検知の基準）
+function touchDeal(d){if(d)d.updatedAt=new Date().toISOString();}
+// v6.3: canvases のシート行 → メモリ（blocks JSON parse）
+function parseCanvases(raw){
+  return (raw||[]).map(function(c){
+    var blocks={};
+    try{blocks=typeof c.blocks==='string'?JSON.parse(c.blocks||'{}'):(c.blocks||{});}catch(e){blocks={};}
+    return {id:String(c.id),deal_id:String(c.deal_id),stage:Number(c.stage)||0,type:String(c.type||'bmc'),blocks:blocks,updated_at:String(c.updated_at||''),updated_by:String(c.updated_by||'')};
+  });
+}
+// v6.3: settings kv行 → オブジェクト（デフォルト補完）
+function parseSettings(raw){
+  var s={staleDays:7,killDays:14,wHrcp:1,wProb:1,wScale:1,wEffort:1};
+  (raw||[]).forEach(function(r){if(s.hasOwnProperty(r.key)){var v=Number(r.value);if(!isNaN(v)&&v>0)s[r.key]=v;}});
+  return s;
 }
 
 // ============================================================
@@ -746,7 +789,18 @@ function scheduleSave() {
   _saveTimer = setTimeout(doSave, 2000);
 }
 
+// v6.3: 編集中ガード — 入力中/直後はポーリング再描画で未確定入力を壊さない
+var _lastInputAt = 0;
+document.addEventListener('input', function(){ _lastInputAt = Date.now(); }, true);
+document.addEventListener('focusin', function(e){ var t=e.target&&e.target.tagName; if(t==='TEXTAREA'||t==='INPUT'||t==='SELECT') _lastInputAt = Date.now(); }, true);
+function userEditing() {
+  var ae = document.activeElement;
+  if (ae && (ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT' || ae.tagName === 'SELECT')) return true;
+  return (Date.now() - _lastInputAt) < 15000;
+}
+
 function doSave() {
+  _saveTimer = null; // v6.3: リセットしないと初回保存以降ポーリングが恒久停止する
   showSaveStatus('saving');
   var payload = {
     deals: flattenDeals(D.deals),
@@ -773,11 +827,21 @@ function doSave() {
         scale: idea.scale || '中', effort: idea.effort || '中',
         hrcp_rice_score: idea.hrcp_rice_score || 0
       };
+    }),
+    canvases: (D.canvases||[]).map(function(c) {
+      return {
+        id: c.id, deal_id: c.deal_id, stage: c.stage, type: c.type,
+        blocks: JSON.stringify(c.blocks || {}),
+        updated_at: c.updated_at || '', updated_by: c.updated_by || ''
+      };
+    }),
+    settings: Object.keys(D.settings||{}).map(function(k) {
+      return { key: k, value: String(D.settings[k]) };
     })
   };
   gasFormPost('saveAllData', JSON.stringify(payload))
-  .then(function() { showSaveStatus('saved'); })
-  .catch(function(e) { showSaveStatus('error'); console.error(e); });
+    .then(function() { showSaveStatus('saved'); })
+    .catch(function(e) { showSaveStatus('error'); console.error(e); });
 }
 
 // ============================================================
@@ -804,6 +868,8 @@ function initApp(jsonStr) {
   D._devLog = raw.dev_log || [];
   D.activities = raw.activities || [];
   D.ideas = raw.ideas || []; // v6: アイデア記録
+  D.canvases = parseCanvases(raw.canvases); // v6.3
+  D.settings = parseSettings(raw.settings); // v6.3
   D._inputDraft = '';
   _loaded = true;
   // Hide loading overlay
@@ -816,17 +882,11 @@ function initApp(jsonStr) {
 // ============================================================
 // Auto-reload polling (Task 1)
 // ============================================================
-var _userEditing = false;
-var _editTimeout = null;
-// Track user activity: any input/click marks editing, cleared after 10s idle
-document.addEventListener('input', function() { _userEditing = true; clearTimeout(_editTimeout); _editTimeout = setTimeout(function(){ _userEditing = false; }, 10000); });
-document.addEventListener('change', function() { _userEditing = true; clearTimeout(_editTimeout); _editTimeout = setTimeout(function(){ _userEditing = false; }, 10000); });
-
 function startAutoReload() {
   if (_pollTimer) clearInterval(_pollTimer);
   _pollTimer = setInterval(function() {
-    // Don't poll if there's a pending save or user is editing
-    if (_saveTimer || _userEditing) return;
+    // Don't poll if there's a pending save or the user is typing (v6.3)
+    if (_saveTimer || userEditing()) return;
     fetch(GAS_API + '?action=getData', { redirect: 'follow' })
       .then(function(r) { return r.text(); })
       .then(function(jsonStr) {
@@ -849,6 +909,8 @@ function startAutoReload() {
         D._devLog = raw.dev_log || [];
         D.activities = raw.activities || [];
         D.ideas = raw.ideas || []; // v6
+        D.canvases = parseCanvases(raw.canvases); // v6.3
+        D.settings = parseSettings(raw.settings); // v6.3
         // Re-render current view without disruption
         render();
       })
@@ -861,7 +923,7 @@ function startAutoReload() {
 // Load data on page open
 fetch(GAS_API + '?action=getData', { redirect: 'follow' })
   .then(function(r) { return r.text(); })
-  .then(function(t) { initApp(t); })
+  .then(initApp)
   .catch(function(e) {
     document.getElementById('loading-overlay').innerHTML =
       '<div style="color:var(--red);font-size:14px">データ読み込みエラー</div>' +
@@ -882,8 +944,8 @@ function toggleBlockReason(){var s=document.getElementById('f-is');var fg=docume
 
 // Tag CSS class mapping
 var TAG_CSS={'法務':'tag-legal','財務':'tag-finance','営業':'tag-sales','開発':'tag-dev','オペレーション':'tag-ops','マーケティング':'tag-marketing','戦略':'tag-strategy','外部交渉':'tag-negotiation'};
-function renderTags(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(t){return '<span class="tag-badge '+(TAG_CSS[t]||'tag-dev')+'">'+esc(t)+'</span>';}).join('');}
-function renderMembers(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(m){return '<span class="member-badge">'+esc(m)+'</span>';}).join('');}
+function renderTags(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(t){return '<span class="tag-badge '+(TAG_CSS[t]||'tag-dev')+'">'+t+'</span>';}).join('');}
+function renderMembers(csv){if(!csv)return '';return csv.split(',').filter(function(v){return v.trim();}).map(function(m){return '<span class="member-badge">'+m+'</span>';}).join('');}
 
 function createDeal(){
   var n=document.getElementById('f-dn').value.trim();if(!n)return;
@@ -892,7 +954,7 @@ function createDeal(){
   var rs=getChipValues('f-drs-chips');
   D.deals.push({id:'d'+Date.now().toString(36),name:n,entity:'Matsuyuki',owner:document.getElementById('f-do').value,priority:document.getElementById('f-dp').value,deadline:document.getElementById('f-dd').value||null,memo:document.getElementById('f-dm').value,category:cat,currentPhase:0,createdAt:new Date().toISOString(),
     marketType:document.getElementById('f-dmt').value||'',targetType:document.getElementById('f-dtt').value||'',targetDetail:document.getElementById('f-dtd').value||'',revenueModel:rm,resources:rs,investmentScale:document.getElementById('f-dis').value||'',targetRevenue:document.getElementById('f-dtr').value||'',
-    phases:PHASES.map(function(p){return{id:p.id,status:p.id===0?'active':'locked',startedAt:p.id===0?new Date().toISOString():null,completedAt:null,gc:p.gate.map(function(){return{p:{白石:false,中野:false,松崎:false},v:'',sv:{}};}),rc:p.req.map(function(){return{p:{白石:false,中野:false,松崎:false},v:'',sv:{}};}),oc:p.opt.map(function(){return{done:false,v:'',sv:{}};}),dc:p.del.map(function(){return false;})};}),killLogs:[]});
+    phases:PHASES.map(function(p){return{id:p.id,status:p.id===0?'active':'locked',startedAt:p.id===0?new Date().toISOString():null,completedAt:null,gc:p.gate.map(function(){return{p:{白石:false,松崎:false},v:'',sv:{}};}),rc:p.req.map(function(){return{p:{白石:false,松崎:false},v:'',sv:{}};}),oc:p.opt.map(function(){return{done:false,v:'',sv:{}};}),dc:p.del.map(function(){return false;})};}),killLogs:[]});
   sv();closeModal('m-deal');document.getElementById('f-dn').value='';document.getElementById('f-dm').value='';setChipValues('f-dcat-chips','');document.getElementById('f-dmt').value='';document.getElementById('f-dtt').value='';document.getElementById('f-dtd').value='';setChipValues('f-drm-chips','');setChipValues('f-drs-chips','');document.getElementById('f-dis').value='';document.getElementById('f-dtr').value='';render();openDeal(D.deals[D.deals.length-1].id);
 }
 function createIssue(){
@@ -909,12 +971,12 @@ function createIssue(){
   sv();closeModal('m-issue');resetIssueForm();render();
 }
 window._editIssueId=null;
-function resetIssueForm(){document.getElementById('f-it').value='';document.getElementById('f-id').value='';document.getElementById('f-idd').value='';document.getElementById('f-ice-i').value='5';document.getElementById('f-ice-c').value='5';document.getElementById('f-ice-e').value='5';document.getElementById('f-is').value='backlog';document.getElementById('f-ip').value='中';setChipValues('f-ia-chips','白石');setChipValues('f-itags-chips','');document.getElementById('f-ibr').value='';document.getElementById('fg-block-reason').style.display='none';window._editIssueId=null;document.getElementById('m-issue-title').textContent='新規Issue';document.getElementById('m-issue-actions').innerHTML='<button class="btn" onclick="closeModal(\'m-issue\')">取消</button><button class="btn primary" onclick="createIssue()">作成</button>';updIcePrev();}
+function resetIssueForm(){document.getElementById('f-it').value='';document.getElementById('f-id').value='';document.getElementById('f-idd').value='';document.getElementById('f-ice-i').value='5';document.getElementById('f-ice-c').value='5';document.getElementById('f-ice-e').value='5';document.getElementById('f-is').value='backlog';document.getElementById('f-ip').value='中';setChipValues('f-ia-chips','白石');setChipValues('f-itags-chips','');document.getElementById('f-ibr').value='';document.getElementById('fg-block-reason').style.display='none';window._editIssueId=null;var enR=window._lang==='en';document.getElementById('m-issue-title').textContent=enR?'New Issue':'新規Issue';document.getElementById('m-issue-actions').innerHTML='<button class="btn" onclick="closeModal(\'m-issue\')">'+(enR?'Cancel':'取消')+'</button><button class="btn primary" onclick="createIssue()">'+(enR?'Create':'作成')+'</button>';updIcePrev();}
 function openEditIssue(id){
   var i=D.issues.find(function(x){return x.id===id;});if(!i)return;
   window._editIssueId=id;
   populateLink('f-il');
-  document.getElementById('m-issue-title').textContent='Issue 編集';
+  document.getElementById('m-issue-title').textContent=window._lang==='en'?'Edit Issue':'Issue 編集';
   document.getElementById('f-it').value=i.title||'';
   setChipValues('f-ia-chips',i.assignee||'白石');
   document.getElementById('f-il').value=i.linkId||'';
@@ -930,7 +992,8 @@ function openEditIssue(id){
   toggleBlockReason();
   updIcePrev();
   // Build actions with comments section
-  document.getElementById('m-issue-actions').innerHTML='<button class="btn" onclick="closeModal(\'m-issue\');resetIssueForm()">取消</button><button class="btn danger" onclick="delIssue(\''+id+'\');closeModal(\'m-issue\');resetIssueForm()" style="margin-right:auto">削除</button><button class="btn primary" onclick="saveEditIssue()">保存</button>';
+  var enE=window._lang==='en';
+  document.getElementById('m-issue-actions').innerHTML='<button class="btn" onclick="closeModal(\'m-issue\');resetIssueForm()">'+(enE?'Cancel':'取消')+'</button><button class="btn danger" onclick="delIssue(\''+id+'\');closeModal(\'m-issue\');resetIssueForm()" style="margin-right:auto">'+(enE?'Delete':'削除')+'</button><button class="btn primary" onclick="saveEditIssue()">'+(enE?'Save':'保存')+'</button>';
   openModal('m-issue');
   // Load comments for this issue
   loadComments(id);
@@ -975,39 +1038,26 @@ function chgIssue(id,st){var i=D.issues.find(function(x){return x.id===id;});if(
 function delIssue(id){D.issues=D.issues.filter(function(x){return x.id!==id;});sv();render();}
 function delTopic(id){if(!confirm('削除？'))return;D.topics=D.topics.filter(function(x){return x.id!==id;});sv();go('topics');}
 function delDeal(id){if(!confirm('削除？'))return;D.deals=D.deals.filter(function(x){return x.id!==id;});sv();cd=null;go('overview');}
-function toggleP(did,type,idx,person){var d=gd(did);var dp=d.phases[d.currentPhase];var a=type==='gate'?dp.gc:dp.rc;a[idx].p[person]=!a[idx].p[person];sv();renderDeal(did);}
-function updVal(did,type,idx,v){var d=gd(did);var dp=d.phases[d.currentPhase];if(type==='gate')dp.gc[idx].v=v;else if(type==='req')dp.rc[idx].v=v;else{dp.oc[idx].v=v;dp.oc[idx].done=v.trim().length>0;}sv();}
-function updSub(did,type,idx,f,v){var d=gd(did);var dp=d.phases[d.currentPhase];var a=type==='gate'?dp.gc:type==='req'?dp.rc:dp.oc;if(!a[idx].sv)a[idx].sv={};a[idx].sv[f]=v;if(type==='opt')a[idx].done=v&&v.trim().length>0;sv();}
-function togDel(did,idx){var d=gd(did);d.phases[d.currentPhase].dc[idx]=!d.phases[d.currentPhase].dc[idx];sv();renderDeal(did);}
+function toggleP(did,type,idx,person){var d=gd(did);var dp=d.phases[d.currentPhase];var a=type==='gate'?dp.gc:dp.rc;a[idx].p[person]=!a[idx].p[person];touchDeal(d);sv();renderDeal(did);}
+function updVal(did,type,idx,v){var d=gd(did);var dp=d.phases[d.currentPhase];if(type==='gate')dp.gc[idx].v=v;else if(type==='req')dp.rc[idx].v=v;else{dp.oc[idx].v=v;dp.oc[idx].done=v.trim().length>0;}touchDeal(d);sv();}
+function updSub(did,type,idx,f,v){var d=gd(did);var dp=d.phases[d.currentPhase];var a=type==='gate'?dp.gc:type==='req'?dp.rc:dp.oc;if(!a[idx].sv)a[idx].sv={};a[idx].sv[f]=v;if(type==='opt')a[idx].done=v&&v.trim().length>0;touchDeal(d);sv();}
+function togDel(did,idx){var d=gd(did);d.phases[d.currentPhase].dc[idx]=!d.phases[d.currentPhase].dc[idx];touchDeal(d);sv();renderDeal(did);}
+// v6.3: 次の1手（Next Action）
+function updNextAction(did,v){var d=gd(did);if(!d)return;d.nextAction=v;touchDeal(d);sv();}
+function updNextActionDue(did,v){var d=gd(did);if(!d)return;d.nextActionDue=v;touchDeal(d);sv();}
+// v6.3: 滞留日数（updatedAt が無ければ現フェーズ開始日、それも無ければ作成日から）
+function staleDaysOf(d){
+  var base=d.updatedAt||((d.phases&&d.phases[d.currentPhase]&&d.phases[d.currentPhase].startedAt)||d.createdAt);
+  if(!base)return 0;
+  var t0=new Date(base).getTime();if(isNaN(t0))return 0;
+  return Math.max(0,Math.floor((Date.now()-t0)/86400000));
+}
 function isOk(c,team){return team?M.every(function(m){return c.p[m];}):M.some(function(m){return c.p[m];});}
-function advPhase(did){var d=gd(did);if(d.currentPhase>=PHASES.length-1)return;var p=PHASES[d.currentPhase];var dp=d.phases[d.currentPhase];if(!dp.gc.every(function(c){return isOk(c,p.team);})||!dp.rc.every(function(c){return isOk(c,p.team);})){alert(t('all_gate_clear'));return;}dp.status='done';dp.completedAt=new Date().toISOString();d.currentPhase++;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].startedAt=new Date().toISOString();sv();render();}
-function retPhase(did){if(!confirm(t('confirm_retreat')))return;var d=gd(did);if(d.currentPhase<=0)return;d.phases[d.currentPhase].status='locked';d.currentPhase--;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].completedAt=null;sv();render();}
-function logKS(){var d=gd(cd);d.killLogs.push({date:new Date().toISOString(),phase:d.currentPhase,cond:document.getElementById('f-kc').value,verdict:document.getElementById('f-kv').value,judge:document.getElementById('f-kw').value});if(document.getElementById('f-kv').value==='後退'&&d.currentPhase>0){d.phases[d.currentPhase].status='locked';d.currentPhase--;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].completedAt=null;}sv();closeModal('m-ks');render();}
+function advPhase(did){var d=gd(did);if(d.currentPhase>=PHASES.length-1)return;var p=PHASES[d.currentPhase];var dp=d.phases[d.currentPhase];if(!dp.gc.every(function(c){return isOk(c,p.team);})||!dp.rc.every(function(c){return isOk(c,p.team);})){alert(t('all_gate_clear'));return;}dp.status='done';dp.completedAt=new Date().toISOString();d.currentPhase++;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].startedAt=new Date().toISOString();touchDeal(d);sv();render();}
+function retPhase(did){if(!confirm(t('confirm_retreat')))return;var d=gd(did);if(d.currentPhase<=0)return;d.phases[d.currentPhase].status='locked';d.currentPhase--;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].completedAt=null;touchDeal(d);sv();render();}
+function logKS(){var d=gd(cd);d.killLogs.push({date:new Date().toISOString(),phase:d.currentPhase,cond:document.getElementById('f-kc').value,verdict:document.getElementById('f-kv').value,judge:document.getElementById('f-kw').value});if(document.getElementById('f-kv').value==='後退'&&d.currentPhase>0){d.phases[d.currentPhase].status='locked';d.currentPhase--;d.phases[d.currentPhase].status='active';d.phases[d.currentPhase].completedAt=null;}touchDeal(d);sv();closeModal('m-ks');render();}
 function updTopicStatus(id,st){var t=gt(id);t.status=st;sv();render();}
 function updTopicConclusion(id,v){var t=gt(id);t.conclusion=v;sv();}
-function editTopicInline(id){
-  var t=gt(id);if(!t)return;
-  var el=document.getElementById('topic-edit-area');
-  if(el){el.remove();renderTopicDetail(id);return;}
-  var hdr=document.querySelector('#v-topic-detail h2');
-  if(!hdr)return;
-  var container=hdr.parentElement.parentElement;
-  var editHtml='<div id="topic-edit-area" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px">'+
-    '<div class="fg" style="margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted)">タイトル</label><input id="te-title" value="'+t.title.replace(/"/g,'&quot;')+'" style="width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px"></div>'+
-    '<div class="fg" style="margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted)">概要</label><textarea id="te-desc" rows="3" style="width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px">'+(t.desc||'')+'</textarea></div>'+
-    '<div class="fg" style="margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted)">関与者</label><div class="chip-select" id="te-members">'+M.map(function(m){return '<span class="chip'+((t.members||'').indexOf(m)>=0?' active':'')+'" data-val="'+m+'" onclick="toggleChip(this)">'+m+'</span>';}).join('')+'</div></div>'+
-    '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" onclick="document.getElementById(\'topic-edit-area\').remove()">キャンセル</button><button class="btn primary" onclick="saveTopicEdit(\''+id+'\')">保存</button></div>'+
-    '</div>';
-  container.insertAdjacentHTML('afterend',editHtml);
-}
-function saveTopicEdit(id){
-  var t=gt(id);if(!t)return;
-  t.title=document.getElementById('te-title').value.trim()||t.title;
-  t.desc=document.getElementById('te-desc').value;
-  var chips=document.querySelectorAll('#te-members .chip.active');
-  t.members=Array.from(chips).map(function(c){return c.getAttribute('data-val');}).join(',');
-  sv();renderTopicDetail(id);
-}
 
 // ============================================================
 // Comments system (Task 3)
@@ -1038,7 +1088,7 @@ function renderComments(comments, issueId) {
     comments.forEach(function(c) {
       var ts = new Date(c.timestamp);
       var timeStr = ts.toLocaleDateString('ja-JP', {month:'short',day:'numeric'}) + ' ' + ts.toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'});
-      html += '<div class="comment-item"><div class="comment-header"><span class="comment-author">' + esc(c.by) + '</span><span class="comment-time">' + timeStr + '</span></div><div class="comment-text">' + esc(c.text).replace(/\n/g,'<br>') + '</div></div>';
+      html += '<div class="comment-item"><div class="comment-header"><span class="comment-author">' + c.by + '</span><span class="comment-time">' + timeStr + '</span></div><div class="comment-text">' + c.text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') + '</div></div>';
     });
   }
   html += '</div>';
@@ -1055,10 +1105,8 @@ function submitComment(issueId) {
   var by = byEl.value;
   textEl.value = '';
   fetch(GAS_API + '?action=addComment&issueId=' + encodeURIComponent(issueId) + '&text=' + encodeURIComponent(text) + '&by=' + encodeURIComponent(by), { redirect: 'follow' })
-  .then(function() { loadComments(issueId); })
-  .catch(function(e) {
-    alert('コメント送信エラー: ' + e.message);
-  });
+    .then(function() { loadComments(issueId); })
+    .catch(function(e) { alert('コメント送信エラー: ' + e.message); });
 }
 
 // ============================================================
@@ -1117,7 +1165,8 @@ function render(){
 // TODAY VIEW (v6.2) — 毎日開く起点画面。検証中の案件・今週のIssue・早見表トップだけ
 // ============================================================
 function renderToday(){
-  var lang=window._lang||'ja';
+  var en=window._lang==='en';
+  var L=function(ja,eng){return en?eng:ja;};
   // 1) アクティブ案件（ステージ順 = 進んでいるものから）
   var activeDeals=D.deals.slice().sort(function(a,b){return b.currentPhase-a.currentPhase;});
   // 2) 今週のIssue: 未完了をICE降順で上位5
@@ -1130,49 +1179,71 @@ function renderToday(){
   // 検証中(validating)アイデア
   var validating=(D.ideas||[]).filter(function(x){return x.status==='validating';});
 
+  // v6.3) 要対応アラート（自動化: 滞留・キル警告・次の1手未設定・期限超過）
+  var cfg=D.settings||{staleDays:7,killDays:14};
+  var attention=[];
+  D.deals.forEach(function(d){
+    var days=staleDaysOf(d);
+    var overdue=d.deadline&&new Date(d.deadline)<new Date();
+    if(overdue)attention.push({sev:2,icon:'🔴',text:L(d.name+' — 期限超過。キルスイッチ判定を実行',d.name+' — past deadline. Run the kill-switch decision'),onclick:"openDeal('"+d.id+"')"});
+    else if(days>=cfg.killDays)attention.push({sev:2,icon:'🔴',text:L(d.name+' — '+days+'日停止。キルスイッチ判定を実行（続行/後退/撤退）',d.name+' — stalled '+days+' days. Run the kill-switch decision'),onclick:"openDeal('"+d.id+"')"});
+    else if(days>=cfg.staleDays)attention.push({sev:1,icon:'🟡',text:L(d.name+' — '+days+'日動きなし',d.name+' — no movement for '+days+' days'),onclick:"openDeal('"+d.id+"')"});
+    if(!String(d.nextAction||'').trim())attention.push({sev:1,icon:'👉',text:L(d.name+' — 次の1手が未設定',d.name+' — next action not set'),onclick:"openDeal('"+d.id+"')"});
+  });
+  attention.sort(function(a,b){return b.sev-a.sev;});
+
   var html='<div style="max-width:860px">';
-  html+='<h2 style="font-size:22px;font-weight:800;margin-bottom:4px">📅 今日</h2>';
-  html+='<p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">'+new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'long'})+' — 種を数えるな。1個実証。</p>';
+  html+='<h2 style="font-size:22px;font-weight:800;margin-bottom:4px">📅 '+L('今日','Today')+'</h2>';
+  html+='<p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">'+new Date().toLocaleDateString(en?'en-US':'ja-JP',{month:'long',day:'numeric',weekday:'long'})+' — '+L('種を数えるな。1個実証。','Don\'t count seeds. Prove one.')+'</p>';
+
+  // 要対応（v6.3 自動化の出口）
+  if(attention.length){
+    html+='<div class="section"><div class="section-title" style="font-size:15px;color:var(--red)">⚠ '+L('要対応（自動検知）','Attention (auto-detected)')+'</div>';
+    html+=attention.map(function(a){
+      return '<div class="list-row" onclick="'+a.onclick+'" style="padding:10px 16px;cursor:pointer;border-left:3px solid '+(a.sev>=2?'var(--red)':'var(--yellow)')+'"><div class="lr-main"><div class="lr-title" style="font-size:13px">'+a.icon+' '+escH(a.text)+'</div></div><div class="lr-right" style="font-size:16px;color:var(--text-muted)">→</div></div>';
+    }).join('');
+    html+='</div>';
+  }
 
   // 検証中（最重要）
-  html+='<div class="section"><div class="section-title" style="font-size:15px">🔬 いま検証しているもの</div>';
+  html+='<div class="section"><div class="section-title" style="font-size:15px">🔬 '+L('いま検証しているもの','Currently validating')+'</div>';
   var validItems=[];
-  validating.forEach(function(x){validItems.push({type:'idea',title:x.title,sub:'アイデア検証中 · score '+(x.hrcp_rice_score||'-'),onclick:"go('ideas')"});});
-  activeDeals.forEach(function(d){var p=PHASES[Math.min(d.currentPhase,PHASES.length-1)];validItems.push({type:'deal',title:d.name,sub:'S'+d.currentPhase+'｜'+p.name+' · '+d.owner,onclick:"openDeal('"+d.id+"')",color:p.color});});
+  validating.forEach(function(x){validItems.push({type:'idea',title:x.title,sub:L('アイデア検証中','Validating idea')+' · score '+(x.hrcp_rice_score||'-'),onclick:"go('ideas')"});});
+  activeDeals.forEach(function(d){var p=PHASES[Math.min(d.currentPhase,PHASES.length-1)];var na=String(d.nextAction||'').trim();validItems.push({type:'deal',title:d.name,sub:'S'+d.currentPhase+'｜'+pName(p)+' · '+d.owner+(na?' · 👉 '+na:''),onclick:"openDeal('"+d.id+"')",color:p.color});});
   if(!validItems.length){
-    html+='<div style="color:var(--text-muted);font-size:13px;padding:14px">検証中ゼロ。早見表トップから1個選んで🔬検証中にしよう。</div>';
+    html+='<div style="color:var(--text-muted);font-size:13px;padding:14px">'+L('検証中ゼロ。早見表トップから1個選んで🔬検証中にしよう。','Nothing in validation. Pick one from the top of the idea list.')+'</div>';
   } else {
     html+=validItems.map(function(v){
-      return '<div class="list-row" onclick="'+v.onclick+'" style="padding:14px 16px;cursor:pointer"><div class="lr-main"><div class="lr-title" style="font-size:15px">'+(v.type==='idea'?'💡 ':'🌱 ')+v.title+'</div><div class="lr-sub" style="font-size:12px">'+v.sub+'</div></div><div class="lr-right" style="font-size:18px;color:var(--text-muted)">→</div></div>';
+      return '<div class="list-row" onclick="'+v.onclick+'" style="padding:14px 16px;cursor:pointer"><div class="lr-main"><div class="lr-title" style="font-size:15px">'+(v.type==='idea'?'💡 ':'🌱 ')+escH(v.title)+'</div><div class="lr-sub" style="font-size:12px">'+escH(v.sub)+'</div></div><div class="lr-right" style="font-size:18px;color:var(--text-muted)">→</div></div>';
     }).join('');
   }
   html+='</div>';
 
   // 今週のIssue
-  html+='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="section-title" style="font-size:15px;margin-bottom:0">📌 今週やること（ICE上位5）</div><button class="btn" style="font-size:11px" onclick="go('issues')">全て見る →</button></div>';
+  html+='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="section-title" style="font-size:15px;margin-bottom:0">📌 '+L('今週やること（ICE上位5）','This week (top 5 by ICE)')+'</div><button class="btn" style="font-size:11px" onclick="go(\'issues\')">'+L('全て見る →','View all →')+'</button></div>';
   if(!openIssues.length){
-    html+='<div style="color:var(--text-muted);font-size:13px;padding:14px">未完了Issueなし</div>';
+    html+='<div style="color:var(--text-muted);font-size:13px;padding:14px">'+L('未完了Issueなし','No open issues')+'</div>';
   } else {
     html+=openIssues.map(function(i){
       var ice=iceScore(i);
       var st=i.status==='wip'?'🔄':i.status==='waiting'?'🚧':'📋';
-      return '<div class="list-row" onclick="go('issues')" style="padding:12px 16px;cursor:pointer"><div style="min-width:44px;text-align:center;font-weight:700;color:var(--accent-light);font-size:14px">'+ice+'</div><div class="lr-main"><div class="lr-title" style="font-size:14px">'+st+' '+i.title+'</div><div class="lr-sub" style="font-size:11px">'+renderMembers(i.assignee)+(i.deadline?' · '+new Date(i.deadline).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}):'')+'</div></div></div>';
+      return '<div class="list-row" onclick="go(\'issues\')" style="padding:12px 16px;cursor:pointer"><div style="min-width:44px;text-align:center;font-weight:700;color:var(--accent-light);font-size:14px">'+ice+'</div><div class="lr-main"><div class="lr-title" style="font-size:14px">'+st+' '+escH(i.title)+'</div><div class="lr-sub" style="font-size:11px">'+renderMembers(i.assignee)+(i.deadline?' · '+new Date(i.deadline).toLocaleDateString(en?'en-US':'ja-JP',{month:'short',day:'numeric'}):'')+'</div></div></div>';
     }).join('');
   }
   html+='</div>';
 
   // 早見表トップ3
-  html+='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="section-title" style="font-size:15px;margin-bottom:0">💡 次に検証すべき種（早見表トップ3）</div><button class="btn" style="font-size:11px" onclick="go('ideas')">早見表 →</button></div>';
+  html+='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="section-title" style="font-size:15px;margin-bottom:0">💡 '+L('次に検証すべき種（早見表トップ3）','Next seeds to validate (top 3)')+'</div><button class="btn" style="font-size:11px" onclick="go(\'ideas\')">'+L('早見表 →','Idea list →')+'</button></div>';
   if(!topIdeas.length){
-    html+='<div style="color:var(--text-muted);font-size:13px;padding:14px">種なし。思いついたら即記録。</div>';
+    html+='<div style="color:var(--text-muted);font-size:13px;padding:14px">'+L('種なし。思いついたら即記録。','No seeds. Capture ideas the moment they spark.')+'</div>';
   } else {
     html+=topIdeas.map(function(x){
-      return '<div class="list-row" onclick="go('ideas')" style="padding:12px 16px;cursor:pointer"><div style="min-width:44px;text-align:center;font-weight:800;color:'+((x.hrcp_rice_score||0)>=10?'var(--green)':'var(--yellow)')+';font-size:14px">'+(x.hrcp_rice_score||0)+'</div><div class="lr-main"><div class="lr-title" style="font-size:14px">'+x.title+'</div><div class="lr-sub" style="font-size:11px">'+(x.layer||'')+(x.memo?' · '+x.memo.substring(0,50):'')+'</div></div></div>';
+      return '<div class="list-row" onclick="go(\'ideas\')" style="padding:12px 16px;cursor:pointer"><div style="min-width:44px;text-align:center;font-weight:800;color:'+((x.hrcp_rice_score||0)>=10?'var(--green)':'var(--yellow)')+';font-size:14px">'+(x.hrcp_rice_score||0)+'</div><div class="lr-main"><div class="lr-title" style="font-size:14px">'+escH(x.title)+'</div><div class="lr-sub" style="font-size:11px">'+escH(x.layer||'')+(x.memo?' · '+escH(x.memo.substring(0,50)):'')+'</div></div></div>';
     }).join('');
   }
   html+='</div>';
 
-  html+='<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="openModal('m-idea')">＋ アイデアを投げ込む</button><button class="btn" onclick="populateLink('f-il');openModal('m-issue')">＋ Issue追加</button></div>';
+  html+='<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="openModal(\'m-idea\')">'+L('＋ アイデアを投げ込む','＋ Capture an idea')+'</button><button class="btn" onclick="populateLink(\'f-il\');openModal(\'m-issue\')">'+L('＋ Issue追加','＋ Add Issue')+'</button></div>';
   html+='</div>';
   document.getElementById('v-today').innerHTML=html;
 }
@@ -1211,9 +1282,11 @@ function renderOverview(){
 }
 
 function pipeHTML(){
+  var en=window._lang==='en';
+  var cfg=D.settings||{staleDays:7,killDays:14};
   return PHASES.map(function(p){
     var deals=D.deals.filter(function(d){return d.currentPhase===p.id;});
-    return '<div class="pipe-col"><div class="pipe-hdr"><div class="pn" style="color:'+p.color+'">P'+p.id+'</div><div class="pname">'+p.name+'</div></div><div class="pipe-body">'+deals.map(function(d){var dp=d.phases[p.id];var done=dp?dp.gc.filter(function(c){return M.some(function(m){return c.p[m];});}).length:0;var tot=dp?dp.gc.length:1;var pi=d.priority==='高'?'🔴':d.priority==='低'?'🔵':'🟡';var dl=d.deadline?new Date(d.deadline).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}):'';return '<div class="pipe-card" onclick="openDeal(\''+d.id+'\')"><div class="cn">'+pi+' '+d.name+'</div><div class="co">'+d.owner+(dl?' · '+dl:'')+'</div><div class="bar"><div class="bar-fill" style="width:'+Math.round(done/tot*100)+'%;background:'+p.color+'"></div></div></div>';}).join('')+'</div></div>';
+    return '<div class="pipe-col"><div class="pipe-hdr"><div class="pn" style="color:'+p.color+'">S'+p.id+'</div><div class="pname">'+pName(p)+'</div></div><div class="pipe-body">'+deals.map(function(d){var dp=d.phases[p.id];var done=dp?dp.gc.filter(function(c){return M.some(function(m){return c.p[m];});}).length:0;var tot=dp?dp.gc.length:1;var pi=d.priority==='高'?'🔴':d.priority==='低'?'🔵':'🟡';var dl=d.deadline?new Date(d.deadline).toLocaleDateString(en?'en-US':'ja-JP',{month:'short',day:'numeric'}):'';var st=staleDaysOf(d);var stBadge=st>=cfg.killDays?' 🔴'+st+'d':st>=cfg.staleDays?' 🟡'+st+'d':'';return '<div class="pipe-card" onclick="openDeal(\''+d.id+'\')"'+(st>=cfg.killDays?' style="border-color:var(--red)"':'')+'><div class="cn">'+pi+' '+escH(d.name)+stBadge+'</div><div class="co">'+d.owner+(dl?' · '+dl:'')+'</div><div class="bar"><div class="bar-fill" style="width:'+Math.round(done/tot*100)+'%;background:'+p.color+'"></div></div></div>';}).join('')+'</div></div>';
   }).join('');
 }
 
@@ -1237,11 +1310,16 @@ function renderCases(){
       var dp=d.phases[d.currentPhase];
       var gc=dp?dp.gc.filter(function(c){return M.some(function(m){return c.p[m];});}).length:0;
       var gt2=dp?dp.gc.length:1;
-      return '<div class="list-row" onclick="openDeal(\''+d.id+'\')"><div class="dot" style="background:'+p.color+';width:8px;height:8px;border-radius:50%;flex-shrink:0"></div><div class="lr-main"><div class="lr-title">'+pi+' '+d.name+'</div><div class="lr-sub"><span>'+d.owner+'</span><span>P'+d.currentPhase+'｜'+p.name+'</span><span>ゲート '+gc+'/'+gt2+'</span>'+(d.category?d.category.split(',').map(function(c){return '<span class="cat-badge">'+c+'</span>';}).join(''):'')+(d.marketType?'<span class="deal-badge deal-badge-market">'+d.marketType+'</span>':'')+(d.targetType?'<span class="deal-badge deal-badge-target">'+d.targetType+'</span>':'')+(d.investmentScale?'<span class="deal-badge deal-badge-invest">'+d.investmentScale+'</span>':'')+'</div></div><div class="lr-right">'+(dl?'<span>🎯 '+dl+'</span>':'')+'</div></div>';
+      var en2=window._lang==='en';
+      var cfg2=D.settings||{staleDays:7,killDays:14};
+      var st2=staleDaysOf(d);
+      var stBadge2=st2>=cfg2.killDays?'<span style="color:var(--red);font-weight:700">🔴 '+st2+(en2?'d stalled':'日停止')+'</span>':st2>=cfg2.staleDays?'<span style="color:var(--yellow)">🟡 '+st2+(en2?'d quiet':'日静止')+'</span>':'';
+      var na2=String(d.nextAction||'').trim();
+      return '<div class="list-row" onclick="openDeal(\''+d.id+'\')"><div class="dot" style="background:'+p.color+';width:8px;height:8px;border-radius:50%;flex-shrink:0"></div><div class="lr-main"><div class="lr-title">'+pi+' '+escH(d.name)+'</div><div class="lr-sub"><span>'+d.owner+'</span><span>S'+d.currentPhase+'｜'+pName(p)+'</span><span>'+(en2?'Gate ':'ゲート ')+gc+'/'+gt2+'</span>'+(na2?'<span style="color:var(--accent-light)">👉 '+escH(na2.substring(0,40))+'</span>':'<span style="color:var(--yellow)">👉 '+(en2?'next action?':'次の1手 未設定')+'</span>')+stBadge2+(d.category?d.category.split(',').map(function(c){return '<span class="cat-badge">'+c+'</span>';}).join(''):'')+(d.marketType?'<span class="deal-badge deal-badge-market">'+d.marketType+'</span>':'')+(d.targetType?'<span class="deal-badge deal-badge-target">'+d.targetType+'</span>':'')+(d.investmentScale?'<span class="deal-badge deal-badge-invest">'+d.investmentScale+'</span>':'')+'</div></div><div class="lr-right">'+(dl?'<span>🎯 '+dl+'</span>':'')+'</div></div>';
     }).join('');
 }
 
-function openDeal(id){cd=id;go('deal');renderDeal(id);}
+function openDeal(id){if(cd!==id){window._dealTab='chk';window._cvStage=null;}cd=id;go('deal');renderDeal(id);}
 
 function renderDealSummaryCard(d){
   var hasAny=d.marketType||d.targetType||d.targetDetail||d.revenueModel||d.resources||d.investmentScale||d.targetRevenue;
@@ -1290,6 +1368,7 @@ function saveDealFields(id){
   d.resources=getChipValues('fe-rs-chips');
   d.investmentScale=document.getElementById('fe-is').value||'';
   d.targetRevenue=document.getElementById('fe-tr').value||'';
+  touchDeal(d);
   sv();
   var modal=document.getElementById('m-deal-edit');
   if(modal)modal.remove();
@@ -1300,6 +1379,8 @@ function closeModal(id){var el=document.getElementById(id);if(el){if(id==='m-dea
 
 function renderDeal(id){
   var d=gd(id);if(!d)return;
+  var en=window._lang==='en';
+  var L=function(ja,eng){return en?eng:ja;};
   var p=PHASES[Math.min(d.currentPhase,PHASES.length-1)];var dp=d.phases[Math.min(d.currentPhase,PHASES.length-1)];if(!dp)return;
   var gc=dp.gc.filter(function(c){return isOk(c,p.team);}).length,gt2=dp.gc.length;
   var rc=dp.rc.filter(function(c){return isOk(c,p.team);}).length,rt=dp.rc.length;
@@ -1308,6 +1389,25 @@ function renderDeal(id){
   var pi=d.priority==='高'?'🔴':d.priority==='低'?'🔵':'🟡';
   var linkedIssues=D.issues.filter(function(i){return i.linkType==='case'&&i.linkId===id;});
   document.getElementById('tt').textContent=d.name;
+
+  // v6.3: 滞留バナー
+  var stale=staleDaysOf(d);
+  var cfg=D.settings||{staleDays:7,killDays:14};
+  var staleBanner='';
+  if(stale>=cfg.killDays){
+    staleBanner='<div style="background:var(--red-bg);border:1px solid var(--red);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--red);font-weight:600">🔴 '+L(stale+'日停止中。キルスイッチ判定（続行/後退/撤退）を実行してください。',stale+' days stalled. Run the kill-switch decision (continue / retreat / kill).')+'</div>';
+  }else if(stale>=cfg.staleDays){
+    staleBanner='<div style="background:var(--yellow-bg);border:1px solid var(--yellow);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--yellow);font-weight:600">🟡 '+L(stale+'日動きなし。次の1手を実行するか、寝かせる判断を。',stale+' days without movement. Execute the next action or park it.')+'</div>';
+  }
+
+  // v6.3: 次の1手（強制）
+  var naVal=escH(d.nextAction||'');
+  var naDue=escH(d.nextActionDue||'');
+  var nextActionRow='<div style="display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid '+(String(d.nextAction||'').trim()?'var(--border)':'var(--yellow)')+';border-radius:8px;padding:10px 14px;margin-bottom:14px;flex-wrap:wrap">'+
+    '<span style="font-size:12px;font-weight:700;color:var(--accent-light);white-space:nowrap">👉 '+L('次の1手','Next action')+'</span>'+
+    '<input value="'+naVal+'" placeholder="'+L('次に何をする？（空欄＝腐る）','What happens next? (blank = it rots)')+'" onchange="updNextAction(\''+id+'\',this.value)" style="flex:1;min-width:200px;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px">'+
+    '<input type="date" value="'+naDue+'" onchange="updNextActionDue(\''+id+'\',this.value)" style="padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px">'+
+    '</div>';
 
   var ri=function(item,chk,type,idx){
     var tm=p.team;var done=type==='opt'?chk.done:isOk(chk,tm);
@@ -1319,7 +1419,7 @@ function renderDeal(id){
       var onChange='updSub(\''+id+'\',\''+type+'\','+idx+',\''+fname+'\',this.value)';
       var inp='';
       if(ftype==='select'){
-        inp='<select onchange="'+onChange+'">'+(val?'':'<option value="">選択...</option>')+f.opts.map(function(o){return '<option value="'+o+'"'+(val===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select>';
+        inp='<select onchange="'+onChange+'">'+(val?'':'<option value="">'+L('選択...','Select...')+'</option>')+f.opts.map(function(o){return '<option value="'+o+'"'+(val===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select>';
       }else if(ftype==='number'){
         inp='<input type="number" min="0" value="'+esc+'" onchange="'+onChange+'" placeholder="0">'+(f.suffix?'<span class="input-suffix">'+f.suffix+'</span>':'');
       }else if(ftype==='currency'){
@@ -1331,28 +1431,137 @@ function renderDeal(id){
       }else{
         inp='<input value="'+esc+'" onchange="'+onChange+'" placeholder="...">';
       }
-      return '<div class="sub"><label>'+fname+'</label>'+inp+'</div>';
+      return '<div class="sub"><label>'+fld(fname)+'</label>'+inp+'</div>';
     };
-    return '<div class="chk"><div class="chk-hdr"><span class="lbl '+(done?'done':'')+'">'+item.t+(item.d?' <span style="color:var(--text-muted);font-size:10px">— '+item.d+'</span>':'')+'</span>'+(type!=='opt'?'<div class="pchk">'+M.map(function(m){return '<div class="pc '+(chk.p[m]?'on':'')+'" onclick="event.stopPropagation();toggleP(\''+id+'\',\''+type+'\','+idx+',\''+m+'\')" title="'+m+'">'+m[0]+'</div>';}).join('')+'</div>':'')+'</div>'+(item.f?'<div class="subs">'+item.f.map(renderSubInput).join('')+'</div>':'<textarea class="itxt" rows="1" placeholder="'+(item.ph||'メモ...')+'" onchange="updVal(\''+id+'\',\''+type+'\','+idx+',this.value)">'+(type==='opt'?chk.v:(chk.v||''))+'</textarea>')+'</div>';
+    return '<div class="chk"><div class="chk-hdr"><span class="lbl '+(done?'done':'')+'">'+iTitle(item)+(iDesc(item)?' <span style="color:var(--text-muted);font-size:10px">— '+iDesc(item)+'</span>':'')+'</span>'+(type!=='opt'?'<div class="pchk">'+M.map(function(m){return '<div class="pc '+(chk.p[m]?'on':'')+'" onclick="event.stopPropagation();toggleP(\''+id+'\',\''+type+'\','+idx+',\''+m+'\')" title="'+m+'">'+m[0]+'</div>';}).join('')+'</div>':'')+'</div>'+(item.f?'<div class="subs">'+item.f.map(renderSubInput).join('')+'</div>':'<textarea class="itxt" rows="1" placeholder="'+(item.ph||L('メモ...','Notes...'))+'" onchange="updVal(\''+id+'\',\''+type+'\','+idx+',this.value)">'+escH(type==='opt'?chk.v:(chk.v||''))+'</textarea>')+'</div>';
   };
 
   document.getElementById('v-deal').innerHTML=
-    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap"><div style="flex:1"><h2 style="font-size:22px;font-weight:800">'+d.name+'</h2><div style="color:var(--text-dim);font-size:12px">Matsuyuki · '+d.owner+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><div class="meta-chip" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px"><div class="dot" style="background:'+p.color+';width:6px;height:6px;border-radius:50%"></div>P'+d.currentPhase+'｜'+p.name+'</div><div style="padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px">'+pi+'</div>'+(d.deadline?'<div style="padding:4px 10px;background:var(--surface);border:1px solid '+(new Date(d.deadline)<new Date()?'var(--red)':'var(--border)')+';border-radius:16px;font-size:10px;'+(new Date(d.deadline)<new Date()?'color:var(--red)':'')+'">🎯 '+new Date(d.deadline).toLocaleDateString('ja-JP')+'</div>':'')+'<div style="padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px">📅 '+days+'日目</div>'+(p.team?'<div style="padding:4px 10px;background:var(--surface);border:1px solid var(--accent);border-radius:16px;font-size:10px;color:var(--accent-light)">👥 全員チェック</div>':'')+(d.category?d.category.split(',').map(function(c){return '<span class="cat-badge">'+c+'</span>';}).join(''):'')+'</div></div>'+
-    '<div class="timeline">'+PHASES.map(function(ph){return '<div class="tstep '+(ph.id<d.currentPhase?'done':ph.id===d.currentPhase?'cur':'')+'"><div class="tdot">'+(ph.id<d.currentPhase?'✓':ph.id)+'</div><div class="tlbl">'+ph.name+'</div></div>';}).join('')+'</div>'+
+    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap"><div style="flex:1"><h2 style="font-size:22px;font-weight:800">'+escH(d.name)+'</h2><div style="color:var(--text-dim);font-size:12px">Matsuyuki · '+d.owner+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><div class="meta-chip" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px"><div class="dot" style="background:'+p.color+';width:6px;height:6px;border-radius:50%"></div>S'+d.currentPhase+'｜'+pName(p)+'</div><div style="padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px">'+pi+'</div>'+(d.deadline?'<div style="padding:4px 10px;background:var(--surface);border:1px solid '+(new Date(d.deadline)<new Date()?'var(--red)':'var(--border)')+';border-radius:16px;font-size:10px;'+(new Date(d.deadline)<new Date()?'color:var(--red)':'')+'">🎯 '+new Date(d.deadline).toLocaleDateString(en?'en-US':'ja-JP')+'</div>':'')+'<div style="padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font-size:10px">📅 '+days+L('日目',' days')+'</div>'+(p.team?'<div style="padding:4px 10px;background:var(--surface);border:1px solid var(--accent);border-radius:16px;font-size:10px;color:var(--accent-light)">👥 '+L('全員チェック','Both must check')+'</div>':'')+(d.category?d.category.split(',').map(function(c){return '<span class="cat-badge">'+c+'</span>';}).join(''):'')+'</div></div>'+
+    staleBanner+
+    nextActionRow+
+    '<div class="timeline">'+PHASES.map(function(ph){return '<div class="tstep '+(ph.id<d.currentPhase?'done':ph.id===d.currentPhase?'cur':'')+'"><div class="tdot">'+(ph.id<d.currentPhase?'✓':ph.id)+'</div><div class="tlbl">'+pName(ph)+'</div></div>';}).join('')+'</div>'+
     renderDealSummaryCard(d)+
-    '<div class="tabs"><button class="tab active" onclick="stab(\'chk\',this)">📋 チェックリスト</button><button class="tab" onclick="stab(\'iss\',this)">📌 Issues ('+linkedIssues.length+')</button><button class="tab" onclick="stab(\'ai\',this)">🤖 AI</button></div>'+
-    '<div class="tab-panel active" id="tp-chk">'+
-      '<div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:700;color:'+p.color+'">Phase '+p.id+'｜'+p.name+'</span><span style="font-size:11px;padding:3px 10px;border-radius:16px;background:'+(ok?'var(--green-bg);color:var(--green)':'var(--yellow-bg);color:var(--yellow)')+'">'+(ok?'✓ 通過可能':'ゲート '+gc+'/'+gt2+' · 把握 '+rc+'/'+rt)+'</span></div><div style="font-size:12px;color:var(--text-dim);margin-top:4px"><strong>Phase達成条件:</strong> '+p.cond+'</div></div>'+
-      '<div class="section"><div class="section-title">🚪 ゲート条件 <span class="badge bg">MUST COMPLETE</span></div><div class="section-desc" style="border-color:'+SD.gate.b+'">'+SD.gate.t+'</div>'+p.gate.map(function(item,i){return ri(item,dp.gc[i],'gate',i);}).join('')+'</div>'+
-      '<div class="section"><div class="section-title">🧠 把握必須 <span class="badge br">MUST KNOW</span></div><div class="section-desc" style="border-color:'+SD.req.b+'">'+SD.req.t+'</div>'+p.req.map(function(item,i){return ri(item,dp.rc[i],'req',i);}).join('')+'</div>'+
-      '<div class="section"><div class="section-title">💡 オプション <span class="badge bo">NICE TO HAVE</span></div><div class="section-desc" style="border-color:'+SD.opt.b+'">'+SD.opt.t+'</div>'+p.opt.map(function(item,i){return ri(item,dp.oc[i],'opt',i);}).join('')+'</div>'+
-      '<div class="section"><div class="section-title">📄 成果物</div><div class="delivs">'+p.del.map(function(d2,i){return '<div class="deliv" onclick="togDel(\''+id+'\','+i+')"><span>📋</span><span>'+d2+'</span><span class="ds '+(dp.dc[i]?'on':'')+'"></span></div>';}).join('')+'</div></div>'+
-      '<div class="ks"><div class="ks-title">⚠ キルスイッチ</div>'+p.ks.map(function(k){return '<div class="ks-item">'+k+'</div>';}).join('')+'<div style="margin-top:10px"><button class="btn danger" onclick="cd=\''+id+'\';openModal(\'m-ks\')">発動記録</button></div></div>'+
-      '<div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">'+(d.currentPhase>0?'<button class="btn" onclick="retPhase(\''+id+'\')">← 後退</button>':'')+'<button class="btn primary" onclick="advPhase(\''+id+'\')" '+(ok?'':'disabled style="opacity:0.4;cursor:not-allowed"')+'>'+(d.currentPhase<PHASES.length-1?'S'+(d.currentPhase+1)+'｜'+PHASES[d.currentPhase+1].name+' へ →':'DONE')+'</button><div style="flex:1"></div><button class="btn danger" onclick="delDeal(\''+id+'\')">削除</button></div>'+
-      (d.killLogs.length?'<div style="margin-top:16px"><h4 style="font-size:13px;color:var(--red);margin-bottom:8px">キルスイッチログ</h4><table style="width:100%;border-collapse:collapse;font-size:11px"><tr style="background:var(--surface2)"><th style="text-align:left;padding:6px">日付</th><th>Phase</th><th>条件</th><th>判定</th><th>判定者</th></tr>'+d.killLogs.map(function(l){return '<tr><td style="padding:6px">'+new Date(l.date).toLocaleDateString('ja-JP')+'</td><td>P'+l.phase+'</td><td>'+l.cond+'</td><td style="color:'+(l.verdict==='撤退'?'var(--red)':'var(--green)')+'">'+l.verdict+'</td><td>'+l.judge+'</td></tr>';}).join('')+'</table></div>':'')+
+    (function(){var atab=window._dealTab||'chk';return '<div class="tabs">'+[['chk','📋 '+L('チェックリスト','Checklist')],['canvas','🎨 Canvas'],['iss','📌 Issues ('+linkedIssues.length+')'],['ai','🤖 AI']].map(function(tb){return '<button class="tab'+(atab===tb[0]?' active':'')+'" onclick="stab(\''+tb[0]+'\',this)">'+tb[1]+'</button>';}).join('')+'</div>';})()+
+    '<div class="tab-panel'+((window._dealTab||'chk')==='chk'?' active':'')+'" id="tp-chk">'+
+      '<div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:700;color:'+p.color+'">S'+p.id+'｜'+pName(p)+'</span><span style="font-size:11px;padding:3px 10px;border-radius:16px;background:'+(ok?'var(--green-bg);color:var(--green)':'var(--yellow-bg);color:var(--yellow)')+'">'+(ok?L('✓ 通過可能','✓ Ready to advance'):L('ゲート ','Gate ')+gc+'/'+gt2+' · '+L('把握 ','Know ')+rc+'/'+rt)+'</span></div><div style="font-size:12px;color:var(--text-dim);margin-top:4px"><strong>'+L('達成条件:','Pass condition:')+'</strong> '+(en?(p.condEn||p.cond):p.cond)+'</div></div>'+
+      '<div class="section"><div class="section-title">🚪 '+L('ゲート条件','Gate conditions')+' <span class="badge bg">MUST COMPLETE</span></div><div class="section-desc" style="border-color:'+SD.gate.b+'">'+(en?SD.gate.te:SD.gate.t)+'</div>'+p.gate.map(function(item,i){return ri(item,dp.gc[i],'gate',i);}).join('')+'</div>'+
+      '<div class="section"><div class="section-title">🧠 '+L('把握必須','Must know')+' <span class="badge br">MUST KNOW</span></div><div class="section-desc" style="border-color:'+SD.req.b+'">'+(en?SD.req.te:SD.req.t)+'</div>'+p.req.map(function(item,i){return ri(item,dp.rc[i],'req',i);}).join('')+'</div>'+
+      '<div class="section"><div class="section-title">💡 '+L('オプション','Optional')+' <span class="badge bo">NICE TO HAVE</span></div><div class="section-desc" style="border-color:'+SD.opt.b+'">'+(en?SD.opt.te:SD.opt.t)+'</div>'+p.opt.map(function(item,i){return ri(item,dp.oc[i],'opt',i);}).join('')+'</div>'+
+      '<div class="section"><div class="section-title">📄 '+L('成果物','Deliverables')+'</div><div class="delivs">'+p.del.map(function(d2,i){return '<div class="deliv" onclick="togDel(\''+id+'\','+i+')"><span>📋</span><span>'+(en&&p.delEn?(p.delEn[i]||d2):d2)+'</span><span class="ds '+(dp.dc[i]?'on':'')+'"></span></div>';}).join('')+'</div></div>'+
+      '<div class="ks"><div class="ks-title">⚠ '+L('キルスイッチ','Kill switch')+'</div>'+(en&&p.ksEn?p.ksEn:p.ks).map(function(k){return '<div class="ks-item">'+k+'</div>';}).join('')+'<div style="margin-top:10px"><button class="btn danger" onclick="cd=\''+id+'\';openModal(\'m-ks\')">'+L('発動記録','Record decision')+'</button></div></div>'+
+      '<div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">'+(d.currentPhase>0?'<button class="btn" onclick="retPhase(\''+id+'\')">'+L('← 後退','← Retreat')+'</button>':'')+'<button class="btn primary" onclick="advPhase(\''+id+'\')" '+(ok?'':'disabled style="opacity:0.4;cursor:not-allowed"')+'>'+(d.currentPhase<PHASES.length-1?'S'+(d.currentPhase+1)+'｜'+pName(PHASES[d.currentPhase+1])+' →':'DONE')+'</button><div style="flex:1"></div><button class="btn danger" onclick="delDeal(\''+id+'\')">'+L('削除','Delete')+'</button></div>'+
+      (d.killLogs.length?'<div style="margin-top:16px"><h4 style="font-size:13px;color:var(--red);margin-bottom:8px">'+L('キルスイッチログ','Kill switch log')+'</h4><table style="width:100%;border-collapse:collapse;font-size:11px"><tr style="background:var(--surface2)"><th style="text-align:left;padding:6px">'+L('日付','Date')+'</th><th>Stage</th><th>'+L('条件','Condition')+'</th><th>'+L('判定','Verdict')+'</th><th>'+L('判定者','Judge')+'</th></tr>'+d.killLogs.map(function(l){return '<tr><td style="padding:6px">'+new Date(l.date).toLocaleDateString(en?'en-US':'ja-JP')+'</td><td>S'+l.phase+'</td><td>'+escH(l.cond)+'</td><td style="color:'+(l.verdict==='撤退'?'var(--red)':'var(--green)')+'">'+l.verdict+'</td><td>'+l.judge+'</td></tr>';}).join('')+'</table></div>':'')+
     '</div>'+
-    '<div class="tab-panel" id="tp-iss"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><h3 style="font-size:15px">この案件のIssues</h3><button class="btn primary" onclick="populateLink(\'f-il\');document.getElementById(\'f-il\').value=\''+id+'\';openModal(\'m-issue\')">＋ Issue追加</button></div>'+(!linkedIssues.length?'<div style="color:var(--text-muted);font-size:12px">まだIssueなし</div>':linkedIssues.map(renderIC).join(''))+'</div>'+
-    '<div class="tab-panel" id="tp-ai"><div style="background:var(--surface);border:1px solid var(--accent-dim);border-radius:10px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:18px">🤖</span><h3 style="font-size:14px;color:var(--accent-light)">AI アシスタント</h3></div><p style="font-size:11px;color:var(--text-muted);margin-bottom:10px">音声書き起こし・LINE会話・メモを貼り付け → AIが構造化してフィールドに自動入力（将来実装）</p><textarea class="itxt" rows="6" placeholder="ここにテキストを貼り付け..." id="ai-in"></textarea><div style="margin-top:10px"><button class="btn primary" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);border:none" onclick="alert(\'Claude API連携は次フェーズで実装予定\')">🤖 構造化して抽出</button></div></div></div>';
+    '<div class="tab-panel'+(window._dealTab==='canvas'?' active':'')+'" id="tp-canvas">'+canvasPanelHTML(d)+'</div>'+
+    '<div class="tab-panel'+(window._dealTab==='iss'?' active':'')+'" id="tp-iss"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><h3 style="font-size:15px">'+L('この案件のIssues','Issues for this deal')+'</h3><button class="btn primary" onclick="populateLink(\'f-il\');document.getElementById(\'f-il\').value=\''+id+'\';openModal(\'m-issue\')">'+L('＋ Issue追加','＋ Add Issue')+'</button></div>'+(!linkedIssues.length?'<div style="color:var(--text-muted);font-size:12px">'+L('まだIssueなし','No issues yet')+'</div>':linkedIssues.map(renderIC).join(''))+'</div>'+
+    '<div class="tab-panel'+(window._dealTab==='ai'?' active':'')+'" id="tp-ai"><div style="background:var(--surface);border:1px solid var(--accent-dim);border-radius:10px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:18px">🤖</span><h3 style="font-size:14px;color:var(--accent-light)">'+L('AI アシスタント','AI Assistant')+'</h3></div><p style="font-size:11px;color:var(--text-muted);margin-bottom:10px">'+L('音声書き起こし・LINE会話・メモを貼り付け → AIが構造化してフィールドに自動入力（将来実装）','Paste transcripts / chats / notes → AI structures them into fields (coming soon)')+'</p><textarea class="itxt" rows="6" placeholder="'+L('ここにテキストを貼り付け...','Paste text here...')+'" id="ai-in"></textarea><div style="margin-top:10px"><button class="btn primary" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);border:none" onclick="alert(\'Claude API連携は次フェーズで実装予定\')">🤖 '+L('構造化して抽出','Structure & extract')+'</button></div></div></div>';
+}
+
+// ============================================================
+// CANVAS (v6.3) — 案件×ステージごとの BMC / Lean Canvas
+// 1案件×1ステージ×1タイプ = 1キャンバス（9ブロック）。自動保存。
+// ============================================================
+// grid geometry: BMC と Lean は同型（10列グリッド）
+var CV_GRID=[
+  'grid-column:1/3;grid-row:1/3',   // 0: 左たて長
+  'grid-column:3/5;grid-row:1/2',   // 1: 左上
+  'grid-column:3/5;grid-row:2/3',   // 2: 左下
+  'grid-column:5/7;grid-row:1/3',   // 3: 中央たて長
+  'grid-column:7/9;grid-row:1/2',   // 4: 右上
+  'grid-column:7/9;grid-row:2/3',   // 5: 右下
+  'grid-column:9/11;grid-row:1/3',  // 6: 右たて長
+  'grid-column:1/6;grid-row:3/4',   // 7: 下左半分
+  'grid-column:6/11;grid-row:3/4'   // 8: 下右半分
+];
+var CANVAS_DEFS={
+  bmc:{ja:'ビジネスモデルキャンバス',en:'Business Model Canvas',blocks:[
+    {k:'kp',ja:'🤝 パートナー',en:'🤝 Key Partners',hja:'誰と組む？サプライヤーは？',hen:'Who do we partner with?'},
+    {k:'ka',ja:'⚙ 主要活動',en:'⚙ Key Activities',hja:'価値を届けるために何をする？',hen:'What must we do to deliver value?'},
+    {k:'kr',ja:'🧱 リソース',en:'🧱 Key Resources',hja:'人・金・技術・信頼など',hen:'People, money, tech, trust'},
+    {k:'vp',ja:'💎 価値提案',en:'💎 Value Propositions',hja:'誰のどんな困りごとをどう解決？',hen:'What pain do we solve, for whom?'},
+    {k:'cr',ja:'💬 顧客との関係',en:'💬 Customer Relationships',hja:'どう獲得・維持・拡大する？',hen:'How do we get, keep, grow customers?'},
+    {k:'ch',ja:'🚚 チャネル',en:'🚚 Channels',hja:'どうやって届ける？売る？',hen:'How do we reach & deliver?'},
+    {k:'cs',ja:'🎯 顧客セグメント',en:'🎯 Customer Segments',hja:'N1は誰？同じ困りごとの群は？',hen:'Who is N1? Who shares the pain?'},
+    {k:'cost',ja:'💸 コスト構造',en:'💸 Cost Structure',hja:'最大のコストは？固定/変動？',hen:'Biggest costs? Fixed vs variable?'},
+    {k:'rev',ja:'💰 収益の流れ',en:'💰 Revenue Streams',hja:'誰がいくら何に払う？',hen:'Who pays how much, for what?'}]},
+  lean:{ja:'リーンキャンバス',en:'Lean Canvas',blocks:[
+    {k:'problem',ja:'🔥 課題',en:'🔥 Problem',hja:'上位3つの課題。N1の困りごと',hen:'Top 3 problems. The N1 pain'},
+    {k:'solution',ja:'💡 解決策',en:'💡 Solution',hja:'各課題への最小の解',hen:'Minimal solution per problem'},
+    {k:'metrics',ja:'📊 主要指標',en:'📊 Key Metrics',hja:'何の数字で進捗を測る？',hen:'Which numbers prove progress?'},
+    {k:'uvp',ja:'💎 独自の価値提案',en:'💎 Unique Value Proposition',hja:'一言で「なぜこれか」',hen:'One clear line: why this?'},
+    {k:'advantage',ja:'🏰 圧倒的優位性',en:'🏰 Unfair Advantage',hja:'真似できない理由=なぜ俺ら',hen:'Cannot be copied = why us'},
+    {k:'channels',ja:'🚚 チャネル',en:'🚚 Channels',hja:'顧客への経路',hen:'Path to customers'},
+    {k:'segments',ja:'🎯 顧客セグメント',en:'🎯 Customer Segments',hja:'ターゲットとアーリーアダプター',hen:'Target & early adopters'},
+    {k:'cost',ja:'💸 コスト構造',en:'💸 Cost Structure',hja:'CAC・固定費・変動費',hen:'CAC, fixed & variable costs'},
+    {k:'rev',ja:'💰 収益の流れ',en:'💰 Revenue Streams',hja:'収益モデル・粗利・LTV',hen:'Revenue model, margin, LTV'}]}
+};
+window._cvStage=null; // null = 案件の現ステージに追従
+window._cvType='lean'; // S0はLeanが定番なのでデフォルトLean
+
+function getCanvas(dealId,stage,type){
+  return (D.canvases||[]).find(function(c){return c.deal_id===dealId&&Number(c.stage)===Number(stage)&&c.type===type;});
+}
+function updCanvasBlock(dealId,stage,type,key,val){
+  var c=getCanvas(dealId,stage,type);
+  if(!c){
+    c={id:'cv'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),deal_id:dealId,stage:Number(stage),type:type,blocks:{},updated_at:'',updated_by:''};
+    if(!D.canvases)D.canvases=[];
+    D.canvases.push(c);
+  }
+  c.blocks[key]=val;
+  c.updated_at=new Date().toISOString();
+  var d=gd(dealId);if(d)touchDeal(d);
+  sv();
+}
+function setCvStage(dealId,s){window._cvStage=Number(s);refreshCanvasPanel(dealId);}
+function setCvType(dealId,ty){window._cvType=ty;refreshCanvasPanel(dealId);}
+function refreshCanvasPanel(dealId){
+  var d=gd(dealId);if(!d)return;
+  var el=document.getElementById('tp-canvas');
+  if(el)el.innerHTML=canvasPanelHTML(d);
+}
+function canvasPanelHTML(d){
+  var en=window._lang==='en';
+  var L=function(ja,eng){return en?eng:ja;};
+  var stage=window._cvStage===null?Math.min(d.currentPhase,PHASES.length-1):Math.min(window._cvStage,PHASES.length-1);
+  var type=window._cvType==='bmc'?'bmc':'lean';
+  var def=CANVAS_DEFS[type];
+  var cvs=getCanvas(d.id,stage,type);
+  var blocks=(cvs&&cvs.blocks)||{};
+  var filled=def.blocks.filter(function(b){return String(blocks[b.k]||'').trim();}).length;
+
+  var html='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">';
+  // タイプ切替
+  html+='<div style="display:flex;gap:2px;background:var(--surface2);border-radius:6px;padding:2px">';
+  html+='<button class="btn" style="font-size:11px;'+(type==='lean'?'background:var(--accent);color:#fff;border-color:var(--accent)':'border:none;background:none')+'" onclick="setCvType(\''+d.id+'\',\'lean\')">Lean Canvas</button>';
+  html+='<button class="btn" style="font-size:11px;'+(type==='bmc'?'background:var(--accent);color:#fff;border-color:var(--accent)':'border:none;background:none')+'" onclick="setCvType(\''+d.id+'\',\'bmc\')">BMC</button>';
+  html+='</div>';
+  // ステージ切替
+  html+='<div style="display:flex;gap:2px">'+PHASES.map(function(p){
+    var active=p.id===stage;
+    return '<button class="btn" style="font-size:11px;'+(active?'background:'+p.color+';color:#fff;border-color:'+p.color:'')+'" onclick="setCvStage(\''+d.id+'\','+p.id+')">S'+p.id+' '+pName(p)+'</button>';
+  }).join('')+'</div>';
+  html+='<div style="flex:1"></div>';
+  html+='<span style="font-size:11px;color:var(--text-muted)">'+filled+'/9'+(cvs&&cvs.updated_at?' · '+L('更新','upd.')+' '+new Date(cvs.updated_at).toLocaleDateString(en?'en-US':'ja-JP',{month:'short',day:'numeric'}):'')+'</span>';
+  html+='</div>';
+
+  html+='<p style="font-size:11px;color:var(--text-muted);margin-bottom:10px">'+L('ステージごとに仮説を上書きせず残す＝S0の仮説とS2の現実を見比べられる。入力は自動保存。','One canvas per stage — S0 hypotheses stay comparable with S2 reality. Auto-saved.')+'</p>';
+
+  html+='<div class="canvas-grid">'+def.blocks.map(function(b,i){
+    var val=escH(blocks[b.k]||'');
+    return '<div class="canvas-block" style="'+CV_GRID[i]+'">'+
+      '<h5>'+(en?b.en:b.ja)+'</h5>'+
+      '<textarea placeholder="'+(en?b.hen:b.hja)+'" onchange="updCanvasBlock(\''+d.id+'\','+stage+',\''+type+'\',\''+b.k+'\',this.value)">'+val+'</textarea>'+
+      '</div>';
+  }).join('')+'</div>';
+
+  // 他ステージのキャンバス存在インジケータ
+  var others=(D.canvases||[]).filter(function(c){return c.deal_id===d.id&&!(Number(c.stage)===stage&&c.type===type);});
+  if(others.length){
+    html+='<div style="margin-top:10px;font-size:10px;color:var(--text-muted)">'+L('他のキャンバス: ','Other canvases: ')+others.map(function(c){return 'S'+c.stage+' '+(c.type==='bmc'?'BMC':'Lean');}).join(' · ')+'</div>';
+  }
+  return html;
 }
 
 function iceScore(i){return (i.iceImpact||5)*(i.iceConfidence||5)*(i.iceEase||5);}
@@ -1375,11 +1584,13 @@ function renderTopics(){
   else if(sortBy==='name')topics.sort(function(a,b){return a.title.localeCompare(b.title);});
   else if(sortBy==='issues')topics.sort(function(a,b){return D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===b.id;}).length-D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===a.id;}).length;});
 
+  var enT=window._lang==='en';
+  var LT=function(ja,eng){return enT?eng:ja;};
   document.getElementById('v-topics').innerHTML=
-    '<div class="list-header"><h2>💬 Topics</h2><div class="list-controls"><span class="count">'+topics.length+'件</span><select id="tp-sort" onchange="renderTopics()"><option value="status"'+(sortBy==='status'?' selected':'')+'>ステータス順</option><option value="name"'+(sortBy==='name'?' selected':'')+'>名前順</option><option value="issues"'+(sortBy==='issues'?' selected':'')+'>Issue数順</option></select><button class="btn primary" onclick="openModal(\'m-topic\')">＋ 新規Topic</button></div></div>'+
-    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">案件横断の意思決定テーマ。ゴールは結論を出すこと。</p>'+
-    (!topics.length?'<div style="color:var(--text-muted)">まだTopicなし</div>':topics.map(function(t){
-      var st=t.status==='open'?'未着手':t.status==='discuss'?'議論中':'結論済';
+    '<div class="list-header"><h2>💬 Topics</h2><div class="list-controls"><span class="count">'+topics.length+LT('件','')+'</span><select id="tp-sort" onchange="renderTopics()"><option value="status"'+(sortBy==='status'?' selected':'')+'>'+LT('ステータス順','By status')+'</option><option value="name"'+(sortBy==='name'?' selected':'')+'>'+LT('名前順','By name')+'</option><option value="issues"'+(sortBy==='issues'?' selected':'')+'>'+LT('Issue数順','By issue count')+'</option></select><button class="btn primary" onclick="openModal(\'m-topic\')">'+LT('＋ 新規Topic','＋ New Topic')+'</button></div></div>'+
+    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">'+LT('案件横断の意思決定テーマ。ゴールは結論を出すこと。','Cross-deal decision themes. The goal is a conclusion.')+'</p>'+
+    (!topics.length?'<div style="color:var(--text-muted)">'+LT('まだTopicなし','No topics yet')+'</div>':topics.map(function(t){
+      var st=t.status==='open'?LT('未着手','Open'):t.status==='discuss'?LT('議論中','Discussing'):LT('結論済','Resolved');
       var sc=t.status==='open'?'ts-open':t.status==='discuss'?'ts-discuss':'ts-resolved';
       var ic=D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===t.id;}).length;
       return '<div class="list-row" onclick="openTopic(\''+t.id+'\')"><div class="lr-main"><div class="lr-title">'+t.title+'</div><div class="lr-sub"><span>Issues: '+ic+'件</span>'+(t.members?'<span>'+renderMembers(t.members)+'</span>':'')+(t.desc?'<span>'+t.desc.substring(0,50)+'</span>':'')+'</div></div><div class="lr-right"><span class="topic-status '+sc+'">'+st+'</span></div></div>';
@@ -1394,7 +1605,7 @@ function renderTopicDetail(id){
   var issues=D.issues.filter(function(i){return i.linkType==='topic'&&i.linkId===id;});
   var logs=D.logs.filter(function(l){return l.linkType==='topic'&&l.linkId===id;});
   document.getElementById('v-topic-detail').innerHTML=
-    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px"><div style="flex:1"><h2 style="font-size:20px;font-weight:800">'+t.title+'</h2><div style="color:var(--text-dim);font-size:12px;margin-top:4px">'+t.desc+'</div>'+(t.members?'<div style="margin-top:6px">'+renderMembers(t.members)+'</div>':'')+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="editTopicInline(\''+id+'\')">✏ 編集</button><button class="sb '+(t.status==='open'?'s-open':'')+'" onclick="updTopicStatus(\''+id+'\',\'open\');renderTopicDetail(\''+id+'\')">未着手</button><button class="sb '+(t.status==='discuss'?'s-prog':'')+'" onclick="updTopicStatus(\''+id+'\',\'discuss\');renderTopicDetail(\''+id+'\')">議論中</button><button class="sb '+(t.status==='resolved'?'s-done':'')+'" onclick="updTopicStatus(\''+id+'\',\'resolved\');renderTopicDetail(\''+id+'\')">結論済</button></div></div>'+
+    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px"><div style="flex:1"><h2 style="font-size:20px;font-weight:800">'+t.title+'</h2><div style="color:var(--text-dim);font-size:12px;margin-top:4px">'+t.desc+'</div>'+(t.members?'<div style="margin-top:6px">'+renderMembers(t.members)+'</div>':'')+'</div><div style="display:flex;gap:6px"><button class="sb '+(t.status==='open'?'s-open':'')+'" onclick="updTopicStatus(\''+id+'\',\'open\');renderTopicDetail(\''+id+'\')">未着手</button><button class="sb '+(t.status==='discuss'?'s-prog':'')+'" onclick="updTopicStatus(\''+id+'\',\'discuss\');renderTopicDetail(\''+id+'\')">議論中</button><button class="sb '+(t.status==='done'?'s-done':'')+'" onclick="updTopicStatus(\''+id+'\',\'resolved\');renderTopicDetail(\''+id+'\')">結論済</button></div></div>'+
     '<div class="section"><div class="section-title">📝 結論メモ</div><textarea class="itxt" rows="3" placeholder="結論が出たらここに記録..." onchange="updTopicConclusion(\''+id+'\',this.value)">'+(t.conclusion||'')+'</textarea></div>'+
     '<div class="section"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><div class="section-title">📌 紐づくIssues</div><button class="btn primary" onclick="populateLink(\'f-il\');document.getElementById(\'f-il\').value=\''+id+'\';openModal(\'m-issue\')">＋ Issue</button></div>'+(!issues.length?'<div style="color:var(--text-muted);font-size:12px">なし</div>':issues.map(renderIC).join(''))+'</div>'+
     '<div class="section"><div class="section-title">📝 関連Log</div>'+(!logs.length?'<div style="color:var(--text-muted);font-size:12px">なし</div>':logs.map(renderLogEntry).join(''))+'</div>'+
@@ -1434,17 +1645,19 @@ function renderIssues(){
 }
 
 function renderLogEntry(l){
-  var tp=l.type==='decision'?'決定事項':l.type==='fact'?'新事実':'アクション変更';
+  var enL=window._lang==='en';
+  var tp=l.type==='decision'?(enL?'Decision':'決定事項'):l.type==='fact'?(enL?'New fact':'新事実'):(enL?'Change':'アクション変更');
   var tc=l.type==='decision'?'var(--green)':l.type==='fact'?'var(--blue)':'var(--yellow)';
   var ln=linkName(l.linkType,l.linkId);
-  return '<div class="log-entry"><div class="log-type" style="color:'+tc+'">'+tp+'</div><div class="log-text">'+l.content+'</div><div class="log-meta">'+l.by+' · '+new Date(l.createdAt).toLocaleDateString('ja-JP')+(ln?' · <span class="log-tag" style="background:'+(l.linkType==='case'?'rgba(108,92,231,0.15);color:var(--accent-light)':'var(--cyan-bg);color:var(--cyan)')+'">'+ln+'</span>':'')+'</div></div>';
+  return '<div class="log-entry"><div class="log-type" style="color:'+tc+'">'+tp+'</div><div class="log-text">'+escH(l.content)+'</div><div class="log-meta">'+l.by+' · '+new Date(l.createdAt).toLocaleDateString(enL?'en-US':'ja-JP')+(ln?' · <span class="log-tag" style="background:'+(l.linkType==='case'?'rgba(108,92,231,0.15);color:var(--accent-light)':'var(--cyan-bg);color:var(--cyan)')+'">'+escH(ln)+'</span>':'')+'</div></div>';
 }
 
 function renderLog(){
+  var enL=window._lang==='en';
   document.getElementById('v-log').innerHTML=
-    '<div style="display:flex;justify-content:space-between;margin-bottom:16px"><h2 style="font-size:18px;font-weight:800">Decision Log</h2><button class="btn primary" onclick="populateLink(\'f-ll\');openModal(\'m-log\')">＋ 記録</button></div>'+
-    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:16px">決定事項・新事実・アクション変更の3カテゴリのみ記録。</p>'+
-    (!D.logs.length?'<div style="color:var(--text-muted)">まだ記録なし</div>':D.logs.slice().reverse().map(renderLogEntry).join(''));
+    '<div style="display:flex;justify-content:space-between;margin-bottom:16px"><h2 style="font-size:18px;font-weight:800">Decision Log</h2><button class="btn primary" onclick="populateLink(\'f-ll\');openModal(\'m-log\')">'+(enL?'＋ Add':'＋ 記録')+'</button></div>'+
+    '<p style="font-size:11px;color:var(--text-muted);margin-bottom:16px">'+(enL?'Only 3 categories: decisions, new facts, action changes.':'決定事項・新事実・アクション変更の3カテゴリのみ記録。')+'</p>'+
+    (!D.logs.length?'<div style="color:var(--text-muted)">'+(enL?'No entries yet':'まだ記録なし')+'</div>':D.logs.slice().reverse().map(renderLogEntry).join(''));
 }
 
 function renderKB(){
@@ -1456,7 +1669,7 @@ function renderKB(){
         '<h2 style="font-size:20px;margin-bottom:16px">阿吽（A-Un）— 設計思想と使い方</h2>'+
         '<div style="background:var(--accent-dim);border-radius:8px;padding:16px;margin-bottom:20px;color:var(--text)">'+
           '<h3 style="font-size:15px;margin-bottom:8px">一言で言うと</h3>'+
-          '<p style="font-size:14px;line-height:1.6"><strong>阿吽は、白石・松崎が新規事業を構造的に立ち上げるための情報同期プラットフォーム。</strong><br>案件の進捗・課題・決定事項が常にチームで共有されている状態を作る。</p>'+
+          '<p style="font-size:14px;line-height:1.6"><strong>阿吽は、白石・松崎の2人が新規事業を構造的に立ち上げるための情報同期プラットフォーム。</strong><br>案件の進捗・課題・決定事項が常に2人で共有されている状態を作る。</p>'+
         '</div>'+
         '<h3 style="font-size:15px;margin-bottom:10px;color:var(--accent-light)">なぜこのツールが必要か</h3>'+
         '<div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:20px">'+
@@ -1581,9 +1794,10 @@ function processInputQueue(){
 function renderRoadmap(){
   document.getElementById('v-roadmap').innerHTML='<div style="max-width:700px"><h2 style="font-size:20px;font-weight:800;margin-bottom:6px">阿吽 開発ロードマップ</h2><p style="font-size:12px;color:var(--text-dim);margin-bottom:20px">このツール自体の開発計画・方向性</p>'+
     '<div class="rm-phase" style="border-left:3px solid var(--green)"><h4><span class="rm-check">✅</span> Phase 1 — MVP</h4><div class="rm-item"><span class="rm-check">✅</span> 案件管理（9フェーズ × ゲート条件 × 3人チェック）</div><div class="rm-item"><span class="rm-check">✅</span> Issue管理（Case/Topic紐付き × カンバン）</div><div class="rm-item"><span class="rm-check">✅</span> Topics（論点管理 × 結論メモ）</div><div class="rm-item"><span class="rm-check">✅</span> Decision Log（決定事項/新事実/アクション変更）</div><div class="rm-item"><span class="rm-check">✅</span> Playbook（全フェーズ定義一覧）</div></div>'+
-    '<div class="rm-phase" style="border-left:3px solid var(--green)"><h4><span class="rm-check">✅</span> Phase 1.5 — GAS WebApp化（現在）</h4><div class="rm-item"><span class="rm-check">✅</span> Google Sheets連携（自動保存）</div><div class="rm-item"><span class="rm-check">✅</span> マルチデバイス対応</div><div class="rm-item"><span class="rm-check">✅</span> ローカルストレージ依存排除</div></div>'+
+    '<div class="rm-phase" style="border-left:3px solid var(--green)"><h4><span class="rm-check">✅</span> Phase 1.5 — GAS WebApp化</h4><div class="rm-item"><span class="rm-check">✅</span> Google Sheets連携（自動保存）</div><div class="rm-item"><span class="rm-check">✅</span> マルチデバイス対応</div><div class="rm-item"><span class="rm-check">✅</span> ローカルストレージ依存排除</div></div>'+
+    '<div class="rm-phase" style="border-left:3px solid var(--green)"><h4><span class="rm-check">✅</span> v6.3 — 自動化+英語+Canvas（現在）</h4><div class="rm-item"><span class="rm-check">✅</span> 滞留検知・キル警告・次の1手強制（今日ビューに自動浮上）</div><div class="rm-item"><span class="rm-check">✅</span> HRCP-RICEスコア重み可変化（⚙設定）</div><div class="rm-item"><span class="rm-check">✅</span> JA/EN言語切替（全画面・記憶される）</div><div class="rm-item"><span class="rm-check">✅</span> 案件×ステージごとのBMC/リーンキャンバス（🎨 Canvasタブ）</div><div class="rm-item"><span class="rm-check">✅</span> 日次自動チェック（GASトリガー+LINE通知対応）</div></div>'+
     '<div class="rm-phase" style="border-left:3px solid var(--yellow)"><h4>🔄 Phase 2 — AI統合</h4><div class="rm-item">⬜ Claude API接続（テキスト→構造化自動入力）</div><div class="rm-item">⬜ LINE Webhook連携（グループ会話→自動抽出）</div><div class="rm-item">⬜ 音声ファイルアップロード→文字起こし→構造化</div></div>'+
-    '<div class="rm-phase" style="border-left:3px solid var(--blue)"><h4>⬜ Phase 3 — マルチユーザー</h4><div class="rm-item">⬜ 認証（白石/中野/松崎の個別ログイン）</div><div class="rm-item">⬜ リアルタイム同期</div><div class="rm-item">⬜ 通知（Telegram連携）</div></div>'+
+    '<div class="rm-phase" style="border-left:3px solid var(--blue)"><h4>⬜ Phase 3 — マルチユーザー</h4><div class="rm-item">⬜ 認証（白石/松崎の個別ログイン）</div><div class="rm-item">⬜ リアルタイム同期</div><div class="rm-item">⬜ 通知（Telegram連携）</div></div>'+
     '<div class="rm-phase" style="border-left:3px solid var(--accent)"><h4>⬜ Phase 4 — 商品化</h4><div class="rm-item">⬜ 汎用テンプレート化</div><div class="rm-item">⬜ マルチチーム対応</div><div class="rm-item">⬜ 課金機能</div></div>'+
     '<h3 style="font-size:16px;font-weight:800;margin:28px 0 12px">📋 開発ログ</h3>'+
     (D._devLog&&D._devLog.length?D._devLog.slice().reverse().map(function(l){return '<div class="log-entry"><div class="log-type" style="color:var(--accent-light)">'+l.version+'</div><div class="log-text">'+l.content+'</div><div class="log-meta">'+l.date+'</div></div>';}).join(''):'')+
@@ -1593,7 +1807,7 @@ function renderRoadmap(){
   '</div>';
 }
 
-function stab(id,btn){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});btn.classList.add('active');document.getElementById('tp-'+id).classList.add('active');}
+function stab(id,btn){window._dealTab=id;document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});btn.classList.add('active');document.getElementById('tp-'+id).classList.add('active');}
 
 // ============================================================
 // NAV
@@ -1604,8 +1818,8 @@ function go(v){cv=v;document.querySelectorAll('.view').forEach(function(el){el.c
   var lang=window._lang||'ja';
   var titles=lang==='ja'?{today:'今日',overview:'全体像',ideas:'アイデア',cases:'新規事業',topics:'論点',issues:'課題',input:'入力',log:'決定ログ',kb:'ナレッジベース',roadmap:'開発ロードマップ'}:{today:'Today',overview:'Overview',ideas:'Ideas',cases:'New Biz. Dev.',topics:'Topics',issues:'Issues',input:'Input',log:'Decision Log',kb:'Knowledge Base',roadmap:'Dev Roadmap'};
   if(titles[v])document.getElementById('tt').textContent=titles[v];
-  // Close sidebar after navigation
-  closeSidebar();
+  // Close sidebar on mobile after navigation
+  var sb=document.getElementById('sidebar');if(sb){sb.classList.remove('open');var ov=document.getElementById('sidebar-overlay');if(ov)ov.style.display='none';}
   render();
 }
 function openModal(id){populateLink('f-il');populateLink('f-ll');document.getElementById(id).classList.add('show');}
@@ -1613,8 +1827,8 @@ document.querySelectorAll('.modal-bg').forEach(function(el){el.addEventListener(
 
 // Menu button always visible (sidebar is slide-to-open on all sizes)
 
-// Language & i18n
-window._lang='ja';
+// Language & i18n (v6.3: localStorage 永続化)
+window._lang=(function(){try{return localStorage.getItem('aun_lang')==='en'?'en':'ja';}catch(e){return 'ja';}})();
 var T={};
 var _i18n={
   ja:{cases_count:'件',open_issues:'未完了Issue',topics_label:'論点',unresolved:'未解決',recorded:'記録済',alerts:'⚠ アラート',pipeline:'🌱 New Biz. Dev. Pipeline',issues_by_person:'📌 担当者別Issue',recent_log:'📝 最新Log',no_log:'まだ記録なし',new_deal:'＋ 新規案件',sort_priority:'優先度順',sort_phase:'Phase順',sort_owner:'責任者順',sort_deadline:'期限順',sort_name:'名前順',gate:'ゲート',stall_days:'日滞留',overdue:'期限超過',new_issue:'＋ 新規Issue',new_topic:'＋ 新規論点',add_log:'＋ 記録',status_icebox:'アイスボックス',status_backlog:'バックログ',status_todo:'未着手',status_wip:'進行中',status_waiting:'ブロック中',status_done:'完了',status_discussing:'議論中',status_resolved:'結論済',conclusion:'結論',linked_issues:'関連Issue',back:'← 戻る',advance:'次フェーズへ →',retreat:'← 前フェーズに戻る',killswitch:'⚠ キルスイッチ判定',gate_cond:'ゲート条件（必須）',required_info:'把握必須項目',optional_info:'オプション情報',deliverables:'成果物',all_gate_clear:'全ゲート+把握必須を完了してください',confirm_retreat:'前フェーズに戻る？',filter_all:'全て',filter_mine:'自分のみ',new_biz:'🌱 New Biz. Dev.',decision:'決定',fact:'新事実',change:'変更',input_title:'入力',input_placeholder:'テキストを貼り付けてください...（LINEの会話、音声書き起こし、メモなど）',input_analyze:'構造化して振り分け',input_result:'振り分け結果',kb_title:'📖 ナレッジベース',roadmap_title:'🗺️ 阿吽 開発ロードマップ',add_dev_log:'＋ 開発ログ追加',dev_log:'開発ログ',no_topics:'論点なし',no_issues:'課題なし',cases_num:'案件数'},
@@ -1623,18 +1837,32 @@ var _i18n={
 function t(k){return (_i18n[window._lang]||_i18n.ja)[k]||(_i18n.ja)[k]||k;}
 function setLang(l){
   window._lang=l==='en'?'en':'ja';
-  document.getElementById('lb-jp').style.opacity=window._lang==='ja'?'1':'0.4';
-  document.getElementById('lb-jp').style.fontWeight=window._lang==='ja'?'700':'400';
-  document.getElementById('lb-en').style.opacity=window._lang==='en'?'1':'0.4';
-  document.getElementById('lb-en').style.fontWeight=window._lang==='en'?'700':'400';
-  document.getElementById('logo-title').textContent=window._lang==='ja'?'阿吽':'A-Un';
-  document.getElementById('logo-sub').textContent=window._lang==='ja'?'事業構築OS v3.0':'Venture Phase OS v3.0';
-  document.getElementById('nav-sec-main').textContent=window._lang==='ja'?'メイン':'MAIN';
-  var ref=document.getElementById('nav-sec-ref');
-  if(ref)ref.textContent=window._lang==='ja'?'リファレンス':'REFERENCE';
-  document.querySelectorAll('.nav-label').forEach(function(el){el.textContent=el.dataset[window._lang]||el.dataset.ja;});
+  try{localStorage.setItem('aun_lang',window._lang);}catch(e){}
+  applyLangChrome();
   go(cv);
 }
+// 静的UI（サイドバー・モーダル・ヘルプ）の言語適用。data-ja/data-en を持つ全要素を翻訳。
+function applyLangChrome(){
+  var en=window._lang==='en';
+  var jb=document.getElementById('lb-jp'),eb=document.getElementById('lb-en');
+  if(jb){jb.style.opacity=en?'0.4':'1';jb.style.fontWeight=en?'400':'700';}
+  if(eb){eb.style.opacity=en?'1':'0.4';eb.style.fontWeight=en?'700':'400';}
+  var lt=document.getElementById('logo-title');if(lt)lt.textContent=en?'A-Un':'阿吽';
+  var ls=document.getElementById('logo-sub');if(ls)ls.textContent=en?'Venture Building OS v6.3':'事業構築OS v6.3';
+  var nm=document.getElementById('nav-sec-main');if(nm)nm.textContent=en?'MAIN':'メイン';
+  var ref=document.getElementById('nav-sec-ref');
+  if(ref)ref.textContent=en?'REFERENCE':'リファレンス';
+  // data-ja/data-en を持つ全要素（nav・モーダルのラベル/ボタン/見出し）
+  document.querySelectorAll('[data-ja]').forEach(function(el){var v=en?el.dataset.en:el.dataset.ja;if(v!==undefined)el.textContent=v;});
+  // placeholder 翻訳（data-ja-ph/data-en-ph）
+  document.querySelectorAll('[data-ja-ph]').forEach(function(el){var v=en?el.dataset.enPh:el.dataset.jaPh;if(v!==undefined)el.placeholder=v;});
+  // 使い方ガイド（JA/EN 2ブロック切替）
+  var hja=document.getElementById('help-ja'),hen=document.getElementById('help-en');
+  if(hja)hja.style.display=en?'none':'block';
+  if(hen)hen.style.display=en?'block':'none';
+}
+// 初期ロード時に保存済み言語を反映
+if(document.readyState!=='loading')applyLangChrome();else document.addEventListener('DOMContentLoaded',applyLangChrome);
 
 // Page-specific help
 var _pageHelp={
@@ -1648,8 +1876,8 @@ var _pageHelp={
     log:'<h4>📝 決定ログ</h4><p>3人で共有すべき重要な記録のみ。日記ではない。</p><div class="ph-tip">💡 記録するのは「決定事項」「新事実」「アクション変更」の3種類だけ。</div>',
     kb:'<h4>📖 ナレッジベース</h4><p>参考資料やプレイブックをまとめた場所。</p><div class="ph-tip">💡 新規事業の進め方に迷ったらここを確認。</div>',
     roadmap:'<h4>🗺️ 開発ロードマップ</h4><p>このツール自体の開発計画と変更履歴。</p><div class="ph-tip">💡 アクティビティは自動記録。手動で開発ログも追加可能。</div>',
-    today:'<h4>📅 今日</h4><p>毎日の起点画面。検証中の案件・今週のIssue上位5・早見表トップ3だけ表示。</p><div class="ph-tip">💡 朝これを開いて「今日どれを進めるか」を決める。</div>',
-    ideas:'<h4>💡 アイデア</h4><p>ビジネスの種・発想・思いつきを即記録する場所。後で「案件化」ボタンで Deal に昇格可能。</p><p style="margin:8px 0 4px;font-weight:700;color:var(--text)">ステータスの流れ</p><p>🌱 <b>種</b> → 🤔 <b>検討中</b> → 🚀 <b>案件化</b> / ❌ <b>却下</b></p><div class="ph-tip">💡 1行追加でいい。詳細は後で書く。</div>'
+    today:'<h4>📅 今日</h4><p>毎日の起点画面。検証中の案件・今週のIssue上位5・早見表トップ3だけを表示。</p><div class="ph-tip">💡 朝これを開いて「今日どれを進めるか」を決める。詳細は各タブへ。</div>',
+    ideas:'<h4>💡 アイデア</h4><p>ビジネスの種・発想・思いつきを即記録する場所。後で「案件化」ボタンで Deal に昇格可能。</p><p style="margin:8px 0 4px;font-weight:700;color:var(--text)">ステータスの流れ</p><p>🌱 <b>種(raw)</b> — まだ何もしてない<br>🤔 <b>検討中</b> — 動かすか考えている<br>🚀 <b>案件化</b> — Deal に昇格済（リンク先あり）<br>❌ <b>却下</b> — やらない判断（後で再評価可）</p><div class="ph-tip">💡 1行追加でいい。詳細は後で書く。雑な発想ほど価値が高い場合がある。</div>'
   },
   en:{
     overview:'<h4>📊 Overview</h4><p>Dashboard showing all key metrics at a glance.</p><div class="ph-tip">💡 Check deal/issue/topic counts and alerts here.</div>',
@@ -1661,23 +1889,58 @@ var _pageHelp={
     log:'<h4>📝 Decision Log</h4><p>Important records only: Decisions, New Facts, Action Changes.</p><div class="ph-tip">💡 Not a diary. Only log what the 3 of you need to remember.</div>',
     kb:'<h4>📖 Knowledge Base</h4><p>Reference materials and playbooks.</p><div class="ph-tip">💡 Check here when unsure about the venture-building process.</div>',
     roadmap:'<h4>🗺️ Dev Roadmap</h4><p>Development plan and changelog for this tool.</p><div class="ph-tip">💡 Activities are auto-logged. Manual dev log entries also supported.</div>',
-    ideas:'<h4>💡 Ideas</h4><p>Capture business seeds and sparks. Promote to a Deal later.</p><p>🌱 Raw → 🤔 Considering → 🚀 Promoted / ❌ Rejected</p><div class="ph-tip">💡 One-line entry is enough. Add details later.</div>'
+    ideas:'<h4>💡 Ideas</h4><p>Capture business seeds, sparks, and fleeting thoughts. Promote any idea to a Deal later.</p><p style="margin:8px 0 4px;font-weight:700;color:var(--text)">Status Flow</p><p>🌱 <b>Raw</b> — Just captured<br>🤔 <b>Considering</b> — Evaluating<br>🚀 <b>Promoted</b> — Became a Deal<br>❌ <b>Rejected</b> — Decided not to pursue (revisit anytime)</p><div class="ph-tip">💡 One-line entry is enough. Add details later. Rough sparks often hide value.</div>'
   }
 };
 
 // ============================================================
 // IDEAS (v6.1: 早見表化・HRCP-RICE評価付き)
 // ============================================================
+// HRCP-RICE スコア計算（v6.3: 重み可変 — settings シートの係数を掛ける）
 function calcHrcpRice(hrcp, probability, scale, effort){
   var scaleMap = { '小':1, '中':3, '大':5, '特大':10, '?':1 };
   var effortMap = { '小':1, '中':3, '大':5, '特大':10 };
-  var s = scaleMap[scale] || 3;
-  var e = effortMap[effort] || 3;
-  var h = Number(hrcp) || 3;
-  var p = Number(probability) || 3;
-  return Math.round((h * p * s) / e * 10) / 10;
+  var w = D.settings || {wHrcp:1,wProb:1,wScale:1,wEffort:1};
+  var s = (scaleMap[scale] || 3) * (w.wScale || 1);
+  var e = (effortMap[effort] || 3) * (w.wEffort || 1);
+  var h = (Number(hrcp) || 3) * (w.wHrcp || 1);
+  var p = (Number(probability) || 3) * (w.wProb || 1);
+  return Math.round((h * p * s) / Math.max(0.1, e) * 10) / 10;
 }
 
+// v6.3: スコア重み・自動化しきい値の設定モーダル（動的生成）
+function openScoreSettings(){
+  var en=window._lang==='en';
+  var L=function(ja,eng){return en?eng:ja;};
+  var s=D.settings||{staleDays:7,killDays:14,wHrcp:1,wProb:1,wScale:1,wEffort:1};
+  var num=function(id,label,val,step,hint){return '<div class="fg" style="flex:1;min-width:130px"><label style="font-size:10px">'+label+(hint?' <span style="color:var(--text-muted)">'+hint+'</span>':'')+'</label><input type="number" id="'+id+'" min="0.1" step="'+step+'" value="'+val+'"></div>';};
+  var html='<div class="modal-bg show" id="m-settings" onclick="if(event.target===this)document.getElementById(\'m-settings\').remove()"><div class="modal" style="width:520px">';
+  html+='<h3>⚙ '+L('スコア重み・自動化設定','Score weights & automation')+'</h3>';
+  html+='<p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">'+L('局面で「哲学適合重視↔額重視」を切り替える。重み1=等倍。全アイデアのスコアを即再計算。','Shift emphasis (philosophy-fit ↔ money) per situation. Weight 1 = neutral. All idea scores recompute instantly.')+'</p>';
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html+=num('st-wh',L('HRCP適合の重み','HRCP weight'),s.wHrcp,'0.1','×');
+  html+=num('st-wp',L('蓋然性の重み','Probability weight'),s.wProb,'0.1','×');
+  html+=num('st-ws',L('額の重み','Scale weight'),s.wScale,'0.1','×');
+  html+=num('st-we',L('工数の重み(大=工数重視)','Effort weight (higher = punish effort)'),s.wEffort,'0.1','×');
+  html+='</div><div style="border-top:1px solid var(--border);margin:10px 0;padding-top:10px;display:flex;gap:8px;flex-wrap:wrap">';
+  html+=num('st-sd',L('滞留アラート日数','Stale alert (days)'),s.staleDays,'1','🟡');
+  html+=num('st-kd',L('キル警告日数','Kill alert (days)'),s.killDays,'1','🔴');
+  html+='</div>';
+  html+='<div class="fa"><button class="btn" onclick="document.getElementById(\'m-settings\').remove()">'+L('取消','Cancel')+'</button><button class="btn primary" onclick="saveScoreSettings()">'+L('保存して再計算','Save & recompute')+'</button></div>';
+  html+='</div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function saveScoreSettings(){
+  var g=function(id,dv){var v=Number(document.getElementById(id).value);return (!isNaN(v)&&v>0)?v:dv;};
+  D.settings={wHrcp:g('st-wh',1),wProb:g('st-wp',1),wScale:g('st-ws',1),wEffort:g('st-we',1),staleDays:g('st-sd',7),killDays:g('st-kd',14)};
+  // 全アイデアのスコア再計算（重み変更を即反映）
+  (D.ideas||[]).forEach(function(x){x.hrcp_rice_score=calcHrcpRice(x.hrcp||3,x.probability||3,x.scale||'中',x.effort||'中');});
+  sv();
+  var m=document.getElementById('m-settings');if(m)m.remove();
+  render();
+}
+
+// モーダル内のリアルタイムスコア表示
 function updIdeaScorePreview(){
   var el = document.getElementById('f-it-score');
   if(!el) return;
@@ -1718,6 +1981,7 @@ function createIdea(){
   D.ideas.push(idea);
   sv();
   closeModal('m-idea');
+  // reset form
   document.getElementById('f-it-title').value='';
   document.getElementById('f-it-memo').value='';
   document.getElementById('f-it-cat').value='新規事業';
@@ -1749,10 +2013,15 @@ function delIdea(id){
 function promoteIdea(id){
   var idea = (D.ideas||[]).find(function(x){ return x.id===id; });
   if(!idea){ alert('アイデアが見つかりません'); return; }
-  if(idea.status === 'promoted'){ alert('既に案件化済'); return; }
+  if(idea.status === 'promoted'){
+    alert('既に案件化されています');
+    return;
+  }
   if(!confirm('「' + idea.title + '」を案件化（Dealに昇格）しますか？')) return;
+  // Create new Deal client-side
   var dealId = 'd'+Date.now().toString(36)+Math.random().toString(36).slice(2,4);
   var nowIso = new Date().toISOString();
+  // Initialize phases (mirror createDeal structure)
   var newDeal = {
     id: dealId, name: idea.title, entity: 'Matsuyuki',
     owner: idea.created_by || '白石', priority: '中',
@@ -1767,23 +2036,26 @@ function promoteIdea(id){
         status: p.id===0 ? 'active' : 'locked',
         startedAt: p.id===0 ? nowIso : null,
         completedAt: null,
-        gc: p.gate.map(function(){ return {p:{白石:false,中野:false,松崎:false},v:'',sv:{}}; }),
-        rc: p.req.map(function(){ return {p:{白石:false,中野:false,松崎:false},v:'',sv:{}}; }),
+        gc: p.gate.map(function(){ return {p:{白石:false,松崎:false},v:'',sv:{}}; }),
+        rc: p.req.map(function(){ return {p:{白石:false,松崎:false},v:'',sv:{}}; }),
         oc: p.opt.map(function(){ return {done:false,v:'',sv:{}}; }),
         dc: p.del.map(function(){ return false; })
       };
     })
   };
   D.deals.push(newDeal);
+  // Update idea
   idea.status = 'promoted';
   idea.linked_deal_id = dealId;
   sv();
   render();
+  // Jump to the new deal detail
   if(typeof openDeal === 'function') openDeal(dealId);
 }
 
 function renderIdeas(){
   var ideas = (D.ideas || []).slice();
+  // backfill scores for older ideas without it
   ideas.forEach(function(x){
     if(x.hrcp_rice_score === undefined || x.hrcp_rice_score === 0){
       x.hrcp_rice_score = calcHrcpRice(x.hrcp||3, x.probability||3, x.scale||'中', x.effort||'中');
@@ -1793,9 +2065,11 @@ function renderIdeas(){
   var fs = document.getElementById('id-fs')?.value || 'active';
   if(fs === 'active') ideas = ideas.filter(function(x){ return ['raw','considering','validating'].indexOf(x.status) >= 0; });
   else if(fs !== 'all') ideas = ideas.filter(function(x){ return x.status === fs; });
+  // 早見表並び: HRCP-RICE スコア降順（高い順から優先）
   ideas.sort(function(a,b){ return (b.hrcp_rice_score||0) - (a.hrcp_rice_score||0); });
 
   var statusLabel = function(s){
+    if(window._lang==='en')return s==='raw'?'🌱 Raw':s==='considering'?'🤔 Considering':s==='validating'?'🔬 Validating':s==='promoted'?'🚀 Promoted':s==='rejected'?'❌ Rejected':s==='parking'?'🛌 Parked':s;
     return s==='raw'?'🌱 種':s==='considering'?'🤔 検討中':s==='validating'?'🔬 検証中':s==='promoted'?'🚀 案件化':s==='rejected'?'❌ 却下':s==='parking'?'🛌 寝かせる':s;
   };
   var statusColor = function(s){
@@ -1805,42 +2079,52 @@ function renderIdeas(){
   var counts = {raw:0, considering:0, validating:0, promoted:0, rejected:0, parking:0};
   (D.ideas||[]).forEach(function(x){ if(counts[x.status]!==undefined) counts[x.status]++; });
 
+  // 哲学的ヘッダー
+  var en = window._lang==='en';
+  var Lx = function(ja,eng){return en?eng:ja;};
+  var w = D.settings||{};
+  var wNote = (w.wHrcp!==1||w.wProb!==1||w.wScale!==1||w.wEffort!==1)?' <span style="color:var(--yellow)">('+Lx('重み調整中','custom weights')+': H×'+(w.wHrcp||1)+' 蓋×'+(w.wProb||1)+' 額×'+(w.wScale||1)+' 工×'+(w.wEffort||1)+')</span>':'';
   var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">' +
-    '<h2 style="font-size:18px;font-weight:800">💡 アイデア早見表</h2>' +
-    '<button class="btn primary" onclick="openModal(\'m-idea\')">＋ 新規アイデア</button>' +
+    '<h2 style="font-size:18px;font-weight:800">💡 '+Lx('アイデア早見表','Idea Scoreboard')+'</h2>' +
+    '<div style="display:flex;gap:6px"><button class="btn" onclick="openScoreSettings()" title="'+Lx('スコア重み・自動化設定','Score weights & automation')+'">⚙</button>' +
+    '<button class="btn primary" onclick="openModal(\'m-idea\')">'+Lx('＋ 新規アイデア','＋ New Idea')+'</button></div>' +
     '</div>' +
     '<div style="background:var(--surface2);border-left:3px solid var(--accent);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--text-dim);line-height:1.6">' +
-      '<strong style="color:var(--accent-light)">種を数えるな。評価して間引け。</strong><br>' +
-      '本当の収穫は種ではなく「種を評価する仕組み」。HRCP-RICEスコア降順で並ぶ。' +
-      '<strong style="color:var(--yellow)">「1個実証」原則</strong>: 同時検証は最大3本まで。残りは寝かせて（parking）Ω保持。' +
+      '<strong style="color:var(--accent-light)">'+Lx('種を数えるな。評価して間引け。','Don\'t count seeds. Score them and cull.')+'</strong><br>' +
+      Lx('本当の収穫は種ではなく「種を評価する仕組み」。HRCP-RICEスコア降順で並ぶ。','The real asset is the scoring system, not the seeds. Sorted by HRCP-RICE desc.')+wNote +
+      '<strong style="color:var(--yellow)">'+Lx('「1個実証」原則','"Prove one" principle')+'</strong>: '+Lx('同時検証は最大3本まで。残りは寝かせて（parking）Ω保持。','Max 3 in validation at once. Park the rest to preserve Ω.') +
     '</div>';
 
+  // 検証中3超警告
   if(counts.validating > 3){
-    html += '<div style="background:rgba(255,76,76,0.1);border:1px solid var(--red);border-radius:6px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--red);font-weight:600">' +
-      '⚠ 検証中が ' + counts.validating + ' 本。3本を超えています。優先1-3本に絞り、残りは「🛌 寝かせる」に。工数（Ω）の浪費を防ぐ。' +
+    html += '<div style="background:var(--red-bg);border:1px solid var(--red);border-radius:6px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--red);font-weight:600">' +
+      Lx('⚠ 検証中が ' + counts.validating + ' 本。3本を超えています。優先1-3本に絞り、残りは「🛌 寝かせる」に。工数（Ω）の浪費を防ぐ。','⚠ ' + counts.validating + ' ideas in validation — over the limit of 3. Keep 1-3, park the rest to protect effort (Ω).') +
       '</div>';
   }
 
+  // Filter
   html += '<div class="filters" style="flex-wrap:wrap;margin-bottom:12px">' +
-    '<span style="color:var(--text-muted)">状態:</span>' +
+    '<span style="color:var(--text-muted)">'+Lx('状態:','Status:')+'</span>' +
     '<select id="id-fs" onchange="render()">' +
-    '<option value="active"' + (fs==='active'?' selected':'') + '>アクティブ（種+検討中+検証中）</option>' +
-    '<option value="all"' + (fs==='all'?' selected':'') + '>全て</option>' +
-    '<option value="raw"' + (fs==='raw'?' selected':'') + '>🌱 種</option>' +
-    '<option value="considering"' + (fs==='considering'?' selected':'') + '>🤔 検討中</option>' +
-    '<option value="validating"' + (fs==='validating'?' selected':'') + '>🔬 検証中</option>' +
-    '<option value="parking"' + (fs==='parking'?' selected':'') + '>🛌 寝かせる</option>' +
-    '<option value="promoted"' + (fs==='promoted'?' selected':'') + '>🚀 案件化済</option>' +
-    '<option value="rejected"' + (fs==='rejected'?' selected':'') + '>❌ 却下</option>' +
-    '</select></div>';
+    '<option value="active"' + (fs==='active'?' selected':'') + '>'+Lx('アクティブ（種+検討中+検証中）','Active (raw+considering+validating)')+'</option>' +
+    '<option value="all"' + (fs==='all'?' selected':'') + '>'+Lx('全て','All')+'</option>' +
+    '<option value="raw"' + (fs==='raw'?' selected':'') + '>'+Lx('🌱 種','🌱 Raw')+'</option>' +
+    '<option value="considering"' + (fs==='considering'?' selected':'') + '>'+Lx('🤔 検討中','🤔 Considering')+'</option>' +
+    '<option value="validating"' + (fs==='validating'?' selected':'') + '>'+Lx('🔬 検証中','🔬 Validating')+'</option>' +
+    '<option value="parking"' + (fs==='parking'?' selected':'') + '>'+Lx('🛌 寝かせる','🛌 Parked')+'</option>' +
+    '<option value="promoted"' + (fs==='promoted'?' selected':'') + '>'+Lx('🚀 案件化済','🚀 Promoted')+'</option>' +
+    '<option value="rejected"' + (fs==='rejected'?' selected':'') + '>'+Lx('❌ 却下','❌ Rejected')+'</option>' +
+    '</select>' +
+    '</div>';
 
+  // Counts strip
   html += '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">' +
     ['raw','considering','validating','parking','promoted','rejected'].map(function(s){
       return '<span style="font-size:10px;color:' + statusColor(s) + ';background:var(--surface2);padding:3px 8px;border-radius:4px">' + statusLabel(s) + ' ' + counts[s] + '</span>';
     }).join('') + '</div>';
 
   if(!ideas.length){
-    html += '<div style="color:var(--text-muted);text-align:center;padding:40px">該当するアイデアなし。＋新規アイデア で1行投げ込もう。</div>';
+    html += '<div style="color:var(--text-muted);text-align:center;padding:40px">'+Lx('該当するアイデアなし。＋新規アイデア で1行投げ込もう。','No matching ideas. Capture one with ＋ New Idea.')+'</div>';
   } else {
     html += '<div class="idea-list">' + ideas.map(function(x){
       var dateStr = x.created_at ? new Date(x.created_at).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}) : '';
@@ -1850,7 +2134,7 @@ function renderIdeas(){
         if(x.status !== 'considering') actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'considering\')" title="検討中">🤔</button>';
         if(x.status !== 'validating') actions += '<button class="sb s-prog" onclick="updIdeaStatus(\'' + x.id + '\',\'validating\')" title="検証中（1個実証）">🔬</button>';
         if(x.status !== 'parking') actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'parking\')" title="寝かせる（Ω保持）">🛌</button>';
-        actions += '<button class="sb s-done" onclick="promoteIdea(\'' + x.id + '\')" title="案件化">🚀</button>';
+        actions += '<button class="sb s-done" onclick="promoteIdea(\'' + x.id + '\')" title="案件化（Dealに昇格）">🚀</button>';
         if(x.status !== 'rejected') actions += '<button class="sb" onclick="updIdeaStatus(\'' + x.id + '\',\'rejected\')" title="却下">❌</button>';
       }
       actions += '<button class="sb" style="margin-left:4px;font-size:9px" onclick="delIdea(\'' + x.id + '\')">✕</button>';
@@ -1861,17 +2145,17 @@ function renderIdeas(){
       return '<div class="list-row" style="align-items:center;padding:10px 14px;gap:10px">' +
         '<div style="min-width:50px;text-align:center;font-weight:800;color:' + scoreColor + ';font-size:14px">' + score + '</div>' +
         '<div class="lr-main" style="min-width:0">' +
-          '<div class="lr-title" style="font-size:13px">' + esc(x.title) + linkedNote + '</div>' +
+          '<div class="lr-title" style="font-size:13px">' + x.title + linkedNote + '</div>' +
           '<div class="lr-sub" style="gap:6px;flex-wrap:wrap">' +
             '<span style="color:' + statusColor(x.status) + ';font-size:10px;font-weight:600">' + statusLabel(x.status) + '</span>' +
-            (x.layer ? '<span style="font-size:10px;color:var(--accent-light);background:var(--surface2);padding:1px 6px;border-radius:3px">' + esc(x.layer) + '</span>' : '') +
-            '<span style="font-size:10px;color:var(--text-muted)">HRCP=' + (x.hrcp||3) + ' / 蓋=' + (x.probability||3) + ' / 額=' + esc(x.scale||'?') + ' / 工=' + esc(x.effort||'?') + '</span>' +
-            (x.category ? '<span style="font-size:10px;color:var(--text-muted)">' + esc(x.category) + '</span>' : '') +
-            (x.source ? '<span style="font-size:10px;color:var(--text-muted)">📥 ' + esc(x.source) + '</span>' : '') +
-            (x.created_by ? '<span style="font-size:10px;color:var(--accent-light)">' + esc(x.created_by) + '</span>' : '') +
+            (x.layer ? '<span style="font-size:10px;color:var(--accent-light);background:var(--surface2);padding:1px 6px;border-radius:3px">' + x.layer + '</span>' : '') +
+            '<span style="font-size:10px;color:var(--text-muted)">HRCP=' + (x.hrcp||3) + ' / 蓋=' + (x.probability||3) + ' / 額=' + (x.scale||'?') + ' / 工=' + (x.effort||'?') + '</span>' +
+            (x.category ? '<span style="font-size:10px;color:var(--text-muted)">' + x.category + '</span>' : '') +
+            (x.source ? '<span style="font-size:10px;color:var(--text-muted)">📥 ' + x.source + '</span>' : '') +
+            (x.created_by ? '<span style="font-size:10px;color:var(--accent-light)">' + x.created_by + '</span>' : '') +
             (dateStr ? '<span style="font-size:10px;color:var(--text-muted)">' + dateStr + '</span>' : '') +
           '</div>' +
-          (x.memo ? '<div style="font-size:10px;color:var(--text-muted);margin-top:4px">' + esc(x.memo.substring(0,140)) + (x.memo.length>140?'...':'') + '</div>' : '') +
+          (x.memo ? '<div style="font-size:10px;color:var(--text-muted);margin-top:4px">' + x.memo.substring(0,140) + (x.memo.length>140?'...':'') + '</div>' : '') +
         '</div>' +
         '<div class="ic-btns" style="flex-shrink:0;gap:2px;flex-wrap:wrap">' + actions + '</div>' +
       '</div>';
@@ -1881,15 +2165,11 @@ function renderIdeas(){
   document.getElementById('v-ideas').innerHTML = html;
 }
 
-// score preview realtime
+// score preview を新規アイデア入力中にリアルタイム更新
 ['f-it-hrcp','f-it-prob','f-it-scale','f-it-effort'].forEach(function(id){
   var bind = function(){ var el=document.getElementById(id); if(el){ el.addEventListener('input', updIdeaScorePreview); el.addEventListener('change', updIdeaScorePreview); } };
   if(document.readyState !== 'loading') bind(); else document.addEventListener('DOMContentLoaded', bind);
 });
-
-function toggleSidebar(){var sb=document.getElementById('sidebar');var ov=document.getElementById('sidebar-overlay');if(sb.classList.contains('open')){closeSidebar();}else{sb.classList.add('open');ov.classList.add('show');}}
-function closeSidebar(){var sb=document.getElementById('sidebar');var ov=document.getElementById('sidebar-overlay');sb.classList.remove('open');ov.classList.remove('show');}
-
 function togglePageHelp(){
   var el=document.getElementById('page-help');if(!el)return;
   if(el.classList.contains('show')){el.classList.remove('show');return;}
